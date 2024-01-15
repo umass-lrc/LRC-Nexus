@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "explorer",
     # Local apps
     "core",
+    "users",
 ]
 
 MIDDLEWARE = [
