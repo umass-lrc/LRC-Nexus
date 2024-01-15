@@ -4,3 +4,6 @@ run:
 init_run:
 	python3 -m venv venv
 	. venv/bin/activate && pip install -r requirements.txt
+
+migrate:
+	./nexus/manage.py migrate
