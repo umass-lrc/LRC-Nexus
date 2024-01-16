@@ -1,6 +1,15 @@
 from typing import Any
 from django.db import models
 
+class Day(models.IntegerChoices):
+    SUNDAY = 0, 'Sunday'
+    MONDAY = 1, 'Monday'
+    TUESDAY = 2, 'Tuesday'
+    WEDNESDAY = 3, 'Wednesday'
+    THURSDAY = 4, 'Thursday'
+    FRIDAY = 5, 'Friday'
+    SATURDAY = 6, 'Saturday'
+
 class SemesterManager(models.Manager):
     def get_active_semester(self):
         return self.get_queryset().filter(active=True).first()
@@ -62,7 +71,8 @@ class HolidayManager(models.Manager):
         return self.get_queryset().filter(semester=semester)
     
     def is_holiday(self, date):
-        return self.get_queryset().filter(date=date).exists()
+        active_semester = Semester.objects.get_active_semester()
+        return self.get_queryset().filter(semester=active_semester, date=date).exists()
 
 class Holiday(models.Model):
     semester = models.ForeignKey(
@@ -87,8 +97,33 @@ class DaySwitchManager(models.Manager):
         return self.get_queryset().filter(semester=semester)
     
     def date_to_day(self, date):
-        if self.get_queryset().filter(date=date).exists():
-            return self.get_queryset().get(date=date).day_to_follow
-        return date.weekday()+
+        active_semester = Semester.objects.get_active_semester()
+        if self.get_queryset().filter(semester=active_semester, date=date).exists():
+            return self.get_queryset().get(semester=active_semester,date=date).day_to_follow
+        return (date.weekday()+1)%7
 
 class DaySwitch(models.Model):
+    semester = models.ForeignKey(
+        to=Semester,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        help_text='The semester the day switch occurs in.',
+    )
+    
+    date = models.DateField(
+        null=False,
+        blank=False,
+        help_text='The date of the day switch. This date will act as "day to follow" for recurring shifts.',
+    )
+    
+    day_to_follow = models.PositiveSmallIntegerField(
+        choices=Day.choices,
+        blank=False,
+        null=False,
+    )
+    
+    objects = DaySwitchManager()
+    
+    def __str__(self):
+        return f'{self.date} - {self.day_to_follow_display}'
