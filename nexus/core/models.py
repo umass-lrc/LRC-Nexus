@@ -65,6 +65,9 @@ class Semester(models.Model):
     
     def __str__(self):
         return f'{self.term_display} {self.year}'
+    
+    class Meta:
+        ordering = ['classes_start']
 
 class HolidayManager(models.Manager):
     def get_holidays_for(self, semester):
@@ -91,6 +94,9 @@ class Holiday(models.Model):
 
     def __str__(self):
         return f'{self.date}'
+    
+    class Meta:
+        ordering = ['date']
 
 class DaySwitchManager(models.Manager):
     def get_switches_for(self, semester):
@@ -127,6 +133,9 @@ class DaySwitch(models.Model):
     
     def __str__(self):
         return f'{self.date} - {self.day_to_follow_display}'
+    
+    class Meta:
+        ordering = ['date']
 
 class CourseSubject(models.Model):
     short_name = models.CharField(
@@ -167,6 +176,11 @@ class CourseManager(models.Manager):
         if obj_data['is_cross_listed'] and obj_data['main_course'].is_cross_listed:
             raise ValueError('Main course cannot be cross listed.')
         return super().create(**obj_data)
+    
+    def save(self, **obj_data):
+        if obj_data['is_cross_listed'] and obj_data['main_course'].is_cross_listed:
+            raise ValueError('Main course cannot be cross listed.')
+        return super().save(**obj_data)
 
 class Course(models.Model):
     subject = models.ForeignKey(
@@ -214,6 +228,9 @@ class Course(models.Model):
     
     def long_name(self):
         return f'{self.subject.description} {self.number} - {self.name}'
+    
+    class Meta:
+        ordering = ['subject', 'number']
 
 class Faculty(models.Model):
     first_name = models.CharField(
@@ -240,3 +257,6 @@ class Faculty(models.Model):
     
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
+    class Meta:
+        ordering = ['last_name', 'first_name']
