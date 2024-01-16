@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 class SemesterManager(models.Manager):
     def get_active_semester(self):
         return self.get_queryset().filter(active=True).first()
@@ -14,7 +13,7 @@ class SemesterManager(models.Manager):
         semester.save()
 
 class Semester(models.Model):
-    class Terms(models.TextChoices):
+    class Terms(models.IntegerChoices):
         SPRING = 0, 'Spring'
         SUMMER = 1, 'Summer - University'
         SUMMER_UWW_1 = 2, 'Summer - UWW Session 1'
@@ -51,3 +50,8 @@ class Semester(models.Model):
         blank = False,
         help_text = 'The date classes end for the semester. This information will be use to create recurring shifts for classes.',
     )
+
+    objects = SemesterManager()
+    
+    def __str__(self):
+        return f'{self.term_display} {self.year}'
