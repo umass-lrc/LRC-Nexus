@@ -127,3 +127,88 @@ class DaySwitch(models.Model):
     
     def __str__(self):
         return f'{self.date} - {self.day_to_follow_display}'
+
+class CourseSubject(models.Model):
+    short_name = models.CharField(
+        primary_key=True,
+        unique=True,
+        max_length=10,
+        null=False,
+        blank=False,
+        help_text='The short name of the course subject. For example, "COMPSCI" for Computer Science.',
+    )
+    
+    description = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        help_text='The description of the course subject. For example, "Computer Science".',
+    )
+    
+    class Meta:
+        ordering = ['short_name']
+    
+    def __str__(self):
+        return f'{self.short_name}'
+    
+    def long_name(self):
+        return f'{self.description}'
+
+class CourseManager(models.Manager):
+    def get_cross_listed_courses_for(self, course):
+        return self.get_queryset().filter(is_cross_listed=True, main_course=course).all()
+    
+    def get_main_course_for(self, course):
+        if course.is_cross_listed:
+            return course.main_course
+        return course
+    
+    def create(self, **obj_data):
+        if obj_data['is_cross_listed'] and obj_data['main_course'].is_cross_listed:
+            raise ValueError('Main course cannot be cross listed.')
+        return super().create(**obj_data)
+
+class Course(models.Model):
+    subject = models.ForeignKey(
+        to=CourseSubject,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        help_text='The department the course belongs to.',
+    )
+    
+    number = models.CharField(
+        max_length=10,
+        null=False,
+        blank=False,
+        help_text='The course number.',
+    )
+    
+    name = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        help_text='The name of the course.',
+    )
+    
+    is_cross_listed = models.BooleanField(
+        default=False,
+        help_text='Whether or not the course is cross listed. (Not true for the main course in a cross listed course.)',
+    )
+    
+    main_course = models.ForeignKey(
+        to='self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text='The main course for the cross listed course.',
+    )
+    
+    def __str__(self):
+        return f'{self.subject.short_name} {self.number}'
+    
+    def str_with_name(self):
+        return f'{self.subject.short_name} {self.number} - {self.name}'
+    
+    def long_name(self):
+        return f'{self.subject.description} {self.number} - {self.name}'
