@@ -64,7 +64,7 @@ class Semester(models.Model):
     objects = SemesterManager()
     
     def __str__(self):
-        return f'{self.term_display} {self.year}'
+        return f'{self.term_display()} {self.year}'
     
     class Meta:
         ordering = ['classes_start']
@@ -132,7 +132,7 @@ class DaySwitch(models.Model):
     objects = DaySwitchManager()
     
     def __str__(self):
-        return f'{self.date} - {self.day_to_follow_display}'
+        return f'{self.date} - {self.day_to_follow_display()}'
     
     class Meta:
         ordering = ['date']
@@ -185,7 +185,7 @@ class CourseManager(models.Manager):
 class Course(models.Model):
     subject = models.ForeignKey(
         to=CourseSubject,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         null=False,
         blank=False,
         help_text='The department the course belongs to.',
@@ -212,7 +212,7 @@ class Course(models.Model):
     
     main_course = models.ForeignKey(
         to='self',
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         null=True,
         blank=True,
         help_text='The main course for the cross listed course.',
@@ -260,3 +260,111 @@ class Faculty(models.Model):
 
     class Meta:
         ordering = ['last_name', 'first_name']
+
+class Buildings(models.Model):
+    short_name = models.CharField(
+        primary_key=True,
+        unique=True,
+        max_length=10,
+        null=False,
+        blank=False,
+        help_text='The short name of the building. For example, "LIBR" for Library.',
+    )
+    
+    name = models.CharField(
+        max_length=50,
+        null=False,
+        blank=False,
+        help_text='The name of the building.',
+    )
+    
+    def __str__(self):
+        return f'{self.name}'
+    
+    class Meta:
+        ordering = ['short_name']
+
+class Classes(models.Model):
+    semester = models.ForeignKey(
+        to=Semester,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+        help_text='The semester the class occurs in.',
+    )
+    
+    course = models.ForeignKey(
+        to=Course,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+        help_text='The course the class belongs to.',
+    )
+    
+    faculty = models.ForeignKey(
+        to=Faculty,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+        help_text='The faculty teaching the class.',
+    )
+    
+    def __str__(self):
+        if Classes.objects.filter(semester=self.semester, course=self.course, faculty=self.faculty).count() == 1:
+            return self.short_name()
+        class_time_info = ClassTimes.objects.filter(orignal_class=self).all()
+        class_time_info_str = ''
+        for class_time in class_time_info:
+            class_time_info_str += f'{str(class_time)} '
+        return f'{self.short_name()} [{class_time_info_str}]'
+            
+    
+    def short_name(self):
+        return f'{self.course} - {self.faculty}'
+
+class ClassTimes(models.Model):
+    orignal_class = models.ForeignKey(
+        to=Classes,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        verbose_name='class',
+        help_text='The class the class time belongs to.',
+    )
+    
+    class_day = models.PositiveSmallIntegerField(
+        choices=Day.choices,
+        null=False,
+        blank=False,
+        help_text='The day of the week the class occurs on.',
+    )
+    
+    time = models.TimeField(
+        null=False,
+        blank=False,
+        help_text='The time of the class.',
+    )
+    
+    duration = models.DurationField(
+        null=False,
+        blank=False,
+        help_text='The duration of the class.',
+    )
+    
+    building = models.ForeignKey(
+        to=Buildings,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+        help_text='The building the class occurs in.',
+    )
+    
+    room = models.CharField(
+        max_length=10,
+        null=False,
+        blank=False,
+        help_text='The room the class occurs in.',
+    )
+    
+    def __str__(self):
+        return f'{self.class_day_display()} {self.time.strftime("%I:%M %p")}'
