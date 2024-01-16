@@ -204,6 +204,8 @@ class Course(models.Model):
         help_text='The main course for the cross listed course.',
     )
     
+    objects = CourseManager()
+    
     def __str__(self):
         return f'{self.subject.short_name} {self.number}'
     
@@ -212,3 +214,29 @@ class Course(models.Model):
     
     def long_name(self):
         return f'{self.subject.description} {self.number} - {self.name}'
+
+class Faculty(models.Model):
+    first_name = models.CharField(
+        max_length=50,
+        null=False,
+        blank=False,
+        help_text='The first name of the faculty.',
+    )
+    
+    last_name = models.CharField(
+        max_length=50,
+        null=False,
+        blank=False,
+        help_text='The last name of the faculty.',
+    )
+    
+    email = models.EmailField(
+        unique=True,
+        max_length=254,
+        null=False,
+        blank=False,
+        help_text='The email of the faculty.',
+    )
+    
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
