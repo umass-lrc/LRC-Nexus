@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 
 class SemesterManager(models.Manager):
@@ -55,3 +56,39 @@ class Semester(models.Model):
     
     def __str__(self):
         return f'{self.term_display} {self.year}'
+
+class HolidayManager(models.Manager):
+    def get_holidays_for(self, semester):
+        return self.get_queryset().filter(semester=semester)
+    
+    def is_holiday(self, date):
+        return self.get_queryset().filter(date=date).exists()
+
+class Holiday(models.Model):
+    semester = models.ForeignKey(
+        to=Semester,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        help_text='The semester the holiday occurs in.',
+    )
+    
+    date = models.DateField(
+        null=False,
+        blank=False,
+        help_text='The date of the holiday. All shifts on this date will be cancelled.',
+    )
+
+    def __str__(self):
+        return f'{self.date}'
+
+class DaySwitchManager(models.Manager):
+    def get_switches_for(self, semester):
+        return self.get_queryset().filter(semester=semester)
+    
+    def date_to_day(self, date):
+        if self.get_queryset().filter(date=date).exists():
+            return self.get_queryset().get(date=date).day_to_follow
+        return date.weekday()+
+
+class DaySwitch(models.Model):
