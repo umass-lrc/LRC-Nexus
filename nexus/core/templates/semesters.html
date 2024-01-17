@@ -1,0 +1,61 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">List of Semesters</h1>
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th class="text-center" scope="col">#</th>
+      <th class="text-center" scope="col">Term</th>
+      <th class="text-center" scope="col">Year</th>
+      <th class="text-center" scope="col">Active</th>
+      <th class="text-center" scope="col">View/Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for semester in semesters %}
+    <tr>
+      <th class="text-center" scope="row">{{ forloop.counter }}</th>
+      <td class="text-center">{{ semester.get_term_display }}</td>
+      <td class="text-center">{{ semester.year }}</td>
+      <td class="text-center">
+        <div
+          class="form-check form-switch d-flex align-items-center justify-content-center"
+        >
+          <form
+            id="active-{{ semester.id }}"
+            hx-put="{% url 'change_active_semester' semester.id %}"
+            hx-trigger="change"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          >
+            <!-- prettier-ignore -->
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              name="active"
+              {% if semester.active %}
+              checked
+              {% endif %}
+            />
+          </form>
+        </div>
+      </td>
+      <td class="text-center">
+        <a href="{% url 'semester_details' semester.id %}"
+          ><i class="bi bi-pencil-square"></i
+        ></a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <th scope="row" colspan="5" class="text-center">None.</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
