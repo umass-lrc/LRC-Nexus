@@ -1,0 +1,30 @@
+{% load crispy_forms_tags %}
+
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th class="text-center" scope="col">#</th>
+      <th class="text-center" scope="col">Date</th>
+      <th class="text-center" scope="col">Day</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for holiday in holidays %}
+    <tr>
+      <th class="text-center" scope="row">{{ forloop.counter }}</th>
+      <td class="text-center">{{ holiday.date }}</td>
+      <td class="text-center">{{ holiday.date|date:"l" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <th scope="row" colspan="3" class="text-center">None.</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<form hx-post="{% url post_url sem_id %}" hx-target="#holidays">
+  {% csrf_token %}
+  <!--Form-->
+  {% crispy form %}
+</form>

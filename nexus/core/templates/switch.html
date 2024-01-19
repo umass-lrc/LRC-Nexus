@@ -1,0 +1,20 @@
+{% if old_id != -1 %}
+<div hx-swap-oob="innerHTML:#active-{{old_id}}">
+  <!-- prettier-ignore -->
+  <input
+  class="form-check-input"
+  type="checkbox"
+  role="switch"
+  name="active"
+/>
+</div>
+{% endif %}
+
+<!-- prettier-ignore -->
+<input
+  class="form-check-input"
+  type="checkbox"
+  role="switch"
+  name="active"
+  {% if active %}checked{% endif %}
+/>

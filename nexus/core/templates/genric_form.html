@@ -1,0 +1,17 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">{{title}}</h1>
+<form
+  method="post"
+  action="{% if not post_arg %}{% url post_url %}{% else %}{% url post_url post_arg %}{% endif %}"
+>
+  {% csrf_token %}
+  <!--Form-->
+  {% crispy form %}
+</form>
+{% endblock %}

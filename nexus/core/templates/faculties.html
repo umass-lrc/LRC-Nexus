@@ -1,0 +1,41 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">List of Faculty</h1>
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th class="text-center" scope="col">#</th>
+      <th class="text-center" scope="col">Last Name</th>
+      <th class="text-center" scope="col">First Name</th>
+      <th class="text-center" scope="col">Email</th>
+      <th class="text-center" scope="col">View/Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for faculty in faculties %}
+    <tr>
+      <th class="text-center" scope="row">{{ forloop.counter }}</th>
+      <td class="text-center">{{ faculty.last_name }}</td>
+      <td class="text-center">{{ faculty.first_name }}</td>
+      <td class="text-center">
+        <a href="mailto:{{faculty.email}}">{{ faculty.email }}</a>
+      </td>
+      <td class="text-center">
+        <a href="{% url 'edit_faculty' faculty.id %}"
+          ><i class="bi bi-pencil-square"></i
+        ></a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <th scope="row" colspan="5" class="text-center">None.</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
