@@ -1,0 +1,37 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">List of Courses</h1>
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th class="text-center" scope="col">#</th>
+      <th class="text-center" scope="col">Subject</th>
+      <th class="text-center" scope="col">Number</th>
+      <th class="text-center" scope="col">Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in courses %}
+    <tr>
+      <th class="text-center" scope="row">{{ forloop.counter }}</th>
+      <td class="text-center">{{ course.subject }}</td>
+      <td class="text-center">{{ course.number }}</td>
+      <td class="text-center">
+        <a href="{% url 'edit_course' course.number %}"
+          ><i class="bi bi-pencil-square"></i
+        ></a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <th scope="row" colspan="4" class="text-center">None.</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

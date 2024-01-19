@@ -275,6 +275,7 @@ class Buildings(models.Model):
         max_length=50,
         null=False,
         blank=False,
+        unique=True,
         help_text='The name of the building.',
     )
     

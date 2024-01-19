@@ -4,33 +4,31 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
 
 from ..models import (
-    Faculty,
+    Buildings,
 )
 
-class FacultyForm(forms.ModelForm):
+class BuildingsForm(forms.ModelForm):
     class Meta:
-        model = Faculty
+        model = Buildings
         fields = (
-            'first_name',
-            'last_name',
-            'email',
+            'short_name',
+            'name',
         )
     
     def __init__(self, *args, button=None, **kwargs):
-        super(FacultyForm, self).__init__(*args, **kwargs)
+        super(BuildingsForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
             Fieldset(
                 '',
                 Div(
-                    Div('first_name', css_class='col-md-6'),
-                    Div('last_name', css_class='col-md-6'),
+                    Div('short_name', css_class='col-md-6'),
+                    Div('name', css_class='col-md-6'),
                     css_class='row',
                 ),
-                'email',
             ),
             Div(
-                Submit('submit', 'Add Faculty' if button is None else button, css_class='btn btn-primary'),
+                Submit('submit', 'Add Building' if button is None else button, css_class='btn btn-primary'),
                 css_class='text-center',
             ),
         )

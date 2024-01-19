@@ -17,6 +17,18 @@ from .views.faculty import (
     edit_faculty,
 )
 
+from .views.building import (
+    create_building,
+    list_buildings,
+    edit_building,
+)
+
+from .views.course import (
+    create_course,
+    list_courses,
+    edit_course,
+)
+
 SEMESTER_URLS = [
     path('semester/create/', create_semester, name='create_semester'),
     path('semester/details/<int:semester_id>/', semester_details, name='semester_details'),
@@ -35,11 +47,15 @@ FACULTY_URLS = [
 ]
 
 BUILDING_URLS = [
-
+    path('building/create/', create_building, name='create_building'),
+    path('building/list/', list_buildings, name='list_buildings'),
+    path('building/edit/<str:building_short_name>/', edit_building, name='edit_building'),
 ]
 
 COURSE_URLS = [
-
+    path('course/create/', create_course, name='create_course'),
+    path('course/list/', list_courses, name='list_courses'),
+    path('course/edit/<int:course_id>/', edit_course, name='edit_course'),
 ]
 
 CLASSES_URLS = [
