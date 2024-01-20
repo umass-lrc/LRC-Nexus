@@ -74,7 +74,10 @@ ROOT_URLCONF = "nexus.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR.joinpath("core", "templates")],
+        "DIRS": [
+            BASE_DIR.joinpath("core", "templates"),
+            BASE_DIR.joinpath("users", "templates"),
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -101,6 +104,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = "users.NexusUser"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
