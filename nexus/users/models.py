@@ -39,8 +39,8 @@ class NexusUserManager(BaseUserManager):
 class NexusUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True, blank=False, null=False)
-    first_name = models.CharField(max_length=255, blank=False, null=False)
-    last_name = models.CharField(max_length=255, blank=False, null=False)
+    first_name = models.CharField(max_length=100, blank=False, null=False)
+    last_name = models.CharField(max_length=100, blank=False, null=False)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
@@ -49,3 +49,6 @@ class NexusUser(AbstractUser):
     
     def __str__(self):
         return f"{self.last_name} {self.first_name}"
+    
+    class Meta(AbstractUser.Meta):
+        ordering = ['last_name', 'first_name', 'email']

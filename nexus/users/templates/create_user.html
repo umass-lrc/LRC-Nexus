@@ -1,0 +1,48 @@
+{% load crispy_forms_tags %} {% if success %}
+<tr hx-swap-oob="beforeend:#users_body">
+  <td class="text-center">{{ new_user.last_name }}</td>
+  <td class="text-center">{{ new_user.first_name }}</td>
+  <td class="text-center">{{ new_user.email }}</td>
+  <td class="text-center">
+    {% if new_user.has_usable_password %}
+    <a
+      href=""
+      hx-get="{% url 'reset_password' new_user.id %}"
+      hx-target="#ut-{{new_user.id}}"
+      hx-swap="outerHTML"
+      hx-trigger="click"
+      ><i class="bi bi-lock-fill"></i
+    ></a>
+    {% else %}
+    <i class="bi bi-unlock-fill"></i>
+    {% endif %}
+  </td>
+  <td class="text-center">
+    <a href="" hx-get="" hx-target=""><i class="bi bi-pencil-square"></i></a>
+  </td>
+</tr>
+
+<div id="create_user_form_message">{% include 'alerts.html' %}</div>
+<form
+  hx-post="{% url 'create_user' %}"
+  hx-target="#create-user-form"
+  hx-target-202="#create_user_form_message"
+>
+  {% csrf_token %}
+  <!--Form-->
+  {% crispy form %}
+</form>
+{% else %}
+<div id="create-user-form" hx-ext="response-targets">
+  <div id="create_user_form_message"></div>
+  <form
+    hx-post="{% url 'create_user' %}"
+    hx-target="#create-user-form"
+    hx-target-202="#create_user_form_message"
+  >
+    {% csrf_token %}
+    <!--Form-->
+    {% crispy form %}
+  </form>
+</div>
+{% endif %}

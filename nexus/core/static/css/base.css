@@ -11,3 +11,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.tableFixHead {
+    overflow-y: auto;
+    height: 100px;
+}
