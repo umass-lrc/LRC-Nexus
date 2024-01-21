@@ -1,0 +1,28 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<div class="custom-center-screen bg-light p-3 rounded border border-primary">
+  <h1 class="text-center">Log In Form</h1>
+  <hr />
+  <div id="login_form_message"></div>
+  <form
+    hx-post="{% url 'login' %}{% if next is not None %}?next={{next}}{% endif %}"
+    hx-target="#login_form_message"
+  >
+    {% csrf_token %}
+    <!--Form-->
+    {% crispy form %}
+  </form>
+  <hr />
+  <p class="text-center"><b>or</b></p>
+  <p class="text-justify text-center">
+    Please reach out to LRC if you do not possess the necessary login details or
+    if you have forgotten your password.
+  </p>
+</div>
+
+{% endblock %}

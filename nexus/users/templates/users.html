@@ -1,0 +1,110 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Users</h1>
+<hr />
+<h3 class="text-center">List of Users</h3>
+<table class="table" id="users">
+  <thead class="thead-dark sticky-top">
+    <tr>
+      <th class="text-center" scope="col">#</th>
+      <th class="text-center" scope="col">Last Name</th>
+      <th class="text-center" scope="col">First Name</th>
+      <th class="text-center" scope="col">Email</th>
+      <th class="text-center" scope="col">Reset Password</th>
+      <th class="text-center" scope="col">Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for curr_user in users %} {% for i in "x"|rjust:"100" %}
+    <tr>
+      <th class="text-center" scope="row">{{ forloop.counter }}</th>
+      <td class="text-center">{{ curr_user.last_name }}</td>
+      <td class="text-center">{{ curr_user.first_name }}</td>
+      <td class="text-center">{{ curr_user.email }}</td>
+      <td class="text-center">
+        <a href=""><i class="bi bi-unlock-fill"></i></a>
+      </td>
+      <td class="text-center">
+        <a href=""><i class="bi bi-pencil-square"></i></a>
+      </td>
+    </tr>
+    {% endfor %} {% empty %}
+    <tr>
+      <th scope="row" colspan="4" class="text-center">None.</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="container accordion accordion-flush fixed-bottom">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="flush-headingOne">
+      <button
+        class="accordion-button collapsed d-block text-center"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#flush-collapseOne"
+        aria-expanded="false"
+        aria-controls="flush-collapseOne"
+      >
+        <h3>Edit User</h3>
+      </button>
+    </h2>
+    <div
+      id="flush-collapseOne"
+      class="accordion-collapse collapse"
+      aria-labelledby="flush-headingOne"
+      data-bs-parent="#accordionFlushExample"
+    >
+      <div class="accordion-body">
+        Placeholder content for this accordion, which is intended to demonstrate
+        the <code>.accordion-flush</code> class. This is the first item's
+        accordion body.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="flush-headingTwo">
+      <button
+        class="accordion-button collapsed d-block text-center"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#flush-collapseTwo"
+        aria-expanded="false"
+        aria-controls="flush-collapseTwo"
+      >
+        <h3>Create User</h3>
+      </button>
+    </h2>
+    <div
+      id="flush-collapseTwo"
+      class="accordion-collapse collapse"
+      aria-labelledby="flush-headingTwo"
+      data-bs-parent="#accordionFlushExample"
+    >
+      <div class="accordion-body">
+        Placeholder content for this accordion, which is intended to demonstrate
+        the <code>.accordion-flush</code> class. This is the second item's
+        accordion body. Let's imagine this being filled with some actual
+        content.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+<!--Extra Scripts-->
+{% block extra_scripts %}
+<script>
+  new DataTable("#users", {
+    paging: false,
+  });
+  let navbar_height = document.getElementById("menuHolder").offsetHeight;
+  let table_head = document.querySelector("#users > thead");
+  table_head.style.top = navbar_height + "px";
+</script>
+{% endblock%}
