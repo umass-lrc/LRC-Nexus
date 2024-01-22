@@ -18,6 +18,12 @@ from .views.positions import (
     get_all_positions,
     add_position,
 )
+from .views.groups import (
+    groups,
+    create_group,
+    create_group_form,
+    delete_group,
+)
 
 
 AUTH_URLS = [
@@ -43,8 +49,16 @@ POSITION_URLS = [
     path('positions/add_position/<int:semester_id>/<int:position_id>/', add_position, name='add_position'),
 ]
 
+GROUP_URLS = [
+    path('groups/', groups, name='groups'),
+    path('groups/create/', create_group, name='create_group'),
+    path('groups/create_form/', create_group_form, name='create_group_form'),
+    path('groups/delete/<int:group_id>/', delete_group, name='delete_group'),
+]
+
 urlpatterns = (
     AUTH_URLS +
     USER_URLS +
-    POSITION_URLS
+    POSITION_URLS +
+    GROUP_URLS
 )

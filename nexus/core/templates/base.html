@@ -41,7 +41,10 @@
     <!--Extra Head-->
     {% block extra_head %} {% endblock %}
   </head>
-  <body hx-ext="response-targets,multi-swap">
+  <body
+    hx-ext="response-targets,multi-swap"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+  >
     {% include "includes/navbar.html" %}
 
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">

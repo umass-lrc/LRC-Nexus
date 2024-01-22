@@ -105,3 +105,32 @@ class Positions(models.Model):
     
     def __str__(self):
         return f"{self.user} - {self.get_position_display()} - {self.semester}"
+
+class PositionGroups(models.Model):
+    semester = models.ForeignKey(
+        to=Semester, 
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        help_text='The semester group is for.',
+    )
+    
+    name = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        help_text='Name of the group.',
+    )
+    
+    members = models.ManyToManyField(
+        to=Positions,
+        related_name='groups',
+        help_text='Members of the group.',
+    )
+    
+    class Meta:
+        ordering = ['semester', 'name']
+        unique_together = ['semester', 'name']
+    
+    def __str__(self):
+        return self.name

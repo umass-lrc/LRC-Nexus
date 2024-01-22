@@ -7,25 +7,35 @@
 {% block content %}
 <h1 class="text-center">Manage Groups</h1>
 <hr />
-<h3 class="text-center">List of Positions</h3>
-<div id="positions_form_message"></div>
-{% crispy form %}
+<h3 class="text-center">List of Groups</h3>
 
 <div class="table-responsive">
   <table class="table" id="users">
     <thead>
       <tr>
-        <th class="text-center" scope="col">Last Name</th>
-        <th class="text-center" scope="col">First Name</th>
-        <th class="text-center" scope="col">Email</th>
-        <th class="text-center" scope="col">Hourly Pay</th>
+        <th class="text-center" scope="col">Group Name</th>
+        <th class="text-center" scope="col"># Active Positions</th>
+        <th class="text-center" scope="col">Edit</th>
         <th class="text-center" scope="col">Delete</th>
       </tr>
     </thead>
-    <tbody id="positions-body">
-      <tr>
-        <th scope="row" colspan="5" class="text-center">None.</th>
+    <tbody id="groups-body">
+      {% for pg in pgs %}
+      <tr id="gt-{{pg.id}}">
+        <td class="text-center">{{ pg.name }}</td>
+        <td class="text-center">{{ pg.count }}</td>
+        <td class="text-center"><i class="bi bi-pencil-square"></i></td>
+        <td class="text-center">
+          <a href="" hx-delete="{% url 'delete_group' pg.id %}"
+            ><i class="bi bi-trash3-fill"></i
+          ></a>
+        </td>
       </tr>
+      {% empty %}
+      <tr>
+        <th scope="row" colspan="4" class="text-center">None.</th>
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
@@ -41,7 +51,7 @@
       aria-controls="flush-collapseOne"
       id="flush-collapseOne-button"
     >
-      <h3>Add Position</h3>
+      <h3>Add Group</h3>
     </button>
   </h2>
   <div
@@ -51,13 +61,17 @@
     data-bs-parent="#accordionFlushExample"
   >
     <div class="accordion-body">
-      <div id="add-position-message"></div>
-      <div id="add-position-form">First Search For Semester and Position.</div>
+      <div id="add-group-message"></div>
+      <div id="add-group-form">{% crispy form %}</div>
     </div>
   </div>
 </div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  document.body.addEventListener("deleteGroup", function (event) {
+    let group_id = event.detail.value;
+    let group_row = document.getElementById(group_id);
+    group_row.remove();
+  });
+</script>
 {% endblock %}
-<!--Extra Scripts-->
-{% block extra_scripts %}
-<script></script>
-{% endblock%}
