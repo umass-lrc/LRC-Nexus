@@ -5,6 +5,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="htmx-config" content='{"useTemplateFragments":"true"}' />
     <title>LRC Nexus</title>
     <link
       rel="shortcut icon"
@@ -40,7 +41,7 @@
     <!--Extra Head-->
     {% block extra_head %} {% endblock %}
   </head>
-  <body>
+  <body hx-ext="response-targets,multi-swap">
     {% include "includes/navbar.html" %}
 
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
@@ -150,6 +151,7 @@
     <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
     <script src="{% static 'js/ResizeSensor.js'%}"></script>
     <script src="{% static 'js/ElementQueries.js'%}"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
     <script>
       let navbar = document.getElementById("menuHolder");
       function stickyTableHeader() {

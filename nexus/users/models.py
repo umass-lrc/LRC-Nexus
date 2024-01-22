@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 
+from core.models import (
+    Semester,
+)
+
 class NexusUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         if not email:
@@ -52,3 +56,52 @@ class NexusUser(AbstractUser):
     
     class Meta(AbstractUser.Meta):
         ordering = ['last_name', 'first_name', 'email']
+        
+class PositionChoices(models.IntegerChoices):
+    TECH = 0, 'Tech'
+    SI = 1, 'SI'
+    Tutor = 2, 'Tutor'
+    SI_PM = 3, 'SI PM'
+    Tutor_PM = 4, 'Tutor PM'
+    GROUP_TUTOR = 5, 'Group Tutor'
+    OURS_MENTOR = 6, 'OURS Mentor'
+    OFFICE_ASSISTANT = 7, 'Office Assistant'
+    
+
+class Positions(models.Model):
+    semester = models.ForeignKey(
+        to=Semester, 
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+        help_text='The semester position is for.',
+    )
+    
+    user = models.ForeignKey(
+        to=NexusUser, 
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+        help_text='User position is for.',
+    )
+    
+    position = models.PositiveSmallIntegerField(
+        choices=PositionChoices.choices,
+        null=False,
+        blank=False,
+        help_text='The position the user has.',
+    )
+    
+    hourly_pay = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0.00,
+        help_text='Hourly pay for the position.',
+    )
+    
+    class Meta:
+        ordering = ['semester', 'user__last_name', 'user__first_name', 'user__email', 'position']
+        unique_together = ['semester', 'user', 'position']
+    
+    def __str__(self):
+        return f"{self.user} - {self.get_position_display()} - {self.semester}"

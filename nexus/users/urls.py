@@ -10,7 +10,15 @@ from .views.users import (
     update_user,
     reset_password,
     get_user_row,
+    user_created,
+    update_user_form,
 )
+from .views.positions import (
+    positions,
+    get_all_positions,
+    add_position,
+)
+
 
 AUTH_URLS = [
     path('login/', login, name='login'),
@@ -24,9 +32,19 @@ USER_URLS = [
     path('users/update/<int:user_id>/', update_user, name='update_user'),
     path('users/reset_password/<int:user_id>/', reset_password, name='reset_password'),
     path('users/get_user_row/<int:user_id>/', get_user_row, name='get_user_row'),
+    path('users/user_created/<int:user_id>/', user_created, name='user_created'),
+    path('users/update_user_form/<int:user_id>/', update_user_form, name='update_user_form'),
+]
+
+POSITION_URLS = [
+    path('positions/', positions, name='positions'),
+    path('positions/<int:semester_id>/<int:position>/', get_all_positions, name='get_all_positions'),
+    path('positions/add_position_default/', add_position, name='add_position_default'),
+    path('positions/add_position/<int:semester_id>/<int:position_id>/', add_position, name='add_position'),
 ]
 
 urlpatterns = (
     AUTH_URLS +
-    USER_URLS
+    USER_URLS +
+    POSITION_URLS
 )

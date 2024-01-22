@@ -17,6 +17,12 @@
     {% endif %}
   </td>
   <td class="text-center">
-    <a href="" hx-get="" hx-target=""><i class="bi bi-pencil-square"></i></a>
+    <a
+      href=""
+      hx-get="{% url 'update_user' curr_user.id %}"
+      hx-trigger="click"
+      hx-swap="multi:#ut-{{curr_user.id}}:outerHTML,#update_user_form:outerHTML"
+      ><i class="bi bi-pencil-square"></i
+    ></a>
   </td>
 </tr>

@@ -1,0 +1,20 @@
+<tbody id="positions-body">
+  {% for position in positions %}
+
+  <tr>
+    <td class="text-center">{{ position.user.last_name }}</td>
+    <td class="text-center">{{ position.user.first_name }}</td>
+    <td class="text-center">{{ position.user.email }}</td>
+    <td class="text-center">{{ position.hourly_pay }}</td>
+    <td class="text-center">
+      <a href="" hx-get="" hx-trigger="click" hx-swap=""
+        ><i class="bi bi-trash3-fill"></i
+      ></a>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <th colspan="5" class="text-center">No positions found</th>
+  </tr>
+  {% endfor %}
+</tbody>

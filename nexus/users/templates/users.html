@@ -46,6 +46,7 @@
       data-bs-target="#flush-collapseOne"
       aria-expanded="false"
       aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
     >
       <h3>Edit User</h3>
     </button>
@@ -57,7 +58,13 @@
     data-bs-parent="#accordionFlushExample"
   >
     <div class="accordion-body" id="edit-user-form">
-      Please go to the user row you want to edit and click the edit button.
+      <p class="text-center">
+        Please go to the user row you want to edit and click the edit button.
+      </p>
+      <div>
+        <div id="update_user_form_message"></div>
+        <div id="update_user_form"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -81,15 +88,45 @@
     data-bs-parent="#accordionFlushExample"
   >
     <div class="accordion-body">
-      <div
-        hx-get="{% url 'create_user' %}"
-        hx-target="this"
-        hx-swap="outerHTML"
-        hx-trigger="intersect once"
-      ></div>
+      <div id="create-user-form">
+        <div id="create_user_form_message"></div>
+        <div
+          hx-get="{% url 'create_user' %}"
+          hx-target="this"
+          hx-swap="outerHTML"
+          hx-trigger="intersect once"
+        ></div>
+      </div>
     </div>
   </div>
 </div>
 {% endblock %}
 <!--Extra Scripts-->
-{% block extra_scripts %} {% endblock%}
+{% block extra_scripts %}
+<script>
+  let last_created = null;
+  let last_updated_id = null;
+  document.body.addEventListener("userCreated", function (e) {
+    let elem_id = e.detail.value;
+    let user_row = document.getElementById(elem_id);
+    last_created = user_row;
+  });
+  document.body.addEventListener("userFormRefreshed", function (e) {
+    if (last_created) {
+      last_created.scrollIntoView();
+    }
+  });
+  document.body.addEventListener("userUpdateClicked", function (e) {
+    if (last_updated_id) {
+      last_updated = document.getElementById(last_updated_id);
+      last_updated.classList.remove("curr-update");
+    }
+    last_updated_id = e.detail.value;
+    let accordion = document.getElementById("flush-collapseOne");
+    if (!accordion.classList.contains("show")) {
+      document.getElementById("flush-collapseOne-button").click();
+    }
+    document.getElementById("update_user_form_message").innerHTML = "";
+  });
+</script>
+{% endblock%}

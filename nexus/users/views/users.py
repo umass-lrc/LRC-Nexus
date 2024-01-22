@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from core.views import restrict_to_http_methods
-from django.db.models import Value
-from django.db.models.functions import Concat
+
+import json
 
 from ..models import (
     NexusUser,
@@ -12,6 +12,7 @@ from ..models import (
 
 from ..forms.users import (
     CreateUserForm,
+    UpdateUserForm,
 )
 
 @login_required
@@ -28,7 +29,7 @@ def create_user(request):
         form = CreateUserForm(request.POST)
         if not form.is_valid():
             messages.error(request, f'Form Errors: {form.errors}')
-            return render(request, 'alerts.html', status=202)
+            return render(request, 'alerts.html')
         data = form.cleaned_data
         data['first_name'] = data['first_name'].title()
         data['last_name'] = data['last_name'].title()
@@ -37,17 +38,53 @@ def create_user(request):
         user.set_unusable_password()
         user.save()
         form = CreateUserForm()
-        context = {'form': form, 'success': True, 'new_user': user}
+        context = {'success': True, 'new_user_id': user.id, 'type': 'create'}
         messages.success(request, 'User created successfully.')
         return render(request, 'create_user.html', context)
     form = CreateUserForm()
     context = {'form': form, 'success': False}
-    return render(request, 'create_user.html', context)
+    response = render(request, 'create_user.html', context)
+    response["HX-Trigger-After-Settle"] = "userFormRefreshed"
+    return response
+
+@login_required
+@restrict_to_http_methods('GET')
+def user_created(request, user_id):
+    form = CreateUserForm()
+    user = NexusUser.objects.get(id=user_id)
+    context = {'new_user': user, 'form': form, 'success': True, 'type': 'after_create'}
+    response = render(request, 'create_user.html', context)
+    response["HX-Trigger-After-Settle"] = json.dumps({"userCreated": f"ut-{user.id}"})
+    return response
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
 def update_user(request, user_id):
-    pass
+    user = NexusUser.objects.get(id=user_id)
+    if request.method == 'POST':
+        form = UpdateUserForm(request.POST, instance=user)
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'alerts.html')
+        data = form.cleaned_data
+        user.first_name = data['first_name'].title()
+        user.last_name = data['last_name'].title()
+        user.save()
+        messages.success(request, 'User updated successfully.')
+        context = {'success': True, 'curr_user': user}
+        return render(request, 'update_user.html', context)
+    context = {'success':False, 'curr_user': user}
+    response = render(request, 'update_user.html', context)
+    response["HX-Trigger-After-Settle"] = json.dumps({"userUpdateClicked": f"ut-{user.id}"})
+    return response
+
+@login_required
+@restrict_to_http_methods('GET')
+def update_user_form(request, user_id):
+    user = NexusUser.objects.get(id=user_id)
+    form = UpdateUserForm(instance=user)
+    context = {'form': form}
+    return render(request, 'just_form.html', context)
 
 @login_required
 @restrict_to_http_methods('GET')
@@ -59,7 +96,9 @@ def get_user_row(request, user_id):
 @login_required
 @restrict_to_http_methods('GET')
 def reset_password(request, user_id):
+    loged_in_user = request.user
     user = NexusUser.objects.get(id=user_id)
-    user.set_unusable_password()
-    user.save()
+    if user.id != loged_in_user.id:
+        user.set_unusable_password()
+        user.save()
     return redirect('get_user_row', user_id=user_id)
