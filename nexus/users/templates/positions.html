@@ -1,0 +1,69 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Positions</h1>
+<hr />
+<h3 class="text-center">List of Positions</h3>
+<div id="positions_form_message"></div>
+{% crispy form %}
+
+<div class="table-responsive">
+  <table class="table" id="users">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Last Name</th>
+        <th class="text-center" scope="col">First Name</th>
+        <th class="text-center" scope="col">Email</th>
+        <th class="text-center" scope="col">Hourly Pay</th>
+        <th class="text-center" scope="col">Delete</th>
+      </tr>
+    </thead>
+    <tbody id="positions-body">
+      <tr>
+        <th scope="row" colspan="5" class="text-center">None.</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Add Position</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <div id="add-position-message"></div>
+      <div id="add-position-form">First Search For Semester and Position.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+<!--Extra Scripts-->
+{% block extra_scripts %}
+<script>
+  document.body.addEventListener("deletePosition", function (event) {
+    let position_id = event.detail.value;
+    let position_row = document.getElementById(position_id);
+    position_row.remove();
+  });
+</script>
+{% endblock %}

@@ -15,10 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.shortcuts import render
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def index(request):
+    return render(request, "base.html")
 
 urlpatterns = [
+    path("", index, name="index"),
     path('admin/', admin.site.urls),
     path('explorer/', include('explorer.urls')),
     path('core/', include('core.urls')),
+    path('users/', include('users.urls')),
 ]

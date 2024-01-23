@@ -1,0 +1,27 @@
+{% if success %}
+<tbody id="groups-body">
+  <tr class="new-add" id="gt-{{pg.id}}">
+    <td class="text-center">{{ pg.name }}</td>
+    <td class="text-center">{{ pg.count }}</td>
+    <td class="text-center"><i class="bi bi-pencil-square"></i></td>
+    <td class="text-center">
+      <a href="" hx-delete="{% url 'delete_group' pg.id %}"
+        ><i class="bi bi-trash3-fill"></i
+      ></a>
+    </td>
+  </tr>
+</tbody>
+{% endif %}
+
+<div id="add-group-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="add-group-form">
+  <div
+    hx-get="{% url 'create_group_form' %}"
+    hx-target="this"
+    hx-trigger="load"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}

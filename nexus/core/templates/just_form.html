@@ -1,11 +1,1 @@
-<!--So forms look good-->
-{% load crispy_forms_tags %}
-
-<!--Content of the page-->
-{% block content %}
-<form method="post" action="{% url post_url %}">
-  {% csrf_token %}
-  <!--Form-->
-  {% crispy form %}
-</form>
-{% endblock %}
+{% load crispy_forms_tags %}{% crispy form %}

@@ -64,7 +64,7 @@ class Semester(models.Model):
     objects = SemesterManager()
     
     def __str__(self):
-        return f'{self.term_display()} {self.year}'
+        return f'{self.get_term_display()} {self.year}'
     
     class Meta:
         ordering = ['classes_start']
