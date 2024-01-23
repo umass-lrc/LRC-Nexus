@@ -1,7 +1,7 @@
 var menuHolder = document.getElementById('menuHolder')
 function menuToggle(){
-    if(menuHolder.className === "drawMenu") menuHolder.className = ""
-    else menuHolder.className = "drawMenu"
+    if(menuHolder.className === "drawMenu sticky-top") menuHolder.className = "sticky-top"
+    else menuHolder.className = "drawMenu sticky-top"
 }
 
 document.addEventListener("DOMContentLoaded", function(){

@@ -5,6 +5,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="htmx-config" content='{"useTemplateFragments":"true"}' />
     <title>LRC Nexus</title>
     <link
       rel="shortcut icon"
@@ -21,6 +22,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"
+    />
     <!--Font Awesome-->
     <link
       rel="stylesheet"
@@ -36,7 +41,10 @@
     <!--Extra Head-->
     {% block extra_head %} {% endblock %}
   </head>
-  <body>
+  <body
+    hx-ext="response-targets,multi-swap"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+  >
     {% include "includes/navbar.html" %}
 
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
@@ -58,7 +66,7 @@
     </svg>
 
     <!--Content-->
-    <div class="container mt-2" id="main-container">
+    <div class="container mt-2 mb-2" id="main-container">
       {% for message in messages %}
       <div
         class="d-flex align-items-center alert {% if message.level_tag %} alert-{{ message.level_tag }} {% endif %} {{ message.extra_tags }}"
@@ -114,6 +122,21 @@
       {% endblock %}
     </div>
 
+    <div
+      class="container accordion accordion-flush fixed-bottom"
+      id="bottomStick"
+    >
+      {% block bottom %} {% endblock %}
+    </div>
+
+    <script
+      type="text/javascript"
+      src="{% static 'admin/js/vendor/jquery/jquery.js' %}"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{% static 'admin/js/vendor/jquery/jquery.js' %}"
+    ></script>
     <!--HTMX-->
     <script
       src="https://unpkg.com/htmx.org@1.9.10"
@@ -134,5 +157,46 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
+    <script src="{% static 'js/ResizeSensor.js'%}"></script>
+    <script src="{% static 'js/ElementQueries.js'%}"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
+    <link
+      href="/static/admin/css/autocomplete.css"
+      media="screen"
+      rel="stylesheet"
+    />
+    <link
+      href="/static/autocomplete_light/select2.css"
+      media="screen"
+      rel="stylesheet"
+    />
+    <script src="/static/admin/js/vendor/select2/select2.full.js"></script>
+    <script src="/static/autocomplete_light/autocomplete_light.js"></script>
+    <script src="/static/autocomplete_light/select2.js"></script>
+    <script src="/static/autocomplete_light/i18n/en.js"></script>
+    <script>
+      let navbar = document.getElementById("menuHolder");
+      function stickyTableHeader() {
+        let table_heads = document.querySelectorAll(".stickyHeader");
+        for (let table_head of table_heads) {
+          table_head.style.top = navbar.offsetHeight + "px";
+        }
+      }
+      stickyTableHeader();
+      new ResizeSensor(navbar, stickyTableHeader);
+      navbar.style.position = "sticky";
+
+      let bottom_stick = document.getElementById("bottomStick");
+      let main_container = document.getElementById("main-container");
+      main_container.style.paddingBottom = bottom_stick.offsetHeight + "px";
+      new ResizeSensor(bottom_stick, function () {
+        main_container.style.paddingBottom = bottom_stick.offsetHeight + "px";
+      });
+    </script>
+    <!--Extra Scripts-->
+    {% block extra_scripts %} {% endblock %}
   </body>
 </html>

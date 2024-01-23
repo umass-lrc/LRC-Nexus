@@ -9,12 +9,8 @@
   </div>
 </div>
 {% endcomment %}
-<div id="menuHolder">
-  <div
-    role="navigation"
-    class="sticky-top border-bottom border-top"
-    id="mainNavigation"
-  >
+<div class="sticky-top" id="menuHolder">
+  <div role="navigation" class="border-bottom border-top" id="mainNavigation">
     <div class="flexMain">
       <div class="flex2">
         <button
@@ -28,16 +24,31 @@
       <div class="flex3 text-center" id="siteBrand">
         <img src="{% static 'img/light-logo.svg' %}" style="height: 2em" />
       </div>
-
-      <div class="flex2 text-end d-block d-md-none">
-        <button class="whiteLink siteLink">
-          <i class="fas fa-search"></i>
+      {% if user.is_authenticated %}
+      <div class="flex2 text-end d-none d-md-block">
+        <button
+          class="whiteLink siteLink"
+          onclick="window.location.href='{% url 'logout' %}'"
+        >
+          Hi, {{ user.first_name }}!
+        </button>
+        <button
+          class="blackLink siteLink"
+          onclick="window.location.href='{% url 'logout' %}'"
+        >
+          Logout
         </button>
       </div>
-
+      {% else %}
       <div class="flex2 text-end d-none d-md-block">
-        <button class="blackLink siteLink">Login</button>
+        <button
+          class="blackLink siteLink"
+          onclick="window.location.href='{% url 'login' %}'"
+        >
+          Login
+        </button>
       </div>
+      {% endif %}
     </div>
   </div>
 
@@ -56,34 +67,182 @@
       <ul class="sidebar nav flex-column" id="nav_accordion">
         <li class="nav-item has-submenu">
           <a class="nav-link nav-menu-item" href="#"
-            ><i class="fas fa-home me-3"></i>Home</a
+            ><i class="bi bi-activity me-3"></i>Core</a
           >
           <ul class="submenu collapse">
             <li>
-              <a class="nav-link nav-menu-item" href="#">Submenu item 1 </a>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Semesters</a
+              >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="#">Submenu item 2 </a>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Courses</a
+              >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="#">Submenu item 3 </a>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Faculties</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Classes</a
+              >
             </li>
           </ul>
         </li>
-        <li class="nav-item">
-          <a class="nav-menu-item" href="#"
-            ><i class="fab fa-product-hunt me-3"></i>Products</a
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-people-fill me-3"></i>Staff</a
           >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Users</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Positions</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Groups</a
+              >
+            </li>
+          </ul>
         </li>
-        <li class="nav-item">
-          <a class="nav-menu-item" href="#"
-            ><i class="fas fa-search me-3"></i>Explore</a
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-calendar-week-fill me-3"></i>Shift</a
           >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Single Shift</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Recurring Shift</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Bulk Shift</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Meeeting</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Schedule</a
+              >
+            </li>
+          </ul>
         </li>
-        <li class="nav-item">
-          <a class="nav-menu-item" href="#"
-            ><i class="fas fa-wrench me-3"></i>Services</a
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-wallet-fill me-3"></i>Payroll</a
           >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Weekly View</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Not Signed</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Student Report</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-search me-3"></i>OURS</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Faculties</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Opportunities</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Search</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-house-heart-fill me-3"></i>SI</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Schedule</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Shift Requests</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Observation</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Student Report</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-heart-pulse-fill me-3"></i>Tutoring</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Schedule</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Shift Request</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Observation</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Student Report</a
+              >
+            </li>
+          </ul>
         </li>
       </ul>
     </div>

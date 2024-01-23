@@ -1,0 +1,35 @@
+<div>
+  {% for message in messages %}
+  <div
+    class="d-flex align-items-center alert {% if message.level_tag %} alert-{{ message.level_tag }} {% endif %} {{ message.extra_tags }}"
+    role="alert"
+  >
+    {% if message.level_tag == 'primary' %}
+    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:">
+      <use xlink:href="#info-fill" />
+    </svg>
+    {% elif message.level_tag == 'success' %}
+    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:">
+      <use xlink:href="#check-circle-fill" />
+    </svg>
+    {% elif message.level_tag == 'warning' %}
+    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:">
+      <use xlink:href="#exclamation-triangle-fill" />
+    </svg>
+    {% elif message.level_tag == 'danger' %}
+    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:">
+      <use xlink:href="#exclamation-triangle-fill" />
+    </svg>
+    {% endif %} {{ message|safe }}
+    <!--Close Button-->
+    {% if 'alert-dismissible' in message.extra_tags%}
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+    ></button>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
