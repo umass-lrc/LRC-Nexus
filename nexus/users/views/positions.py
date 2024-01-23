@@ -1,3 +1,5 @@
+import json
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -46,11 +48,12 @@ def add_position(request, semester_id=None, position_id=None):
         form = PositionForm(POST, initial={'semester': semester_id, 'position': position_id})
         if not form.is_valid():
             messages.error(request, f'Form Errors: {form.errors}')
-            return render(request, 'alerts.html')
+            return render(request, 'add_position_response.html', context={'success': False})
         data = form.cleaned_data
         form.save()
         messages.success(request, 'Position added successfully.')
-        return redirect('get_all_positions', semester_id=data['semester'].id, position=data['position'])
+        positions = Positions.objects.filter(semester_id=data['semester'].id, position=data['position']).all()
+        return render(request, 'add_position_response.html', context={'success': True, 'positions': positions})
     form = None
     if semester_id is None and position_id is None:
         form = PositionForm()
@@ -60,6 +63,10 @@ def add_position(request, semester_id=None, position_id=None):
     return render(request, 'just_form.html', context)
 
 @login_required
-@restrict_to_http_methods('GET')
+@restrict_to_http_methods('DELETE')
 def delete_position(request, position_id):
-    pass
+    position = Positions.objects.get(id=position_id)
+    position.delete()
+    response = HttpResponse()
+    response["HX-Trigger"] = json.dumps({"deletePosition": f"pt-{position_id}"})
+    return response

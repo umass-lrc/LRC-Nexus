@@ -129,6 +129,14 @@
       {% block bottom %} {% endblock %}
     </div>
 
+    <script
+      type="text/javascript"
+      src="{% static 'admin/js/vendor/jquery/jquery.js' %}"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{% static 'admin/js/vendor/jquery/jquery.js' %}"
+    ></script>
     <!--HTMX-->
     <script
       src="https://unpkg.com/htmx.org@1.9.10"
@@ -155,6 +163,20 @@
     <script src="{% static 'js/ResizeSensor.js'%}"></script>
     <script src="{% static 'js/ElementQueries.js'%}"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
+    <link
+      href="/static/admin/css/autocomplete.css"
+      media="screen"
+      rel="stylesheet"
+    />
+    <link
+      href="/static/autocomplete_light/select2.css"
+      media="screen"
+      rel="stylesheet"
+    />
+    <script src="/static/admin/js/vendor/select2/select2.full.js"></script>
+    <script src="/static/autocomplete_light/autocomplete_light.js"></script>
+    <script src="/static/autocomplete_light/select2.js"></script>
+    <script src="/static/autocomplete_light/i18n/en.js"></script>
     <script>
       let navbar = document.getElementById("menuHolder");
       function stickyTableHeader() {

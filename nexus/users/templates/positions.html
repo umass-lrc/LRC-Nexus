@@ -59,5 +59,11 @@
 {% endblock %}
 <!--Extra Scripts-->
 {% block extra_scripts %}
-<script></script>
-{% endblock%}
+<script>
+  document.body.addEventListener("deletePosition", function (event) {
+    let position_id = event.detail.value;
+    let position_row = document.getElementById(position_id);
+    position_row.remove();
+  });
+</script>
+{% endblock %}

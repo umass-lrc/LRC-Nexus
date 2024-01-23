@@ -73,8 +73,7 @@ class PositionForm(forms.ModelForm):
         self.helper = FormHelper(self)
         self.helper.attrs = {
             'hx-post': reverse('add_position', kwargs={'semester_id': self.initial.get('semester'), 'position_id': self.initial.get('position')}),
-            'hx-target': '#positions-body',
-            'hx-swap': 'outerHTML',
+            'hx-swap': 'multi:#positions-body:outerHTML,#add-position-message',
         }
         self.helper.layout = Layout(
             Fieldset(

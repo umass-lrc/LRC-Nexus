@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from .views.login import (
     login,
@@ -17,12 +17,17 @@ from .views.positions import (
     positions,
     get_all_positions,
     add_position,
+    delete_position,
 )
 from .views.groups import (
     groups,
     create_group,
     create_group_form,
     delete_group,
+    edit_group,
+    add_group_member,
+    remove_group_member,
+    PositionAutocomplete,
 )
 
 
@@ -47,6 +52,7 @@ POSITION_URLS = [
     path('positions/<int:semester_id>/<int:position>/', get_all_positions, name='get_all_positions'),
     path('positions/add_position_default/', add_position, name='add_position_default'),
     path('positions/add_position/<int:semester_id>/<int:position_id>/', add_position, name='add_position'),
+    path('positions/delete/<int:position_id>/', delete_position, name='delete_position'),
 ]
 
 GROUP_URLS = [
@@ -54,6 +60,10 @@ GROUP_URLS = [
     path('groups/create/', create_group, name='create_group'),
     path('groups/create_form/', create_group_form, name='create_group_form'),
     path('groups/delete/<int:group_id>/', delete_group, name='delete_group'),
+    path('groups/edit/<int:group_id>/', edit_group, name='edit_group'),
+    path('groups/add_member/<int:group_id>/', add_group_member, name='add_group_member'),
+    path('groups/remove_member/<int:group_id>/<int:member_id>/', remove_group_member, name='remove_group_member'),
+    re_path(r'^groups/autocomplete/position/$', PositionAutocomplete.as_view(), name='position_autocomplete'),
 ]
 
 urlpatterns = (

@@ -24,7 +24,14 @@
       <tr id="gt-{{pg.id}}">
         <td class="text-center">{{ pg.name }}</td>
         <td class="text-center">{{ pg.count }}</td>
-        <td class="text-center"><i class="bi bi-pencil-square"></i></td>
+        <td class="text-center">
+          <a
+            href=""
+            hx-get="{% url 'edit_group' pg.id %}"
+            hx-target="#edit_group"
+            ><i class="bi bi-pencil-square"></i
+          ></a>
+        </td>
         <td class="text-center">
           <a href="" hx-delete="{% url 'delete_group' pg.id %}"
             ><i class="bi bi-trash3-fill"></i
@@ -40,6 +47,36 @@
   </table>
 </div>
 {% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingTwo">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseTwo"
+      aria-expanded="false"
+      aria-controls="flush-collapseTwo"
+      id="flush-collapseTwo-button"
+    >
+      <h3>Edit Group</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseTwo"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingTwo"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please go to the group row you want to edit and click the edit button.
+      </p>
+      <div>
+        <div id="edit_group"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="accordion-item">
   <h2 class="accordion-header" id="flush-headingOne">
     <button
@@ -72,6 +109,20 @@
     let group_id = event.detail.value;
     let group_row = document.getElementById(group_id);
     group_row.remove();
+  });
+
+  document.body.addEventListener("deleteMember", function (event) {
+    let memeber_id = event.detail.value;
+    let member_row = document.getElementById(memeber_id);
+    member_row.remove();
+  });
+
+  document.body.addEventListener("changeMemberCount", function (event) {
+    let data = event.detail.value.split(",");
+    let group_id = data[0];
+    let count = data[1];
+    let group_row = document.getElementById(group_id);
+    group_row.children[1].innerHTML = count;
   });
 </script>
 {% endblock %}

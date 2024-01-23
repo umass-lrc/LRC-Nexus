@@ -40,6 +40,10 @@ DEBUG = os.environ.get("NEXUS_DEBUG", "0") == "1"
 # Application definition
 
 INSTALLED_APPS = [
+    # Installed apps
+    "dal",
+    "dal_select2",
+    # Django apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
