@@ -260,7 +260,9 @@ class Faculty(models.Model):
     )
     
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        if Faculty.objects.filter(first_name=self.first_name, last_name=self.last_name).count() == 1:
+            return f'{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name} ({self.email})'
 
     class Meta:
         ordering = ['last_name', 'first_name']

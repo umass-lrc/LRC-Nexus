@@ -22,6 +22,7 @@ from . import restrict_to_http_methods
 
 import json
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
 def create_semester(request):
     if request.method == 'POST':
@@ -40,6 +41,7 @@ def create_semester(request):
     context = {'form': form}
     return render(request, 'just_form.html', context)
 
+@login_required
 @restrict_to_http_methods('GET')
 def semester_details(request, semester_id):
     context = {
@@ -50,6 +52,7 @@ def semester_details(request, semester_id):
     response["HX-Trigger-After-Settle"] = json.dumps({"semesterUpdateClicked": f"st-{semester_id}"})
     return response
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_holidays(request, semester_id):
     semester = Semester.objects.get(id=semester_id)
@@ -61,6 +64,7 @@ def list_holidays(request, semester_id):
     }
     return render(request, 'holidays.html', context)
 
+@login_required
 @restrict_to_http_methods('POST')
 def add_holiday(request, semester_id):
     form = HolidayForm(semester_id, request.POST)
@@ -73,6 +77,7 @@ def add_holiday(request, semester_id):
         )
     return redirect('list_holidays', semester_id=semester_id)
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_day_switches(request, semester_id):
     semester = Semester.objects.get(id=semester_id)
@@ -84,6 +89,7 @@ def list_day_switches(request, semester_id):
     }
     return render(request, 'day_switches.html', context)
 
+@login_required
 @restrict_to_http_methods('POST')
 def add_day_switch(request, semester_id):
     form = DaySwitchForm(semester_id, request.POST)
@@ -97,6 +103,7 @@ def add_day_switch(request, semester_id):
         )
     return redirect('list_day_switches', semester_id=semester_id)
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_semesters(request):
     semesters = Semester.objects.all()
@@ -105,7 +112,7 @@ def list_semesters(request):
     }
     return render(request, 'semesters.html', context)
 
-@csrf_protect
+@login_required
 @restrict_to_http_methods('PUT')
 def change_active_semester(request, semester_id):
     semester = Semester.objects.get(id=semester_id)

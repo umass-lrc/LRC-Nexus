@@ -1,6 +1,7 @@
 import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from . import restrict_to_http_methods
 
@@ -13,6 +14,7 @@ from ..models import (
     CourseSubject,
 )
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
 def create_course(request):
     if request.method == 'POST':
@@ -44,6 +46,7 @@ def create_course(request):
     }
     return render(request, 'just_form.html', context)
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
 def edit_course(request, course_id):
     if request.method == 'POST':
@@ -64,8 +67,7 @@ def edit_course(request, course_id):
             return render(request, 'edit_course_response.html', context={'success': False})
         Course.objects.filter(id=course_id).update(**data)
         messages.success(request, 'Course updated successfully.')
-        form = CourseForm(True, instance=Course.objects.get(id=course_id))
-        context = {'form': form, 'success': True, 'course': Course.objects.get(id=course_id)}
+        context = {'success': True, 'course': Course.objects.get(id=course_id)}
         return render(request, 'edit_course_response.html', context=context)
     form = CourseForm(True, instance=Course.objects.get(id=course_id))
     context = {
@@ -75,6 +77,7 @@ def edit_course(request, course_id):
     response["HX-Trigger-After-Settle"] = json.dumps({"courseUpdateClicked": f"ct-{course_id}"})
     return response
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_courses(request):
     courses = Course.objects.all()
