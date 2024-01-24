@@ -23,8 +23,4 @@
   </tbody>
 </table>
 
-<form hx-post="{% url post_url sem_id %}" hx-target="#holidays">
-  {% csrf_token %}
-  <!--Form-->
-  {% crispy form %}
-</form>
+{% crispy form %}

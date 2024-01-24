@@ -68,6 +68,7 @@ class Semester(models.Model):
     
     class Meta:
         ordering = ['classes_start']
+        unique_together = ['term', 'year']
 
 class HolidayManager(models.Manager):
     def get_holidays_for(self, semester):
@@ -89,6 +90,7 @@ class Holiday(models.Model):
     date = models.DateField(
         null=False,
         blank=False,
+        unique=True,
         help_text='The date of the holiday. All shifts on this date will be cancelled.',
     )
 
@@ -120,6 +122,7 @@ class DaySwitch(models.Model):
     date = models.DateField(
         null=False,
         blank=False,
+        unique=True,
         help_text='The date of the day switch. This date will act as "day to follow" for recurring shifts.',
     )
     
@@ -158,7 +161,7 @@ class CourseSubject(models.Model):
         ordering = ['short_name']
     
     def __str__(self):
-        return f'{self.short_name}'
+        return f'{self.short_name} - {self.description}'
     
     def long_name(self):
         return f'{self.description}'
@@ -231,6 +234,7 @@ class Course(models.Model):
     
     class Meta:
         ordering = ['subject', 'number']
+        unique_together = ['subject', 'number']
 
 class Faculty(models.Model):
     first_name = models.CharField(

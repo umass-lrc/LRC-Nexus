@@ -1,0 +1,52 @@
+{% if success %}
+<tbody id="semester-body">
+  <tr id="st-{{semester.id}}" class="new-add">
+    <td class="text-center">{{ semester.get_term_display }}</td>
+    <td class="text-center">{{ semester.year }}</td>
+    <td class="text-center">
+      <div
+        class="form-check form-switch d-flex align-items-center justify-content-center"
+      >
+        <form
+          id="active-{{ semester.id }}"
+          hx-put="{% url 'change_active_semester' semester.id %}"
+          hx-trigger="change"
+        >
+          <!-- prettier-ignore -->
+          <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              name="active"
+              {% if semester.active %}
+              checked
+              {% endif %}
+            />
+        </form>
+      </div>
+    </td>
+    <td class="text-center">
+      <a
+        href=""
+        hx-get="{% url 'semester_details' semester.id %}"
+        hx-target="#edit_semester"
+        hx-trigger="click"
+        ><i class="bi bi-pencil-square"></i
+      ></a>
+    </td>
+  </tr>
+</tbody>
+{% endif %}
+
+<div id="add-semester-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="add-semester-form">
+  <div
+    hx-get="{% url 'create_semester' %}"
+    hx-target="this"
+    hx-trigger="load"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}

@@ -1,0 +1,31 @@
+{% if success %}
+<tbody id="course-body">
+  <tr id="ct-{{course.id}}" class="new-add">
+    <td class="text-center">{{ course.subject.short_name }}</td>
+    <td class="text-center">{{ course.number }}</td>
+    <td class="text-center">{{ course.name }}</td>
+    <td class="text-center">
+      <a
+        href=""
+        hx-get="{% url 'edit_course' course.id %}"
+        hx-target="#edit-course-form"
+        hx-trigger="click"
+        ><i class="bi bi-pencil-square"></i
+      ></a>
+    </td>
+  </tr>
+</tbody>
+{% endif %}
+
+<div id="add-course-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="add-course-form">
+  <div
+    hx-get="{% url 'create_course' %}"
+    hx-target="this"
+    hx-trigger="load"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}

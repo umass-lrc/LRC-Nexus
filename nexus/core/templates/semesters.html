@@ -9,17 +9,15 @@
 <table class="table">
   <thead class="thead-dark">
     <tr>
-      <th class="text-center" scope="col">#</th>
       <th class="text-center" scope="col">Term</th>
       <th class="text-center" scope="col">Year</th>
       <th class="text-center" scope="col">Active</th>
       <th class="text-center" scope="col">View/Edit</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="semester-body">
     {% for semester in semesters %}
-    <tr>
-      <th class="text-center" scope="row">{{ forloop.counter }}</th>
+    <tr id="st-{{semester.id}}">
       <td class="text-center">{{ semester.get_term_display }}</td>
       <td class="text-center">{{ semester.year }}</td>
       <td class="text-center">
@@ -30,7 +28,6 @@
             id="active-{{ semester.id }}"
             hx-put="{% url 'change_active_semester' semester.id %}"
             hx-trigger="change"
-            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
           >
             <!-- prettier-ignore -->
             <input
@@ -46,16 +43,106 @@
         </div>
       </td>
       <td class="text-center">
-        <a href="{% url 'semester_details' semester.id %}"
+        <a
+          href=""
+          hx-get="{% url 'semester_details' semester.id %}"
+          hx-target="#edit_semester"
+          hx-trigger="click"
           ><i class="bi bi-pencil-square"></i
         ></a>
       </td>
     </tr>
     {% empty %}
     <tr>
-      <th scope="row" colspan="5" class="text-center">None.</th>
+      <th scope="row" colspan="4" class="text-center">None.</th>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-{% endblock %}
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingTwo">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseTwo"
+      aria-expanded="false"
+      aria-controls="flush-collapseTwo"
+      id="flush-collapseTwo-button"
+    >
+      <h3>Edit Semester</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseTwo"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingTwo"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please go to the semester row you want to edit and click the edit
+        button.
+      </p>
+      <div>
+        <div id="edit_semester"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Add Semester</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <div id="add-semester-message"></div>
+      <div id="add-semester-form">
+        <div
+          hx-get="{% url 'create_semester' %}"
+          hx-target="this"
+          hx-trigger="intersect once"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let last_updated = null;
+  document.body.addEventListener("semesterCreated", function (e) {
+    let elem_id = e.detail.value;
+    let row = document.getElementById(elem_id);
+    row.scrollIntoView();
+  });
+  document.body.addEventListener("semesterUpdateClicked", function (e) {
+    if (last_updated) {
+      last_updated.classList.remove("curr-update");
+    }
+    let last_updated_id = e.detail.value;
+    last_updated = document.getElementById(last_updated_id);
+    last_updated.classList.add("curr-update");
+    let accordion = document.getElementById("flush-collapseTwo");
+    if (!accordion.classList.contains("show")) {
+      document.getElementById("flush-collapseTwo-button").click();
+    }
+  });
+</script>
+{% endblock%}
