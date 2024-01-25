@@ -22,7 +22,7 @@
 {% if success %}
 <div id="add-course-form">
   <div
-    hx-get="{% url 'create_course' %}"
+    hx-get="{% url 'create_course' semester_id %}"
     hx-target="this"
     hx-trigger="load"
     hx-swap="outerHTML"

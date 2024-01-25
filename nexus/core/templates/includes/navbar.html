@@ -22,7 +22,9 @@
         </button>
       </div>
       <div class="flex3 text-center" id="siteBrand">
-        <img src="{% static 'img/light-logo.svg' %}" style="height: 2em" />
+        <a href="/"
+          ><img src="{% static 'img/light-logo.svg' %}" style="height: 2em"
+        /></a>
       </div>
       {% if user.is_authenticated %}
       <div class="flex2 text-end d-none d-md-block">
@@ -90,7 +92,7 @@
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a class="nav-link nav-menu-item" href="{% url 'all_classes' %}"
                 >Classes</a
               >
             </li>
@@ -124,27 +126,37 @@
           >
           <ul class="submenu collapse">
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Single Shift</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Recurring Shift</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Bulk Shift</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Meeeting</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Schedule</a
               >
             </li>
@@ -156,17 +168,23 @@
           >
           <ul class="submenu collapse">
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Weekly View</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Not Signed</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Student Report</a
               >
             </li>
@@ -178,17 +196,23 @@
           >
           <ul class="submenu collapse">
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Faculties</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Opportunities</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Search</a
               >
             </li>
@@ -200,22 +224,30 @@
           >
           <ul class="submenu collapse">
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Schedule</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Shift Requests</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Observation</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Student Report</a
               >
             </li>
@@ -227,22 +259,30 @@
           >
           <ul class="submenu collapse">
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Schedule</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Shift Request</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Observation</a
               >
             </li>
             <li>
-              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
                 >Student Report</a
               >
             </li>

@@ -1,0 +1,36 @@
+<!--Extends base template-->
+{% extends "base.html" %} {% load static %}
+
+<!--Content of the page-->
+{% block content %}
+<div
+  class="center-div d-flex align-items-center justify-content-center"
+  id="center-if-possible"
+>
+  <div class="align-items-center justify-content-center">
+    <p class="fs-5 container text-center">
+      Dear <i>{{user}}</i>, welcome back!
+    </p>
+    <img
+      class="img-fluid mx-auto d-block"
+      src="{% static 'img/welcome.gif' %}"
+      alt="Welcome Back"
+    />
+    <br />
+    <p class="fs-5 container text-center">
+      We are pleased to introduce <b>LRC Nexus</b>, the new staff website for
+      the Learning Resource Center (LRC). Our goal is to streamline the work of
+      the LRC staff and enhance the management of our student staff and
+      programs. <br /><br />
+      Please note that LRC Nexus is currently under development, and we value
+      your input. If you have any suggestions or feedback, we would appreciate
+      hearing from you. <br /><br />
+      LRC Nexus is currently maintained by
+      <a href="mailto:alokhandwala@umass.edu">Aadam Lokhandwala</a>. If you
+      encounter any difficulties or require assistance, please do not hesitate
+      to contact him.
+    </p>
+  </div>
+</div>
+
+{% endblock %}

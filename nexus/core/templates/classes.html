@@ -5,41 +5,27 @@
 
 <!--Content of the page-->
 {% block content %}
-<h1 class="text-center">Manage Faculties</h1>
-<table class="table">
-  <thead class="thead-dark">
-    <tr>
-      <th class="text-center" scope="col">Last Name</th>
-      <th class="text-center" scope="col">First Name</th>
-      <th class="text-center" scope="col">Email</th>
-      <th class="text-center" scope="col">Edit</th>
-    </tr>
-  </thead>
-  <tbody id="faculty-body">
-    {% for faculty in faculties %}
-    <tr id="ft-{{faculty.id}}">
-      <td class="text-center">{{ faculty.last_name }}</td>
-      <td class="text-center">{{ faculty.first_name }}</td>
-      <td class="text-center">
-        <a href="mailto:{{faculty.email}}">{{ faculty.email }}</a>
-      </td>
-      <td class="text-center">
-        <a
-          href=""
-          hx-get="{% url 'edit_faculty' faculty.id %}"
-          hx-target="#edit-faculty-form"
-          hx-trigger="click"
-          ><i class="bi bi-pencil-square"></i
-        ></a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <th scope="row" colspan="4" class="text-center">None.</th>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<h1 class="text-center">Manage Classes</h1>
+<div id="semester-form-message"></div>
+{% crispy form %}
+
+<div class="table-responsive">
+  <table class="table" id="users">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Course</th>
+        <th class="text-center" scope="col">Faculty</th>
+        <th class="text-center" scope="col">Class Times</th>
+        <th class="text-center" scope="col">Edit</th>
+      </tr>
+    </thead>
+    <tbody id="classes-body">
+      <tr>
+        <th scope="row" colspan="4" class="text-center">None.</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
 {% endblock %} {% block bottom %}
 <div class="accordion-item">
   <h2 class="accordion-header" id="flush-headingTwo">
@@ -52,7 +38,7 @@
       aria-controls="flush-collapseTwo"
       id="flush-collapseTwo-button"
     >
-      <h3>Edit Faculty</h3>
+      <h3>Edit Class</h3>
     </button>
   </h2>
   <div
@@ -63,11 +49,11 @@
   >
     <div class="accordion-body">
       <p class="text-center">
-        Please go to the faculty row you want to edit and click the edit button.
+        Please go to the class row you want to edit and click the edit button.
       </p>
       <div>
-        <div id="edit-faculty-message"></div>
-        <div id="edit-faculty-form"></div>
+        <div id="edit-class-message"></div>
+        <div id="edit-class-form"></div>
       </div>
     </div>
   </div>
@@ -83,7 +69,7 @@
       aria-controls="flush-collapseOne"
       id="flush-collapseOne-button"
     >
-      <h3>Add Faculty</h3>
+      <h3>Add Class</h3>
     </button>
   </h2>
   <div
@@ -93,14 +79,9 @@
     data-bs-parent="#accordionFlushExample"
   >
     <div class="accordion-body">
-      <div id="add-faculty-message"></div>
-      <div id="add-faculty-form">
-        <div
-          hx-get="{% url 'create_faculty' %}"
-          hx-target="this"
-          hx-trigger="intersect once"
-          hx-swap="outerHTML"
-        ></div>
+      <div id="add-class-message"></div>
+      <div id="add-class-form">
+        Please select a semester before adding classes.
       </div>
     </div>
   </div>
@@ -108,22 +89,28 @@
 {% endblock %} {% block extra_scripts %}
 <script>
   let last_updated = null;
-  document.body.addEventListener("facultyCreated", function (e) {
+  document.body.addEventListener("classCreated", function (e) {
     let elem_id = e.detail.value;
     let row = document.getElementById(elem_id);
     row.scrollIntoView();
   });
-  document.body.addEventListener("facultyUpdateClicked", function (e) {
+  document.body.addEventListener("classUpdateClicked", function (e) {
     if (last_updated) {
       last_updated.classList.remove("curr-update");
     }
     let last_updated_id = e.detail.value;
+    console.log(last_updated_id);
     last_updated = document.getElementById(last_updated_id);
     last_updated.classList.add("curr-update");
     let accordion = document.getElementById("flush-collapseTwo");
     if (!accordion.classList.contains("show")) {
       document.getElementById("flush-collapseTwo-button").click();
     }
+  });
+  document.body.addEventListener("deleteClassTime", function (e) {
+    let class_table_row_id = e.detail.value;
+    let row = document.getElementById(class_table_row_id);
+    row.remove();
   });
 </script>
 {% endblock%}

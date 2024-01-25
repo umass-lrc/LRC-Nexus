@@ -4,6 +4,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
 from django.urls import reverse
 
+from crispy_bootstrap5.bootstrap5 import FloatingField
+
 from ..models import (
     Faculty,
 )
@@ -34,11 +36,11 @@ class FacultyForm(forms.ModelForm):
             Fieldset(
                 '',
                 Div(
-                    Div('first_name', css_class='col-md-6'),
-                    Div('last_name', css_class='col-md-6'),
+                    Div(FloatingField('first_name'), css_class='col-md-6'),
+                    Div(FloatingField('last_name'), css_class='col-md-6'),
                     css_class='row',
                 ),
-                'email',
+                FloatingField('email'),
             ),
             Div(
                 Submit('submit', 'Add Faculty' if not edit else "Update Faculty", css_class='btn btn-primary'),

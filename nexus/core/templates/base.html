@@ -42,6 +42,7 @@
     {% block extra_head %} {% endblock %}
   </head>
   <body
+    class="bg-img"
     hx-ext="response-targets,multi-swap"
     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
   >
@@ -66,60 +67,62 @@
     </svg>
 
     <!--Content-->
-    <div class="container mt-2 mb-2" id="main-container">
-      {% for message in messages %}
-      <div
-        class="d-flex align-items-center alert {% if message.level_tag %} alert-{{ message.level_tag }} {% endif %} {{ message.extra_tags }}"
-        role="alert"
-      >
-        {% if message.level_tag == 'primary' %}
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:">
-          <use xlink:href="#info-fill" />
-        </svg>
-        {% elif message.level_tag == 'success' %}
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:">
-          <use xlink:href="#check-circle-fill" />
-        </svg>
-        {% elif message.level_tag == 'warning' %}
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:">
-          <use xlink:href="#exclamation-triangle-fill" />
-        </svg>
-        {% elif message.level_tag == 'danger' %}
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:">
-          <use xlink:href="#exclamation-triangle-fill" />
-        </svg>
-        {% endif %} {{ message|safe }}
-        <!--Close Button-->
-        {% if 'alert-dismissible' in message.extra_tags%}
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
-        {% endif %}
-      </div>
-      {% endfor %}
-      <!--Content-->
-      {% block content %}
-      <div
-        class="d-flex align-items-center justify-content-center"
-        style="height: 100vh; width: 100vw"
-      >
-        <div class="align-items-center justify-content-center">
-          <img
-            class="img-fluid mx-auto d-block"
-            src="{% static 'img/things_on_fire.gif' %}"
-            alt="Server on fire"
-          />
-          <br />
-          <p class="fs-5">
-            This is a template. You shouldn't be seeing this. Something has gone
-            terribly wrong.
-          </p>
+    <div>
+      <div class="container mt-2 mb-2 bg-opacity-10" id="main-container">
+        {% for message in messages %}
+        <div
+          class="d-flex align-items-center alert {% if message.level_tag %} alert-{{ message.level_tag }} {% endif %} {{ message.extra_tags }}"
+          role="alert"
+        >
+          {% if message.level_tag == 'primary' %}
+          <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:">
+            <use xlink:href="#info-fill" />
+          </svg>
+          {% elif message.level_tag == 'success' %}
+          <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:">
+            <use xlink:href="#check-circle-fill" />
+          </svg>
+          {% elif message.level_tag == 'warning' %}
+          <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:">
+            <use xlink:href="#exclamation-triangle-fill" />
+          </svg>
+          {% elif message.level_tag == 'danger' %}
+          <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:">
+            <use xlink:href="#exclamation-triangle-fill" />
+          </svg>
+          {% endif %} {{ message|safe }}
+          <!--Close Button-->
+          {% if 'alert-dismissible' in message.extra_tags%}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+          {% endif %}
         </div>
+        {% endfor %}
+        <!--Content-->
+        {% block content %}
+        <div
+          class="center-div d-flex align-items-center justify-content-center"
+          id="center-if-possible"
+        >
+          <div class="align-items-center justify-content-center">
+            <img
+              class="img-fluid mx-auto d-block"
+              src="{% static 'img/things_on_fire.gif' %}"
+              alt="Server on fire"
+            />
+            <br />
+            <p class="fs-5">
+              This is a template. You shouldn't be seeing this. Something has
+              gone terribly wrong.
+            </p>
+          </div>
+        </div>
+        {% endblock %}
       </div>
-      {% endblock %}
     </div>
 
     <div
@@ -196,6 +199,24 @@
       new ResizeSensor(bottom_stick, function () {
         main_container.style.paddingBottom = bottom_stick.offsetHeight + "px";
       });
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+          let elem = document.getElementById("center-if-possible");
+          if (!elem) return;
+
+          let elemHeight = elem.getBoundingClientRect().height;
+          let screenHeight = screen.height;
+
+          let isOverflowing = elemHeight > screenHeight;
+          console.log(isOverflowing);
+          if (isOverflowing) {
+            elem.classList.remove("center-div");
+          }
+        },
+        false
+      );
     </script>
     <!--Extra Scripts-->
     {% block extra_scripts %} {% endblock %}

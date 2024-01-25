@@ -2,9 +2,8 @@ from django import forms
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
-from crispy_forms.bootstrap import AccordionGroup
 
-from crispy_bootstrap5.bootstrap5 import BS5Accordion
+from crispy_bootstrap5.bootstrap5 import FloatingField
 from django.urls import reverse
 
 from ..models import (
@@ -43,11 +42,11 @@ class CourseForm(forms.ModelForm):
         self.helper.layout = Layout(
             Fieldset(
                 '',
-                'subject',
-                'number',
-                'name',
+                FloatingField('subject'),
+                FloatingField('number'),
+                FloatingField('name'),
                 'is_cross_listed',
-                'main_course'
+                FloatingField('main_course')
             ),
             Div(
                 Submit('submit', 'Add Course' if not edit else 'Update Course', css_class='btn btn-primary'),
