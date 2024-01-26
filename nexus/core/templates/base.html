@@ -203,13 +203,15 @@
       document.addEventListener(
         "DOMContentLoaded",
         function () {
+          let navbar = document.getElementById("menuHolder");
           let elem = document.getElementById("center-if-possible");
           if (!elem) return;
 
+          let navbarHeight = navbar.getBoundingClientRect().height;
           let elemHeight = elem.getBoundingClientRect().height;
           let screenHeight = screen.height;
 
-          let isOverflowing = elemHeight > screenHeight;
+          let isOverflowing = elemHeight > screenHeight - navbarHeight;
           console.log(isOverflowing);
           if (isOverflowing) {
             elem.classList.remove("center-div");

@@ -28,6 +28,8 @@ def index(request):
 def work_in_progress(request):
     return render(request, "work_in_progress_full_page.html")
 
+# handler404 = 'core.views.handler404'
+
 urlpatterns = [
     path("", index, name="index"),
     path('admin/', admin.site.urls),

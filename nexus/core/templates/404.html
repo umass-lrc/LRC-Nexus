@@ -1,0 +1,25 @@
+<!--Extends base template-->
+{% extends "base.html" %} {% load static %}
+
+<!--Content of the page-->
+{% block content %}
+<div
+  class="center-div d-flex align-items-center justify-content-center"
+  id="center-if-possible"
+>
+  <div class="align-items-center justify-content-center">
+    <h1 class="text-center">We Lost This Page</h1>
+    <p class="fs-5 container text-center">
+      Oops! Looks like our web page went on a little adventure and got lost.
+      We've sent out a search party, but in the meantime, how about a joke to
+      pass the time? Why did the web page go to therapy? It had too many issues!
+    </p>
+    <img
+      class="img-fluid mx-auto d-block"
+      src="{% static 'img/404.gif' %}"
+      alt="Page Not Found"
+    />
+  </div>
+</div>
+
+{% endblock %}
