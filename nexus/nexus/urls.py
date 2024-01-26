@@ -31,10 +31,11 @@ def work_in_progress(request):
 # handler404 = 'core.views.handler404'
 
 urlpatterns = [
-    path("", index, name="index"),
+    path('', index, name='index'),
+    path('work_in_progress/', work_in_progress, name='work_in_progress'),
     path('admin/', admin.site.urls),
     path('explorer/', include('explorer.urls')),
     path('core/', include('core.urls')),
     path('users/', include('users.urls')),
-    path('work_in_progress/', work_in_progress, name='work_in_progress'),
+    path('patches/', include('patches.urls')),
 ]
