@@ -55,10 +55,10 @@ def load_user_from_line(request, line_number):
                 email = values[0].lower()
                 first_name = values[1].title()
                 if first_name[0] == '"':
-                    first_name = first_name[1:-1]
+                    first_name = first_name[1:-2]
                 last_name = values[2].title()
                 if last_name[0] == '"':
-                    last_name = last_name[1:-1]
+                    last_name = last_name[1:-2]
                 user = NexusUser.objects.create_user(
                     email=email,
                     first_name=first_name,
