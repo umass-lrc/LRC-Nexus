@@ -1,0 +1,49 @@
+{% if success %}
+<tbody id="class-times-body">
+  <tr id="ctt-{{class_time.id}}" class="new-add">
+    <td class="text-center">{{class_time.get_class_day_display}}</td>
+    <td class="text-center">{{class_time.start_time}}</td>
+    <td class="text-center">{{class_time.duration}}</td>
+    <td class="text-center">
+      {{class_time.building.short_name}} - {{class_time.room}}
+    </td>
+    <td class="text-center">
+      <a
+        href=""
+        hx-delete="{% url 'delete_class_time' class_time.id %}"
+        hx-trigger="click"
+        hx-target="#ct-{{class.id}}"
+        ><i class="bi bi-trash3-fill"></i
+      ></a>
+    </td>
+  </tr>
+</tbody>
+
+<tr id="ct-{{class.id}}">
+  <td class="text-center">{{class.course}}</td>
+  <td class="text-center">{{class.faculty}}</td>
+  <td class="text-center">{{class.str_class_times}}</td>
+  <td class="text-center">
+    <a
+      href=""
+      hx-get="{% url 'edit_class' class.id %}"
+      hx-target="#edit-class-form"
+      hx-trigger="click"
+      ><i class="bi bi-pencil-square"></i
+    ></a>
+  </td>
+</tr>
+{% endif %}
+
+<div id="add-class-time-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="add-class-time-form">
+  <div
+    hx-get="{% url 'add_class_time' class.id %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}

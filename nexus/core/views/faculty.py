@@ -1,4 +1,7 @@
+import json
 from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from . import restrict_to_http_methods
 
@@ -10,40 +13,45 @@ from ..models import (
     Faculty,
 )
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
 def create_faculty(request):
     if request.method == 'POST':
-        form = FacultyForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect('create_faculty')
+        form = FacultyForm(False, request.POST)
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'create_faculty_response.html', context={'success': False})
+        faculty = form.save()
+        messages.success(request, 'Faculty created successfully.')
+        form = FacultyForm(False)
+        context = {'success': True, 'faculty': faculty, 'form': form}
+        response = render(request, 'create_faculty_response.html', context)
+        response["HX-Trigger-After-Settle"] = json.dumps({"facultyCreated": f"ft-{faculty.id}"})
+        return response
     context = {
-        'title': 'Create Faculty',
-        'form': FacultyForm(),
-        'post_url': 'create_faculty',
+        'form': FacultyForm(False),
     }
-    return render(request, 'genric_form.html', context)
+    return render(request, 'just_form.html', context)
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
 def edit_faculty(request, faculty_id):
     if request.method == 'POST':
-        form = FacultyForm(request.POST)
-        if form.is_valid():
-            faculty = Faculty.objects.get(id=faculty_id)
-            data = form.cleaned_data
-            faculty.first_name = data['first_name']
-            faculty.last_name = data['last_name']
-            faculty.email = data['email']
-            faculty.save()
-        return redirect('edit_faculty', faculty_id)
-    context = {
-        'title': 'View/Edit Faculty',
-        'form': FacultyForm(instance=Faculty.objects.get(id=faculty_id), button='Save Changes'),
-        'post_url': 'edit_faculty',
-        'post_arg': faculty_id,
-    }
-    return render(request, 'genric_form.html', context)
+        form = FacultyForm(True, request.POST, instance=Faculty.objects.get(id=faculty_id))
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'edit_faculty_response.html', context={'success': False})
+        Faculty.objects.filter(id=faculty_id).update(**form.cleaned_data)
+        faculty = Faculty.objects.get(id=faculty_id)
+        messages.success(request, 'Faculty updated successfully.')
+        context = {'success': True, 'faculty': faculty}
+        return render(request, 'edit_faculty_response.html', context)
+    context = {'form': FacultyForm(True, instance=Faculty.objects.get(id=faculty_id)),}
+    response = render(request, 'just_form.html', context)
+    response["HX-Trigger-After-Settle"] = json.dumps({"facultyUpdateClicked": f"ft-{faculty_id}"})
+    return response
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_faculties(request):
     faculties = Faculty.objects.all()

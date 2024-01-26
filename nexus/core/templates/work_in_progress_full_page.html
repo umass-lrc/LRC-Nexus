@@ -1,0 +1,25 @@
+<!--Extends base template-->
+{% extends "base.html" %} {% load static %}
+
+<!--Content of the page-->
+{% block content %}
+<div
+  class="center-div d-flex align-items-center justify-content-center"
+  id="center-if-possible"
+>
+  <div class="align-items-center justify-content-center">
+    <img
+      class="img-fluid mx-auto d-block"
+      src="{% static 'img/work_in_progress.gif' %}"
+      alt="Work in Progress"
+    />
+    <br />
+    <p class="fs-5 container text-center">
+      Sorry for the Inconvinience. We are currently in the process of
+      implementing this feature and it will be available soon. Thank you for
+      your patience.
+    </p>
+  </div>
+</div>
+
+{% endblock %}

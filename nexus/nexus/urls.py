@@ -22,7 +22,13 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def index(request):
-    return render(request, "base.html")
+    return render(request, "home.html")
+
+@login_required
+def work_in_progress(request):
+    return render(request, "work_in_progress_full_page.html")
+
+# handler404 = 'core.views.handler404'
 
 urlpatterns = [
     path("", index, name="index"),
@@ -30,4 +36,5 @@ urlpatterns = [
     path('explorer/', include('explorer.urls')),
     path('core/', include('core.urls')),
     path('users/', include('users.urls')),
+    path('work_in_progress/', work_in_progress, name='work_in_progress'),
 ]
