@@ -8,8 +8,11 @@ from .models import (
 )
 
 @admin.register(NexusUser)
-class NexusUserAdmin(UserAdmin):
-    pass
+class NexusUserAdmin(admin.ModelAdmin):
+    list_display = ('last_name', 'first_name', 'email')
+    list_filter = ('last_name', 'first_name', 'email')
+    search_fields = ('last_name', 'first_name', 'email')
+    ordering = ('last_name', 'first_name', 'email')
 
 @admin.register(Positions)
 class PositionsAdmin(admin.ModelAdmin):
