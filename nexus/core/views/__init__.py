@@ -15,7 +15,7 @@ def restrict_to_groups(*groups):
         def inner(request, *args, **kwargs):
             if not request.user.is_authenticated:
                 return redirect('login')
-            if not request.user.groups.filter(name__in=groups).exists():
+            if not request.user.groups.filter(name__in=groups).exists() or not request.user.is_superuser:
                 response = render(request, '403.html')
                 response.status_code = 403
                 return response

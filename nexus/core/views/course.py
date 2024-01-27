@@ -16,6 +16,7 @@ from ..models import (
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'Tutor Supervisor', 'SI Supervisor')
 def create_course(request):
     if request.method == 'POST':
         form = CourseForm(False, request.POST)
@@ -48,6 +49,7 @@ def create_course(request):
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'Tutor Supervisor', 'SI Supervisor')
 def edit_course(request, course_id):
     if request.method == 'POST':
         form = CourseForm(True, request.POST, instance=Course.objects.get(id=course_id))
@@ -77,9 +79,9 @@ def edit_course(request, course_id):
     response["HX-Trigger-After-Settle"] = json.dumps({"courseUpdateClicked": f"ct-{course_id}"})
     return response
 
-# @login_required
+@login_required
 @restrict_to_http_methods('GET')
-@restrict_to_groups(['admin'])
+@restrict_to_groups('Staff Admin', 'Tutor Supervisor', 'SI Supervisor')
 def list_courses(request):
     courses = Course.objects.all()
     context = { 'courses': courses }
