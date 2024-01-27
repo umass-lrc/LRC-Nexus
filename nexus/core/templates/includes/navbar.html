@@ -1,0 +1,316 @@
+{% load static %} {% comment %}
+<div class="p-3 bg-dark text-white">
+  <div class="flexMain">
+    <div class="flex1"></div>
+    <div class="flex2 text-center">
+      <div><strong>This site design is awesome. Try it</strong></div>
+    </div>
+    <div class="flex1"></div>
+  </div>
+</div>
+{% endcomment %}
+<div class="sticky-top" id="menuHolder">
+  <div role="navigation" class="border-bottom border-top" id="mainNavigation">
+    <div class="flexMain">
+      <div class="flex2">
+        <button
+          class="whiteLink siteLink"
+          style="border-right: 1px solid #eaeaea"
+          onclick="menuToggle()"
+        >
+          <i class="fas fa-bars me-2"></i> MENU
+        </button>
+      </div>
+      <div class="flex3 text-center" id="siteBrand">
+        <a href="/"
+          ><img src="{% static 'img/light-logo.svg' %}" style="height: 2em"
+        /></a>
+      </div>
+      {% if user.is_authenticated %}
+      <div class="flex2 text-end d-none d-md-block">
+        <button
+          class="whiteLink siteLink"
+          onclick="window.location.href='{% url 'logout' %}'"
+        >
+          Hi, {{ user.first_name }}!
+        </button>
+        <button
+          class="blackLink siteLink"
+          onclick="window.location.href='{% url 'logout' %}'"
+        >
+          Logout
+        </button>
+      </div>
+      {% else %}
+      <div class="flex2 text-end d-none d-md-block">
+        <button
+          class="blackLink siteLink"
+          onclick="window.location.href='{% url 'login' %}'"
+        >
+          Login
+        </button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div id="menuDrawer">
+    <div class="p-4 border-bottom">
+      <div class="row">
+        <div class="col">
+          <p>MENU</p>
+        </div>
+        <div class="col text-end">
+          <i class="fas fa-times" role="btn" onclick="menuToggle()"></i>
+        </div>
+      </div>
+    </div>
+    <div>
+      <ul class="sidebar nav flex-column" id="nav_accordion">
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-activity me-3"></i>Core</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'list_semesters' %}"
+                >Semesters</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'list_courses' %}"
+                >Courses</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'list_faculties' %}"
+                >Faculties</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'all_classes' %}"
+                >Classes</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-people-fill me-3"></i>Staff</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'users' %}"
+                >Users</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'positions' %}"
+                >Positions</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'groups' %}"
+                >Groups</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-calendar-week-fill me-3"></i>Shift</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Single Shift</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Recurring Shift</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Bulk Shift</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Meeeting</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Schedule</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-wallet-fill me-3"></i>Payroll</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Weekly View</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Not Signed</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Student Report</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-search me-3"></i>OURS</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Faculties</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Opportunities</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Search</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-house-heart-fill me-3"></i>SI</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Schedule</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Shift Requests</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Observation</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Student Report</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-heart-pulse-fill me-3"></i>Tutoring</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Schedule</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Shift Request</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Observation</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Student Report</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-puzzle-fill me-3"></i>Tech</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'admin:index' %}"
+                >Admin Panel</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="/explorer/"
+                >SQL Explorer</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'load_users' %}"
+                >Load Users</a
+              >
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

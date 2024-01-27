@@ -1,0 +1,116 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Classes</h1>
+<div id="semester-form-message"></div>
+{% crispy form %}
+
+<div class="table-responsive">
+  <table class="table" id="users">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Course</th>
+        <th class="text-center" scope="col">Faculty</th>
+        <th class="text-center" scope="col">Class Times</th>
+        <th class="text-center" scope="col">Edit</th>
+      </tr>
+    </thead>
+    <tbody id="classes-body">
+      <tr>
+        <th scope="row" colspan="4" class="text-center">None.</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingTwo">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseTwo"
+      aria-expanded="false"
+      aria-controls="flush-collapseTwo"
+      id="flush-collapseTwo-button"
+    >
+      <h3>Edit Class</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseTwo"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingTwo"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please go to the class row you want to edit and click the edit button.
+      </p>
+      <div>
+        <div id="edit-class-message"></div>
+        <div id="edit-class-form"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Add Class</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <div id="add-class-message"></div>
+      <div id="add-class-form">
+        Please select a semester before adding classes.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let last_updated = null;
+  document.body.addEventListener("classCreated", function (e) {
+    let elem_id = e.detail.value;
+    let row = document.getElementById(elem_id);
+    row.scrollIntoView();
+  });
+  document.body.addEventListener("classUpdateClicked", function (e) {
+    if (last_updated) {
+      last_updated.classList.remove("curr-update");
+    }
+    let last_updated_id = e.detail.value;
+    console.log(last_updated_id);
+    last_updated = document.getElementById(last_updated_id);
+    last_updated.classList.add("curr-update");
+    let accordion = document.getElementById("flush-collapseTwo");
+    if (!accordion.classList.contains("show")) {
+      document.getElementById("flush-collapseTwo-button").click();
+    }
+  });
+  document.body.addEventListener("deleteClassTime", function (e) {
+    let class_table_row_id = e.detail.value;
+    let row = document.getElementById(class_table_row_id);
+    row.remove();
+  });
+</script>
+{% endblock%}

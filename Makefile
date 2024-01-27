@@ -6,4 +6,5 @@ init_run:
 	. venv/bin/activate && pip install -r requirements.txt
 
 migrate:
+	./nexus/manage.py makemigrations
 	./nexus/manage.py migrate

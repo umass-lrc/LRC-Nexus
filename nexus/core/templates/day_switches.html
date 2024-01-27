@@ -1,0 +1,28 @@
+{% load crispy_forms_tags %}
+
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th class="text-center" scope="col">#</th>
+      <th class="text-center" scope="col">Date</th>
+      <th class="text-center" scope="col">Orignal Day</th>
+      <th class="text-center" scope="col">Day to Follow</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for day_switch in day_switches %}
+    <tr>
+      <th class="text-center" scope="row">{{ forloop.counter }}</th>
+      <td class="text-center">{{ day_switch.date }}</td>
+      <td class="text-center">{{ day_switch.date|date:'l' }}</td>
+      <td class="text-center">{{ day_switch.get_day_to_follow_display }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <th scope="row" colspan="4" class="text-center">None.</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% crispy form %}

@@ -1,0 +1,19 @@
+{% if success %}
+<tbody id="members-body">
+  <tr id="mt-{{member.id}}" class="new_add">
+    <td class="text-center">{{ member.user.last_name }}</td>
+    <td class="text-center">{{ member.user.first_name }}</td>
+    <td class="text-center">{{ member.get_position_display }}</td>
+    <td class="text-center">
+      <a
+        href=""
+        hx-delete="{% url 'remove_group_member' group_id member.id %}"
+        hx-trigger="click"
+        ><i class="bi bi-trash3-fill"></i
+      ></a>
+    </td>
+  </tr>
+</tbody>
+{% endif %}
+
+<div id="add_member_form_message">{% include 'alerts.html' %}</div>

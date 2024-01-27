@@ -1,0 +1,14 @@
+<tbody
+  id="positions-body"
+  hx-get="{% url 'get_all_positions' semester position %}"
+  hx-swap="outerHTML"
+  hx-trigger="load"
+  hx-target="this"
+></tbody>
+<div
+  id="add-position-form"
+  hx-get="{% url 'add_position' semester position %}"
+  hx-swap="innerHTML"
+  hx-trigger="load"
+  hx-target="this"
+></div>
