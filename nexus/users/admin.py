@@ -13,10 +13,10 @@ class NexusUserAdmin(UserAdmin):
 
 @admin.register(Positions)
 class PositionsAdmin(admin.ModelAdmin):
-    list_display = ('semester', 'user', 'faculty', 'hourly_pay')
-    list_filter = ('semester', 'user', 'faculty', 'hourly_pay')
-    search_fields = ('semester', 'user', 'faculty', 'hourly_pay')
-    ordering = ('semester', 'user', 'faculty')
+    list_display = ('semester', 'user', 'position', 'hourly_pay')
+    list_filter = ('semester', 'user', 'position', 'hourly_pay')
+    search_fields = ('semester', 'user', 'position', 'hourly_pay')
+    ordering = ('semester', 'user', 'position')
 
 @admin.register(PositionGroups)
 class PositionGroupsAdmin(admin.ModelAdmin):
