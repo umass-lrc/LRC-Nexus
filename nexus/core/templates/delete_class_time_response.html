@@ -1,0 +1,12 @@
+<td class="text-center">{{class.course}}</td>
+<td class="text-center">{{class.faculty}}</td>
+<td class="text-center">{{class.str_class_times}}</td>
+<td class="text-center">
+  <a
+    href=""
+    hx-get="{% url 'edit_class' class.id %}"
+    hx-target="#edit-class-form"
+    hx-trigger="click"
+    ><i class="bi bi-pencil-square"></i
+  ></a>
+</td>

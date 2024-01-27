@@ -1,0 +1,20 @@
+{% if success %}
+<tr id="ft-{{faculty.id}}">
+  <td class="text-center">{{ faculty.last_name }}</td>
+  <td class="text-center">{{ faculty.first_name }}</td>
+  <td class="text-center">
+    <a href="mailto:{{faculty.email}}">{{ faculty.email }}</a>
+  </td>
+  <td class="text-center">
+    <a
+      href=""
+      hx-get="{% url 'edit_faculty' faculty.id %}"
+      hx-target="#edit-faculty-form"
+      hx-trigger="click"
+      ><i class="bi bi-pencil-square"></i
+    ></a>
+  </td>
+</tr>
+{% endif %}
+
+<div id="edit-faculty-message">{% include 'alerts.html' %}</div>

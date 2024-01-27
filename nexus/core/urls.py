@@ -29,6 +29,14 @@ from .views.course import (
     edit_course,
 )
 
+from .views.classes import (
+    all_classes,
+    create_class,
+    edit_class,
+    add_class_time,
+    delete_class_time,
+)
+
 SEMESTER_URLS = [
     path('semester/create/', create_semester, name='create_semester'),
     path('semester/details/<int:semester_id>/', semester_details, name='semester_details'),
@@ -59,7 +67,11 @@ COURSE_URLS = [
 ]
 
 CLASSES_URLS = [
-
+    path('classes/all/', all_classes, name='all_classes'),
+    path('classes/create/<int:semester_id>/', create_class, name='create_class'),
+    path('classes/edit/<int:class_id>/', edit_class, name='edit_class'),
+    path('classes/add_time/<int:class_id>/', add_class_time, name='add_class_time'),
+    path('classes/delete_time/<int:class_time_id>/', delete_class_time, name='delete_class_time'),
 ]
 
 urlpatterns = (

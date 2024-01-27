@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 from ..models import (
@@ -20,45 +22,52 @@ from . import restrict_to_http_methods
 
 import json
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
 def create_semester(request):
     if request.method == 'POST':
         form = SemesterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('semester_details', semester_id=form.instance.id)
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'create_semester_response.html', context={'success': False})
+        semester = form.save()
+        form = SemesterForm()
+        messages.success(request, 'Semester created successfully.')
+        context = {'form': form, 'success': True, 'semester': semester}
+        response = render(request, 'create_semester_response.html', context=context)
+        response["HX-Trigger-After-Settle"] = json.dumps({"semesterCreated": f"st-{semester.id}"})
+        return response
     form = SemesterForm()
-    context = {
-        'title': 'Create Semester',
-        'form': form,
-        'post_url': 'create_semester',
-    }
-    return render(request, 'genric_form.html', context)
+    context = {'form': form}
+    return render(request, 'just_form.html', context)
 
+@login_required
 @restrict_to_http_methods('GET')
 def semester_details(request, semester_id):
     context = {
         'semester_form': SemesterReadOnly(instance=Semester.objects.get(id=semester_id)),
         'sem_id': semester_id,
     }
-    return render(request, 'semester_details.html', context)
+    response = render(request, 'semester_details.html', context)
+    response["HX-Trigger-After-Settle"] = json.dumps({"semesterUpdateClicked": f"st-{semester_id}"})
+    return response
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_holidays(request, semester_id):
     semester = Semester.objects.get(id=semester_id)
     holidays = Holiday.objects.filter(semester=semester)
-    form = HolidayForm()
+    form = HolidayForm(semester_id)
     context = {
         'holidays': holidays,
         'form': form,
-        'post_url': 'add_holiday',
-        'sem_id': semester_id,
     }
     return render(request, 'holidays.html', context)
 
+@login_required
 @restrict_to_http_methods('POST')
 def add_holiday(request, semester_id):
-    form = HolidayForm(request.POST)
+    form = HolidayForm(semester_id, request.POST)
     semester = Semester.objects.get(id=semester_id)
     if form.is_valid():
         data = form.cleaned_data
@@ -68,22 +77,22 @@ def add_holiday(request, semester_id):
         )
     return redirect('list_holidays', semester_id=semester_id)
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_day_switches(request, semester_id):
     semester = Semester.objects.get(id=semester_id)
     day_switches = DaySwitch.objects.filter(semester=semester)
-    form = DaySwitchForm()
+    form = DaySwitchForm(semester_id)
     context = {
         'day_switches': day_switches,
         'form': form,
-        'post_url': 'add_day_switch',
-        'sem_id': semester_id,
     }
     return render(request, 'day_switches.html', context)
 
+@login_required
 @restrict_to_http_methods('POST')
 def add_day_switch(request, semester_id):
-    form = DaySwitchForm(request.POST)
+    form = DaySwitchForm(semester_id, request.POST)
     semester = Semester.objects.get(id=semester_id)
     if form.is_valid():
         data = form.cleaned_data
@@ -94,6 +103,7 @@ def add_day_switch(request, semester_id):
         )
     return redirect('list_day_switches', semester_id=semester_id)
 
+@login_required
 @restrict_to_http_methods('GET')
 def list_semesters(request):
     semesters = Semester.objects.all()
@@ -102,7 +112,7 @@ def list_semesters(request):
     }
     return render(request, 'semesters.html', context)
 
-@csrf_protect
+@login_required
 @restrict_to_http_methods('PUT')
 def change_active_semester(request, semester_id):
     semester = Semester.objects.get(id=semester_id)

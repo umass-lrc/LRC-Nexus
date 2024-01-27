@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     # Local apps
     "core",
     "users",
+    "patches",
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,7 @@ TEMPLATES = [
         "DIRS": [
             BASE_DIR.joinpath("core", "templates"),
             BASE_DIR.joinpath("users", "templates"),
+            BASE_DIR.joinpath("patches", "templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -147,7 +149,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-STATIC_ROOT = "/srv/static"
+STATIC_ROOT = "/srv/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

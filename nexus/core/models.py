@@ -10,6 +10,23 @@ class Day(models.IntegerChoices):
     FRIDAY = 5, 'Friday'
     SATURDAY = 6, 'Saturday'
 
+def short_day_name(day):
+    if day == 0:
+        return 'Su'
+    elif day == 1:
+        return 'M'
+    elif day == 2:
+        return 'Tu'
+    elif day == 3:
+        return 'W'
+    elif day == 4:
+        return 'Th'
+    elif day == 5:
+        return 'F'
+    elif day == 6:
+        return 'Sa'
+    return '??'
+
 class SemesterManager(models.Manager):
     def get_active_semester(self):
         return self.get_queryset().filter(active=True).first()
@@ -68,6 +85,7 @@ class Semester(models.Model):
     
     class Meta:
         ordering = ['classes_start']
+        unique_together = ['term', 'year']
 
 class HolidayManager(models.Manager):
     def get_holidays_for(self, semester):
@@ -89,6 +107,7 @@ class Holiday(models.Model):
     date = models.DateField(
         null=False,
         blank=False,
+        unique=True,
         help_text='The date of the holiday. All shifts on this date will be cancelled.',
     )
 
@@ -120,6 +139,7 @@ class DaySwitch(models.Model):
     date = models.DateField(
         null=False,
         blank=False,
+        unique=True,
         help_text='The date of the day switch. This date will act as "day to follow" for recurring shifts.',
     )
     
@@ -158,7 +178,7 @@ class CourseSubject(models.Model):
         ordering = ['short_name']
     
     def __str__(self):
-        return f'{self.short_name}'
+        return f'{self.short_name} - {self.description}'
     
     def long_name(self):
         return f'{self.description}'
@@ -231,6 +251,7 @@ class Course(models.Model):
     
     class Meta:
         ordering = ['subject', 'number']
+        unique_together = ['subject', 'number']
 
 class Faculty(models.Model):
     first_name = models.CharField(
@@ -256,7 +277,9 @@ class Faculty(models.Model):
     )
     
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        if Faculty.objects.filter(first_name=self.first_name, last_name=self.last_name).count() == 1:
+            return f'{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name} ({self.email})'
 
     class Meta:
         ordering = ['last_name', 'first_name']
@@ -313,11 +336,18 @@ class Classes(models.Model):
     def __str__(self):
         if Classes.objects.filter(semester=self.semester, course=self.course, faculty=self.faculty).count() == 1:
             return self.short_name()
-        class_time_info = ClassTimes.objects.filter(orignal_class=self).all()
-        class_time_info_str = ''
-        for class_time in class_time_info:
-            class_time_info_str += f'{str(class_time)} '
-        return f'{self.short_name()} [{class_time_info_str}]'
+        return f'{self.short_name()} [{self.str_class_times()}]'
+    
+    def str_class_times(self):
+        class_times = ClassTimes.objects.filter(orignal_class=self).all()
+        class_times_info = '['
+        for class_time in class_times:
+            time_info = f'{short_day_name(class_time.class_day)} {class_time.start_time.strftime("%I:%M %p")}'
+            class_times_info += f'{time_info}, '
+        if class_times_info[-1] == ' ':
+            class_times_info = class_times_info[:-2]
+        class_times_info += ']'
+        return class_times_info
             
     
     def short_name(self):
@@ -340,10 +370,10 @@ class ClassTimes(models.Model):
         help_text='The day of the week the class occurs on.',
     )
     
-    time = models.TimeField(
+    start_time = models.TimeField(
         null=False,
         blank=False,
-        help_text='The time of the class.',
+        help_text='The time class starts. <b>Note:</b> <i>The time you specify is interpreted according to Amherst time. Therefore, regardless of your current timezone, please provide the time in accordance with Amherst time</i>.',
     )
     
     duration = models.DurationField(
