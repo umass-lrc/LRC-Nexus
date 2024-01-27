@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from dal import autocomplete
 
-from core.views import restrict_to_http_methods
+from core.views import restrict_to_http_methods, restrict_to_groups
 
 from core.models import (
     Semester,
@@ -27,6 +27,7 @@ from ..forms.groups import (
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def groups(request):
     pgs = PositionGroups.objects.filter(semester=Semester.objects.get_active_semester()).all()
     pgs_data = []
@@ -42,6 +43,7 @@ def groups(request):
 
 @login_required
 @restrict_to_http_methods('POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def create_group(request):
     form = CreateGroupForm(request.POST)
     if not form.is_valid():
@@ -67,6 +69,7 @@ def create_group(request):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def create_group_form(request):
     form = CreateGroupForm()
     context = {'form': form}
@@ -74,6 +77,7 @@ def create_group_form(request):
 
 @login_required
 @restrict_to_http_methods('DELETE')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def delete_group(request, group_id):
     pg = PositionGroups.objects.get(id=group_id)
     pg.delete()
@@ -83,6 +87,7 @@ def delete_group(request, group_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def edit_group(request, group_id):
     group = PositionGroups.objects.get(id=group_id)
     form = AddGroupMemeberForm(group_id)
@@ -91,6 +96,7 @@ def edit_group(request, group_id):
 
 @login_required
 @restrict_to_http_methods('POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def add_group_member(request, group_id):
     form = AddGroupMemeberForm(group_id, request.POST)
     if not form.is_valid():
@@ -111,6 +117,7 @@ def add_group_member(request, group_id):
 
 @login_required
 @restrict_to_http_methods('DELETE')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def remove_group_member(request, group_id, member_id):
     pg = PositionGroups.objects.get(id=group_id)
     member = Positions.objects.get(id=member_id)
