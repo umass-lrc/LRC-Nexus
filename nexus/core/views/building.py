@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from . import restrict_to_http_methods
+from . import restrict_to_http_methods, restrict_to_groups
 
 from ..forms.building import (
     BuildingsForm,

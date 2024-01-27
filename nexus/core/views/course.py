@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from . import restrict_to_http_methods
+from . import restrict_to_http_methods, restrict_to_groups
 
 from ..forms.course import (
     CourseForm,
@@ -77,8 +77,9 @@ def edit_course(request, course_id):
     response["HX-Trigger-After-Settle"] = json.dumps({"courseUpdateClicked": f"ct-{course_id}"})
     return response
 
-@login_required
+# @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups(['admin'])
 def list_courses(request):
     courses = Course.objects.all()
     context = { 'courses': courses }
