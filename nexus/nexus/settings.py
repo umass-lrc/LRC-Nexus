@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "core",
     "users",
     "patches",
+    "shifts",
 ]
 
 MIDDLEWARE = [
