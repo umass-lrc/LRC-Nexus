@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "users",
     "patches",
     "shifts",
+    "payrolls",
 ]
 
 MIDDLEWARE = [
