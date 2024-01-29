@@ -87,6 +87,7 @@ TEMPLATES = [
             BASE_DIR.joinpath("core", "templates"),
             BASE_DIR.joinpath("users", "templates"),
             BASE_DIR.joinpath("patches", "templates"),
+            BASE_DIR.joinpath("shifts", "templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
