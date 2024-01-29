@@ -38,4 +38,5 @@ urlpatterns = [
     path('core/', include('core.urls')),
     path('users/', include('users.urls')),
     path('patches/', include('patches.urls')),
+    path('shifts/', include('shifts.urls')),
 ]

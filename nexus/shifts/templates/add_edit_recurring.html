@@ -1,0 +1,47 @@
+{% load crispy_forms_tags %}
+
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th class="text-center" scope="col">Kind</th>
+      <th class="text-center" scope="col">Day</th>
+      <th class="text-center" scope="col">Time</th>
+      <th class="text-center" scope="col">Location</th>
+      <th class="text-center" scope="col">Edit</th>
+    </tr>
+  </thead>
+  <tbody id="recurring-body">
+    {% for rshift in recurring_shifts %}
+    <tr id="rt-{{rshift.id}}">
+      <td class="text-center">{{ rshift.kind }}</td>
+      <td class="text-center">{{ rshift.get_day_display }}</td>
+      <td class="text-center">{{ rshift.start_time }}</td>
+      <td class="text-center">
+        {{ rshift.building.short_name }}-{{ rshift.room }}
+      </td>
+      <td class="text-center">
+        <a
+          href=""
+          hx-get="{% url 'edit_recurring' rshift.id %}"
+          hx-trigger="click"
+          hx-target="#edit-recurring-form"
+          ><i class="bi bi-pencil-square"></i
+        ></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div id="edit-recurring-message"></div>
+<div id="edit-recurring-form">{% crispy edit_form %}</div>
+
+<div id="add-recurring-message"></div>
+<div id="add-recurring-form">
+  <div
+    hx-get="{% url 'add_recurring' user_id %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>

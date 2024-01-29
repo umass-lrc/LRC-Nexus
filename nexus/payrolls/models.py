@@ -1,9 +1,6 @@
-from django.db import models
+from datetime import timedelta
 
-from shifts.models import (
-    Shift,
-    AttendanceInfo,
-)
+from django.db import models
 
 from users.models import (
     Positions,
@@ -42,6 +39,18 @@ class Payroll(models.Model):
             "position",
             "week_end",
         ]
+    
+    def save(self, *args, **kwargs):
+        print("\n\n###########WTF!!##############\n\n")
+        update = self.id is not None
+        super(Payroll, self).save(*args, **kwargs)
+        if update:
+            return
+        PayrollInHR.objects.create(payroll=self)
+        PayrollInHRViaLatePay.objects.create(payroll=self)
+        PayrollNotInHR.objects.create(payroll=self)
+        PayrollNotSigned.objects.create(payroll=self)
+        return
 
 class PayrollInHR(models.Model):
     payroll = models.OneToOneField(
@@ -54,48 +63,56 @@ class PayrollInHR(models.Model):
     sunday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Sunday."
     )
     
     monday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Monday."
     )
     
     tuesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Tuesday."
     )
     
     wednesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Wednesday."
     )
     
     thursday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Thursday."
     )
     
     friday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Friday."
     )
     
     saturday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Saturday."
     )
     
     total_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked for the week."
     )
 
@@ -110,48 +127,56 @@ class PayrollInHRViaLatePay(models.Model):
     sunday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Sunday."
     )
     
     monday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Monday."
     )
     
     tuesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Tuesday."
     )
     
     wednesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Wednesday."
     )
     
     thursday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Thursday."
     )
     
     friday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Friday."
     )
     
     saturday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Saturday."
     )
     
     total_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked for the week."
     )
 
@@ -166,48 +191,56 @@ class PayrollNotInHR(models.Model):
     sunday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Sunday."
     )
     
     monday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Monday."
     )
     
     tuesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Tuesday."
     )
     
     wednesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Wednesday."
     )
     
     thursday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Thursday."
     )
     
     friday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Friday."
     )
     
     saturday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Saturday."
     )
     
     total_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked for the week."
     )
 
@@ -222,47 +255,55 @@ class PayrollNotSigned(models.Model):
     sunday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Sunday."
     )
     
     monday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Monday."
     )
     
     tuesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Tuesday."
     )
     
     wednesday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Wednesday."
     )
     
     thursday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Thursday."
     )
     
     friday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Friday."
     )
     
     saturday_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked on Saturday."
     )
     
     total_hours = models.DurationField(
         null=False,
         blank=False,
+        default=timedelta(hours=0),
         help_text="The total number of hours worked for the week."
     )

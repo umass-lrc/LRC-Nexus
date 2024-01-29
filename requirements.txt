@@ -5,6 +5,7 @@ django-autocomplete-light==3.9.7
 django-cors-headers==4.3.1
 django-crispy-forms==2.1
 django-sql-explorer==3.2.1
+pytz==2023.4
 six==1.16.0
 soupsieve==2.5
 sqlparse==0.4.4
