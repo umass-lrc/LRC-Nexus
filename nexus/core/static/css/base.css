@@ -73,3 +73,11 @@ span.select2.select2-container {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.dot {
+    display: inline-block;
+    border-radius: 50%;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+}
