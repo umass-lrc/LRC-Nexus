@@ -1,0 +1,54 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Bulk Shift</h1>
+<div id="look-up-form-message"></div>
+{% crispy form %}
+<p class="text-center"><b>Look up a group to see it members.</b></p>
+<hr />
+<table class="table">
+  <thead>
+    <tr>
+      <th class="text-center" scope="col">Last Name</th>
+      <th class="text-center" scope="col">First Name</th>
+      <th class="text-center" scope="col">Position</th>
+    </tr>
+  </thead>
+  <tbody id="members-body"></tbody>
+</table>
+
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Add Group Shift</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please look up a group for whom you want to add shift.
+      </p>
+      <div id="add-shift-message"></div>
+      <div id="add-shift-form"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -13,6 +13,12 @@ from .views.users_shift import (
     UserAutocomplete,    
 )
 
+from .views.bulk_shift import (
+    group_shift,
+    group_add_shift,
+    GroupAutocomplete,
+)
+
 USERS_SHIFT_URLS = [
     path('users_shift/', users_shift, name='users_shift'),
     path('user_calender/<int:user_id>/', user_calendar, name='user_calendar'),
@@ -26,6 +32,13 @@ USERS_SHIFT_URLS = [
     re_path(r'^users_shift/autocomplete/$', UserAutocomplete.as_view(), name='user-autocomplete'),
 ]
 
+BULK_SHIFT_URLS = [
+    path('group_shift/', group_shift, name='group_shift'),
+    path('group_add_shift/<int:group_id>/', group_add_shift, name='group_add_shift'),
+    re_path(r'^group_shift/autocomplete/$', GroupAutocomplete.as_view(), name='group-autocomplete'),
+]
+
 urlpatterns = (
-    USERS_SHIFT_URLS
+    USERS_SHIFT_URLS +
+    BULK_SHIFT_URLS
 )

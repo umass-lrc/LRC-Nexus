@@ -1,0 +1,25 @@
+{% if success %}
+<tbody id="members-body">
+  {% for position in members %}
+  <tr id="mt-{{position.id}}">
+    <td class="text-center">{{ position.user.last_name }}</td>
+    <td class="text-center">{{ position.user.first_name }}</td>
+    <td class="text-center">{{ position.get_position_display }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+{% endif %}
+
+<div id="look-up-form-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="add-shift-message"></div>
+<div id="add-shift-form">
+  <div
+    hx-get="{% url 'group_add_shift' group_id %}"
+    hx-target="this"
+    hx-swap="outerHTML"
+    hx-trigger="intersect"
+  ></div>
+</div>
+{% endif %}
