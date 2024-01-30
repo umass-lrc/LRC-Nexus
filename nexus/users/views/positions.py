@@ -4,10 +4,15 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
+from django.db.models import Q
+
+from dal import autocomplete
+
 from core.views import restrict_to_http_methods
 
 from ..models import (
     Positions,
+    NexusUser,
 )
 
 from ..forms.positions import (
@@ -70,3 +75,11 @@ def delete_position(request, position_id):
     response = HttpResponse()
     response["HX-Trigger"] = json.dumps({"deletePosition": f"pt-{position_id}"})
     return response
+
+
+class UserAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = NexusUser.objects.all()
+        if self.q:
+            qs = qs.filter(Q(first_name__icontains=self.q) | Q(last_name__icontains=self.q)).all()
+        return qs
