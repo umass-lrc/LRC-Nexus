@@ -1,0 +1,47 @@
+<div id="look-up-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="calendar">
+  <div
+    hx-get="{% url 'user_calendar' curr_user.id %}"
+    hx-swap="multi:#colors:innerHTML,#calendar:innerHTML"
+    hx-trigger="intersect"
+  ></div>
+</div>
+
+<div id="add-shift">
+  <div id="add-shift-message"></div>
+  <div id="add-shift-form">
+    <div
+      hx-get="{% url 'add_shift' curr_user.id %}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      hx-trigger="intersect"
+    ></div>
+  </div>
+</div>
+
+<div id="add-edit-recurring">
+  <div id="add-edit-recurring-message"></div>
+  <div id="add-edit-recurring-form">
+    <div
+      hx-get="{% url 'add_edit_recurring' curr_user.id %}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      hx-trigger="intersect"
+    ></div>
+  </div>
+</div>
+
+<div id="record-meeting">
+  <div id="record-meeting-message"></div>
+  <div id="record-meeting-form">
+    <div
+      hx-get="{% url 'record_meeting' curr_user.id %}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      hx-trigger="intersect"
+    ></div>
+  </div>
+</div>
+{% endif %}

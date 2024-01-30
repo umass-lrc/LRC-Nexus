@@ -18,12 +18,13 @@ from ..forms.semester import (
     DaySwitchForm,
 )
 
-from . import restrict_to_http_methods
+from . import restrict_to_http_methods, restrict_to_groups
 
 import json
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin')
 def create_semester(request):
     if request.method == 'POST':
         form = SemesterForm(request.POST)
@@ -43,6 +44,7 @@ def create_semester(request):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin')
 def semester_details(request, semester_id):
     context = {
         'semester_form': SemesterReadOnly(instance=Semester.objects.get(id=semester_id)),
@@ -54,6 +56,7 @@ def semester_details(request, semester_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin')
 def list_holidays(request, semester_id):
     semester = Semester.objects.get(id=semester_id)
     holidays = Holiday.objects.filter(semester=semester)
@@ -66,6 +69,7 @@ def list_holidays(request, semester_id):
 
 @login_required
 @restrict_to_http_methods('POST')
+@restrict_to_groups('Staff Admin')
 def add_holiday(request, semester_id):
     form = HolidayForm(semester_id, request.POST)
     semester = Semester.objects.get(id=semester_id)
@@ -79,6 +83,7 @@ def add_holiday(request, semester_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin')
 def list_day_switches(request, semester_id):
     semester = Semester.objects.get(id=semester_id)
     day_switches = DaySwitch.objects.filter(semester=semester)
@@ -91,6 +96,7 @@ def list_day_switches(request, semester_id):
 
 @login_required
 @restrict_to_http_methods('POST')
+@restrict_to_groups('Staff Admin')
 def add_day_switch(request, semester_id):
     form = DaySwitchForm(semester_id, request.POST)
     semester = Semester.objects.get(id=semester_id)
@@ -105,6 +111,7 @@ def add_day_switch(request, semester_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin')
 def list_semesters(request):
     semesters = Semester.objects.all()
     context = {
@@ -114,6 +121,7 @@ def list_semesters(request):
 
 @login_required
 @restrict_to_http_methods('PUT')
+@restrict_to_groups('Staff Admin')
 def change_active_semester(request, semester_id):
     semester = Semester.objects.get(id=semester_id)
     body_unicode = request.body.decode('utf-8')

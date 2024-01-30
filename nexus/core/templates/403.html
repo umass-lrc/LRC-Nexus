@@ -1,0 +1,27 @@
+<!--Extends base template-->
+{% extends "base.html" %} {% load static %}
+
+<!--Content of the page-->
+{% block content %}
+<div
+  class="center-div d-flex align-items-center justify-content-center"
+  id="center-if-possible"
+>
+  <div class="align-items-center justify-content-center">
+    <h1 class="text-center">Access Denied!</h1>
+    <p class="fs-5 container text-center">
+      Sorry, but it seems like our web page is feeling a bit exclusive today and
+      has denied entry. We're currently negotiating with its security team to
+      let you in. In the meantime, here's a techy joke to lighten the mood: Why
+      did the website lock you out? It heard you weren't using the secret
+      handshake!
+    </p>
+    <img
+      class="img-fluid mx-auto d-block"
+      src="{% static 'img/403.gif' %}"
+      alt="Page Not Found"
+    />
+  </div>
+</div>
+
+{% endblock %}

@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from dal import autocomplete
 
-from core.views import restrict_to_http_methods
+from core.views import restrict_to_http_methods, restrict_to_groups
 
 from ..models import (
     Positions,
@@ -22,6 +22,7 @@ from ..forms.positions import (
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def get_all_positions(request, semester_id, position):
     positions = Positions.objects.filter(semester_id=semester_id, position=position).all()
     context = {'positions': positions}
@@ -29,6 +30,7 @@ def get_all_positions(request, semester_id, position):
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def positions(request):
     if request.method == 'POST':
         form = PositionSelector(request.POST)
@@ -45,6 +47,7 @@ def positions(request):
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def add_position(request, semester_id=None, position_id=None):
     if request.method == 'POST':
         POST = request.POST.copy()
@@ -69,6 +72,7 @@ def add_position(request, semester_id=None, position_id=None):
 
 @login_required
 @restrict_to_http_methods('DELETE')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def delete_position(request, position_id):
     position = Positions.objects.get(id=position_id)
     position.delete()

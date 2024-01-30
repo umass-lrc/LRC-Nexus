@@ -1,4 +1,3 @@
-from typing import Any
 from django.db import models
 
 class Day(models.IntegerChoices):
