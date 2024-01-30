@@ -13,11 +13,14 @@ from users.models import (
 
 from core.models import (
     Semester,
+    CourseSubject,
+    Course,
 )
 
 from .forms import (
     loadUsersForm,
     loadPositionsForm,
+    loadCoursesForm,
 )
 
 @login_required
@@ -109,7 +112,6 @@ def load_position_from_line(request, line_number, position):
             if i == line_number-1:
                 to_read = line
                 break
-        print(to_read)
         if to_read is None:
             return HttpResponse("<b>==File End==</b><br/>")
         content = f"""
@@ -134,6 +136,66 @@ def load_position_from_line(request, line_number, position):
                     semester=Semester.objects.get_active_semester(),
                     position=position,
                     hourly_pay=hourly_pay,
+                )
+                content += f"<b>==Position Added Successfully==</b>"
+            except Exception as e:
+                content += f"<b>==Error Occoured On Line {line_number}, Position Not Added: {e}==</b>"
+        content += f"<br/>Line {line_number} Content: {to_read} <br/>"
+        return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
+def load_courses(request):
+    if request.method == 'POST':
+        form = loadCoursesForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_courses_response.html', context={'success': False})
+        with open("temp/courses.csv", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        data = form.cleaned_data
+        return render(request, 'load_courses_response.html', context={'success': True})
+    form = loadCoursesForm()
+    context = {'form': form}
+    return render(request, 'load_courses.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_course_from_line(request, line_number):
+    with open("temp/courses.csv", "r") as f:
+        to_read = None
+        for i, line in enumerate(f):
+            if i == line_number-1:
+                to_read = line
+                break
+        if to_read is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = f"""
+            <div
+                hx-post="{reverse('load_course_from_line', kwargs={'line_number': line_number+1})}"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="outerHTML"
+            >
+            </div>
+        """
+        values = to_read.split(',')
+        if len(values) != 3:
+            content += f"<b>==Invalid Format On Line {line_number}==</b>"
+        else:
+            try:
+                couse_subject_short_name = values[0].upper()
+                number = values[1]
+                course_name = values[2]
+                course_subject = CourseSubject.objects.get(short_name=couse_subject_short_name)
+                Course.objects.create(
+                    subject=course_subject,
+                    number=number,
+                    name=course_name,
+                    is_cross_listed=False,
+                    main_course=None,
                 )
                 content += f"<b>==Position Added Successfully==</b>"
             except Exception as e:
