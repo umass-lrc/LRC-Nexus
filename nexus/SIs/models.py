@@ -24,8 +24,8 @@ class SIRoleInfo(models.Model):
     assigned_class = models.ForeignKey(
         to=Classes,
         on_delete=models.RESTRICT,
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         help_text="The class that this role is for."
     )
     

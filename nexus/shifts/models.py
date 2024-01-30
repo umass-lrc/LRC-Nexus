@@ -6,6 +6,7 @@ from django.db import models
 from core.models import (
     Buildings,
     Day,
+    ClassTimes,
 )
 
 from users.models import (
@@ -15,9 +16,6 @@ from users.models import (
 
 from payrolls.models import (
     Payroll,
-    PayrollInHR,
-    PayrollInHRViaLatePay,
-    PayrollNotInHR,
     PayrollStatus,
     PayrollNotSigned,
 )
@@ -126,6 +124,14 @@ class RecurringShift(models.Model):
         null=False,
         blank=False,
         help_text="The end date of the recurring shift. This is inclusive."
+    )
+    
+    class_time = models.ForeignKey(
+        to=ClassTimes,
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        help_text="The class time that this recurring shift is for."
     )
     
     def save(self, *args, **kwargs):
