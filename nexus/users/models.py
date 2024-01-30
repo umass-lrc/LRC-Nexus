@@ -66,6 +66,8 @@ class PositionChoices(models.IntegerChoices):
     GROUP_TUTOR = 5, 'Group Tutor'
     OURS_MENTOR = 6, 'OURS Mentor'
     OFFICE_ASSISTANT = 7, 'Office Assistant'
+    OFFICE_ASSISTANT_PM = 8, 'Office Assistant PM'
+    OURS_MENTOR_PM = 9, 'OURS Mentor PM'
     
 
 class Positions(models.Model):
