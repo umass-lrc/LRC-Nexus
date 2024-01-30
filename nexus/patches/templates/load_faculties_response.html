@@ -1,0 +1,12 @@
+<div id="load-faculties-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="load-faculties-logs">
+  <div
+    hx-post="{% url 'load_faculty_from_line' 1 %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}

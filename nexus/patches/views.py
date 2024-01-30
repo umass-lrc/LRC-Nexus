@@ -15,12 +15,14 @@ from core.models import (
     Semester,
     CourseSubject,
     Course,
+    Faculty,
 )
 
 from .forms import (
     loadUsersForm,
     loadPositionsForm,
     loadCoursesForm,
+    loadFacultiesForm,
 )
 
 @login_required
@@ -200,5 +202,61 @@ def load_course_from_line(request, line_number):
                 content += f"<b>==Position Added Successfully==</b>"
             except Exception as e:
                 content += f"<b>==Error Occoured On Line {line_number}, Position Not Added: {e}==</b>"
+        content += f"<br/>Line {line_number} Content: {to_read} <br/>"
+        return HttpResponse(content)
+    
+@login_required
+@restrict_to_groups('Tech')
+def load_faculties(request):
+    if request.method == 'POST':
+        form = loadFacultiesForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_faculies_response.html', context={'success': False})
+        with open("temp/faculties.csv", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        return render(request, 'load_faculties_response.html', context={'success': True})
+    form = loadFacultiesForm()
+    context = {'form': form}
+    return render(request, 'load_faculties.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_faculty_from_line(request, line_number):
+    with open("temp/faculties.csv", "r") as f:
+        to_read = None
+        for i, line in enumerate(f):
+            if i == line_number-1:
+                to_read = line
+                break
+        if to_read is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = f"""
+            <div
+                hx-post="{reverse('load_faculty_from_line', kwargs={'line_number': line_number+1})}"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="outerHTML"
+            >
+            </div>
+        """
+        values = to_read.split(',')
+        if len(values) != 3:
+            content += f"<b>==Invalid Format On Line {line_number}==</b>"
+        else:
+            try:
+                first_name = values[0].title()
+                last_name = values[1].title()
+                email = values[2].lower()
+                Faculty.objects.create(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                )
+                content += f"<b>==User Added Successfully==</b>"
+            except Exception as e:
+                content += f"<b>==Error Occoured On Line {line_number}, Faculty Not Added: {e}==</b>"
         content += f"<br/>Line {line_number} Content: {to_read} <br/>"
         return HttpResponse(content)
