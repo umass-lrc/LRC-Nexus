@@ -26,6 +26,25 @@
   {% endfor %}
 </div>
 <hr />
+<h3 class="text-center">Shifts to Sign</h3>
+<div id="sign-shift-main">
+  <div id="sign-shift-message"></div>
+  {% for shift in not_signed_shifts %}
+  <div id="sign-shift-form-{{shift.id}}">
+    <div
+      hx-get="{% url 'sign_shift' shift.id %}"
+      hx-trigger="revealed once"
+      hx-swap="outerHTML"
+      hx-target="this"
+    ></div>
+  </div>
+  {% empty %}
+  <p class="text-center">
+    Looks like you don't have any shift which is left to aprove.
+  </p>
+  {% endfor %}
+</div>
+<hr />
 {% endblock %} {% block bottom %} {% endblock %}
 <!--Extra Scripts-->
 {% block extra_scripts %}

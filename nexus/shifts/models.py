@@ -21,6 +21,7 @@ from payrolls.models import (
     Payroll,
     PayrollStatus,
     PayrollNotSigned,
+    PayrollNotInHR,
 )
 
 def get_weekend(date):
@@ -370,7 +371,7 @@ class Shift(models.Model):
         super(Shift, self).delete()
     
     def __str__(self):
-        return f"{self.building.short_name}-{self.room}"
+        return f"{self.kind} {self.building.short_name}-{self.room} {timezone.localtime(self.start).strftime('%m/%d, %I:%M %p')}"
 
 
 class AttendanceInfo(models.Model):
@@ -421,6 +422,53 @@ class AttendanceInfo(models.Model):
         help_text="Whether or not the shift was signed after the payroll period."
     )
     
+    def did_attend(self):
+        pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
+        nihr = PayrollNotInHR.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
+        start_weekday = self.shift.start.weekday()
+        if start_weekday == 6:
+            pns.sunday_hours -= self.shift.duration
+            nihr.sunday_hours += self.shift.duration
+        elif start_weekday == 0:
+            pns.monday_hours -= self.shift.duration
+            nihr.monday_hours += self.shift.duration
+        elif start_weekday == 1:
+            pns.tuesday_hours -= self.shift.duration
+            nihr.tuesday_hours += self.shift.duration
+        elif start_weekday == 2:
+            pns.wednesday_hours -= self.shift.duration
+            nihr.wednesday_hours += self.shift.duration
+        elif start_weekday == 3:
+            pns.thursday_hours -= self.shift.duration
+            nihr.thursday_hours += self.shift.duration
+        elif start_weekday == 4:
+            pns.friday_hours -= self.shift.duration
+            nihr.friday_hours += self.shift.duration
+        elif start_weekday == 5:
+            pns.saturday_hours -= self.shift.duration
+            nihr.saturday_hours += self.shift.duration
+        pns.save()
+        nihr.save()
+    
+    def did_not_attend(self):
+        pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
+        start_weekday = self.shift.start.weekday()
+        if start_weekday == 6:
+            pns.sunday_hours -= self.shift.duration
+        elif start_weekday == 0:
+            pns.monday_hours -= self.shift.duration
+        elif start_weekday == 1:
+            pns.tuesday_hours -= self.shift.duration
+        elif start_weekday == 2:
+            pns.wednesday_hours -= self.shift.duration
+        elif start_weekday == 3:
+            pns.thursday_hours -= self.shift.duration
+        elif start_weekday == 4:
+            pns.friday_hours -= self.shift.duration
+        elif start_weekday == 5:
+            pns.saturday_hours -= self.shift.duration
+        pns.save()
+        
     def __str__(self):
         return f"{self.shift} - Signed:{self.signed}"
 

@@ -30,6 +30,7 @@ from shifts.models import (
 from ..forms.payroll import (
     PunchInForm,
     PunchOutForm,
+    SignShiftForm,
 )
 
 @login_required
@@ -38,9 +39,11 @@ def get_user_payroll_page(request):
     user = request.user
     active_sem = Semester.objects.get_active_semester()
     positions_punch_in_out = Positions.objects.filter(Q(user=user) & Q(semester=active_sem) & ~Q(position__in=[PositionChoices.SI, PositionChoices.GROUP_TUTOR])).all()
-    print(positions_punch_in_out)
+    att_not_signed = AttendanceInfo.objects.filter(shift__position__user=user, signed=False).values_list('shift__id', flat=True)
+    not_signed_shifts = Shift.objects.filter(id__in=att_not_signed).all()
     context = {
         'positions_punch_in_out': positions_punch_in_out,
+        'not_signed_shifts': not_signed_shifts,
     }
     return render(request, 'user_payroll_main.html', context)
 
@@ -78,6 +81,7 @@ def punch_in_out_position(request, position_id):
             att_info.punch_in_time = punch_in_time.time()
             att_info.attended = True
             att_info.save()
+            att_info.did_attend()
             messages.success(request, 'Punched in successfully.')
         else:
             punch_out_time = timezone.now()
@@ -99,3 +103,50 @@ def punch_in_out_position(request, position_id):
         'form': form,
     }
     return render(request, 'just_form.html', context)
+
+@login_required
+@restrict_to_http_methods('GET', 'POST')
+def sign_shift(request, shift_id):
+    shift = Shift.objects.get(id=shift_id)
+    if request.method == "POST":
+        form = SignShiftForm(request.POST, initial={
+            'position': shift.position,
+            'start': shift.start,
+            'duration': shift.duration,
+            'building': shift.building, 
+            'room': shift.room, 
+            'kind': shift.kind,
+            'shift_id': shift.id,
+            'shift': shift,
+        })
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'sign_shift_response.html', context={'success': False})
+        data = form.cleaned_data
+        if 'did_attend' in request.POST:
+            att = AttendanceInfo.objects.get(shift=shift)
+            att.attended = True
+            att.signed = True
+            att.sign_datetime = timezone.now()
+            att.save()
+            att.did_attend()
+        elif 'did_not_attend' in request.POST:
+            att = AttendanceInfo.objects.get(shift=shift)
+            att.attended = False
+            att.signed = True
+            att.sign_datetime = timezone.now()
+            att.save()
+            att.did_not_attend()
+        messages.success(request, 'Shift signed successfully.')
+        return render(request, 'sign_shift_response.html', context={'success': True, 'shift_id': shift.id})
+    form = SignShiftForm(initial={
+        'position': shift.position,
+        'start': shift.start,
+        'duration': shift.duration,
+        'building': shift.building, 
+        'room': shift.room, 
+        'kind': shift.kind,
+        'shift_id': shift.id,
+        'shift': shift,
+    })
+    return render(request, 'just_form.html', context={'form': form})
