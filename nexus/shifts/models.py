@@ -6,6 +6,9 @@ from django.db import models
 from core.models import (
     Buildings,
     Day,
+    Holiday,
+    Semester,
+    DaySwitch,
 )
 
 from users.models import (
@@ -162,10 +165,16 @@ class RecurringShift(models.Model):
         if start_date > self.end_date:
             return recurring_shift
         
-        while start_date <= self.end_date:
+        active_sem = Semester.objects.get_active_semester()
+        holidays = Holiday.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).values_list('date', flat=True)
+        day_switches = DaySwitch.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).all()
+        day_switches_dates = day_switches.values_list('date', flat=True)
+        date_which_follow_day = day_switches.filter(day=self.day).values_list('date', flat=True)
+        
+        for date in date_which_follow_day:
             Shift.objects.create(
                 position=self.position,
-                start=datetime.combine(start_date, self.start_time, tzinfo=pytz.timezone('America/New_York')),
+                start=datetime.combine(date, self.start_time, tzinfo=pytz.timezone('America/New_York')),
                 duration=self.duration,
                 building=self.building,
                 room=self.room,
@@ -175,6 +184,21 @@ class RecurringShift(models.Model):
                 require_punch_in_out=self.require_punch_in_out,
                 recurring_shift=self,
             )
+        
+        while start_date <= self.end_date:
+            if not (start_date in holidays or start_date in day_switches_dates):
+                Shift.objects.create(
+                    position=self.position,
+                    start=datetime.combine(start_date, self.start_time, tzinfo=pytz.timezone('America/New_York')),
+                    duration=self.duration,
+                    building=self.building,
+                    room=self.room,
+                    kind=self.kind,
+                    note=self.note,
+                    document=self.document,
+                    require_punch_in_out=self.require_punch_in_out,
+                    recurring_shift=self,
+                )
             start_date += timedelta(days=7)
         
         return recurring_shift
