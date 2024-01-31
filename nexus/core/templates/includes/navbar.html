@@ -67,6 +67,7 @@
     </div>
     <div>
       <ul class="sidebar nav flex-column" id="nav_accordion">
+        {% if user.is_staff %}
         <li class="nav-item has-submenu">
           <a class="nav-link nav-menu-item" href="#"
             ><i class="bi bi-activity me-3"></i>Core</a
@@ -328,6 +329,23 @@
             </li>
           </ul>
         </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-calendar-week-fill me-3"></i>Calendar</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-cash-coin me-3"></i>Payroll</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-info-circle-fill me-3"></i>LRC Schedule</a
+          >
+        </li>
+        {% endif %}
       </ul>
     </div>
   </div>
