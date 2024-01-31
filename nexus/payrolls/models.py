@@ -41,16 +41,15 @@ class Payroll(models.Model):
         ]
     
     def save(self, *args, **kwargs):
-        print("\n\n###########WTF!!##############\n\n")
         update = self.id is not None
-        super(Payroll, self).save(*args, **kwargs)
+        payroll = super(Payroll, self).save(*args, **kwargs)
         if update:
-            return
+            return payroll
         PayrollInHR.objects.create(payroll=self)
         PayrollInHRViaLatePay.objects.create(payroll=self)
         PayrollNotInHR.objects.create(payroll=self)
         PayrollNotSigned.objects.create(payroll=self)
-        return
+        return payroll
 
 class PayrollInHR(models.Model):
     payroll = models.OneToOneField(

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-import pytz
+from django.utils import timezone
 
 from django.db import models
 
@@ -146,13 +146,38 @@ class RecurringShift(models.Model):
         
         if update:
             shifts = Shift.objects.filter(recurring_shift=self, start__date__gte=start_date).all()
-            print(len(shifts))
+            
+            active_sem = Semester.objects.get_active_semester()
+            holidays = Holiday.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).values_list('date', flat=True)
+            day_switches = DaySwitch.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).all()
+            day_switches_dates = day_switches.values_list('date', flat=True)
+            date_which_follow_day = day_switches.filter(day_to_follow=self.day).values_list('date', flat=True)
+            print(date_which_follow_day)
+            for date in date_which_follow_day:
+                print(date)
+                shift = Shift.objects.create(
+                    position=self.position,
+                    start=timezone.make_aware(datetime.combine(date, self.start_time)),
+                    duration=self.duration,
+                    building=self.building,
+                    room=self.room,
+                    kind=self.kind,
+                    note=self.note,
+                    document=self.document,
+                    require_punch_in_out=self.require_punch_in_out,
+                    recurring_shift=self,
+                )
+                print(shift.start)
+            
             for shift in shifts:
-                new_start = datetime.combine(shift.start.date(), self.start_time, tzinfo=pytz.timezone('America/New_York'))
+                new_start = timezone.make_aware(datetime.combine(shift.start.date(), self.start_time))
                 while (new_start.weekday()+1)%7 != 0:
                     new_start -= timedelta(days=1)
                 while (new_start.weekday()+1)%7 != self.day:
                     new_start += timedelta(days=1)
+                if new_start.date() in holidays or new_start.date() in day_switches_dates:
+                    shift.delete()
+                    continue
                 shift.start = new_start
                 shift.position = self.position
                 shift.duration = self.duration
@@ -175,12 +200,12 @@ class RecurringShift(models.Model):
         holidays = Holiday.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).values_list('date', flat=True)
         day_switches = DaySwitch.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).all()
         day_switches_dates = day_switches.values_list('date', flat=True)
-        date_which_follow_day = day_switches.filter(day=self.day).values_list('date', flat=True)
+        date_which_follow_day = day_switches.filter(day_to_follow=self.day).values_list('date', flat=True)
         
         for date in date_which_follow_day:
             Shift.objects.create(
                 position=self.position,
-                start=datetime.combine(date, self.start_time, tzinfo=pytz.timezone('America/New_York')),
+                start=timezone.make_aware(datetime.combine(date, self.start_time)),
                 duration=self.duration,
                 building=self.building,
                 room=self.room,
@@ -195,7 +220,7 @@ class RecurringShift(models.Model):
             if not (start_date in holidays or start_date in day_switches_dates):
                 Shift.objects.create(
                     position=self.position,
-                    start=datetime.combine(start_date, self.start_time, tzinfo=pytz.timezone('America/New_York')),
+                    start=timezone.make_aware(datetime.combine(start_date, self.start_time)),
                     duration=self.duration,
                     building=self.building,
                     room=self.room,
@@ -208,6 +233,12 @@ class RecurringShift(models.Model):
             start_date += timedelta(days=7)
         
         return recurring_shift
+    
+    def delete(self):
+        todays_date = datetime.now().date()
+        for shift in Shift.objects.filter(recurring_shift=self, start__date__gte=todays_date).all():
+            shift.delete()
+        super(RecurringShift, self).delete()
 
 def shift_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -319,6 +350,7 @@ class Shift(models.Model):
             elif start_weekday == 5:
                 not_signed_payroll.saturday_hours -= old_shift.duration
             not_signed_payroll.save()
+        print(self.start)
         shift = super(Shift, self).save(*args, **kwargs)
         
         if not update:
@@ -352,6 +384,30 @@ class Shift(models.Model):
         not_signed_payroll.save()
         
         return shift
+    
+    def delete(self):
+        attendance = AttendanceInfo.objects.get(shift=self)
+        if attendance.signed:
+            raise Exception("Cannot delete a signed shift.")
+        attendance.delete()
+        not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
+        start_weekday = self.start.weekday()
+        if start_weekday == 6:
+            not_signed_payroll.sunday_hours -= self.duration
+        elif start_weekday == 0:
+            not_signed_payroll.monday_hours -= self.duration
+        elif start_weekday == 1:
+            not_signed_payroll.tuesday_hours -= self.duration
+        elif start_weekday == 2:
+            not_signed_payroll.wednesday_hours -= self.duration
+        elif start_weekday == 3:
+            not_signed_payroll.thursday_hours -= self.duration
+        elif start_weekday == 4:
+            not_signed_payroll.friday_hours -= self.duration
+        elif start_weekday == 5:
+            not_signed_payroll.saturday_hours -= self.duration
+        not_signed_payroll.save()
+        super(Shift, self).delete()
     
     def __str__(self):
         return f"{self.building.short_name}-{self.room}"
@@ -406,7 +462,7 @@ class AttendanceInfo(models.Model):
     )
     
     def __str__(self):
-        return f"{self.shift} - {self.attendance_code} - {self.start} - {self.end}"
+        return f"{self.shift} - Signed:{self.signed}"
 
 class State(models.TextChoices):
     NOT_VIEWED = "Not Viewed"
