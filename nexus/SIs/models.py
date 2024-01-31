@@ -1,7 +1,7 @@
 from django.db import models
 
 from shifts.models import (
-    Shift,
+    RecurringShift,
 )
 
 from users.models import (
@@ -10,6 +10,7 @@ from users.models import (
 
 from core.models import (
     Classes,
+    ClassTimes,
 )
 
 class SIRoleInfo(models.Model):
@@ -34,27 +35,40 @@ class SIRoleInfo(models.Model):
             "position",
             "assigned_class",
         ]
-
-class SIShiftInfo(models.Model):
-    shift = models.OneToOneField(
-        to=Shift,
-        on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-        help_text="The shift that this shift info is for."
-    )
     
+    def save(self, *args, **kwargs):
+        if self.position.position != "SI":
+            raise ValueError("This role is not for an SI position.")
+        if self.id is not None:
+            old_role = SIRoleInfo.objects.get(id=self.id)
+            
+        new_role = super(SIRoleInfo, self).save(*args, **kwargs)
+
+class SIReccuringShiftInfo(models.Model):
     role = models.ForeignKey(
         to=SIRoleInfo,
         on_delete=models.RESTRICT,
         null=False,
-        blank=False,
-        help_text="The role that this shift info is for."
+        blank=False
+    )
+    
+    class_time = models.ForeignKey(
+        to=ClassTimes,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False
+    )
+    
+    recuring_shift = models.ForeignKey(
+        to=RecurringShift,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False
     )
     
     class Meta:
         unique_together = [
-            "shift",
             "role",
+            "class_time",
         ]
 
