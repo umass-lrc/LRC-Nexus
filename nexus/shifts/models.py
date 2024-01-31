@@ -147,48 +147,8 @@ class RecurringShift(models.Model):
         if update:
             shifts = Shift.objects.filter(recurring_shift=self, start__date__gte=start_date).all()
             
-            active_sem = Semester.objects.get_active_semester()
-            holidays = Holiday.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).values_list('date', flat=True)
-            day_switches = DaySwitch.objects.filter(semester=active_sem, date__gte=start_date, date__lte=self.end_date).all()
-            day_switches_dates = day_switches.values_list('date', flat=True)
-            date_which_follow_day = day_switches.filter(day_to_follow=self.day).values_list('date', flat=True)
-            print(date_which_follow_day)
-            for date in date_which_follow_day:
-                print(date)
-                shift = Shift.objects.create(
-                    position=self.position,
-                    start=timezone.make_aware(datetime.combine(date, self.start_time)),
-                    duration=self.duration,
-                    building=self.building,
-                    room=self.room,
-                    kind=self.kind,
-                    note=self.note,
-                    document=self.document,
-                    require_punch_in_out=self.require_punch_in_out,
-                    recurring_shift=self,
-                )
-                print(shift.start)
-            
             for shift in shifts:
-                new_start = timezone.make_aware(datetime.combine(shift.start.date(), self.start_time))
-                while (new_start.weekday()+1)%7 != 0:
-                    new_start -= timedelta(days=1)
-                while (new_start.weekday()+1)%7 != self.day:
-                    new_start += timedelta(days=1)
-                if new_start.date() in holidays or new_start.date() in day_switches_dates:
-                    shift.delete()
-                    continue
-                shift.start = new_start
-                shift.position = self.position
-                shift.duration = self.duration
-                shift.building = self.building
-                shift.room = self.room
-                shift.kind = self.kind
-                shift.note = self.note
-                shift.document = self.document
-                shift.require_punch_in_out = self.require_punch_in_out
-                shift.save()
-            return recurring_shift
+                shift.delete()
         
         while (start_date.weekday()+1)%7 != self.day:
             start_date += timedelta(days=1)
