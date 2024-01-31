@@ -25,7 +25,6 @@ from users.models import (
 
 from ..models import (
     SIRoleInfo,
-    SIShiftInfo,
 )
 
 from ..forms.role import (
