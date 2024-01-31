@@ -1,0 +1,33 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Your Payroll</h1>
+<hr />
+<h3 class="text-center">Punch In/Out</h3>
+<div id="punch-in-out-main">
+  <div id="punch-in-out-message"></div>
+  {% for position in positions_punch_in_out %}
+  <div id="punch-in-out-form-{{position.id}}">
+    <div
+      hx-get="{% url 'punch_in_out_position' position.id %}"
+      hx-trigger="revealed once"
+      hx-swap="outerHTML"
+      hx-target="this"
+    ></div>
+  </div>
+  {% empty %}
+  <p class="text-center">
+    Looks like you don't have any position which requires punch in/out.
+  </p>
+  {% endfor %}
+</div>
+<hr />
+{% endblock %} {% block bottom %} {% endblock %}
+<!--Extra Scripts-->
+{% block extra_scripts %}
+<script></script>
+{% endblock%}
