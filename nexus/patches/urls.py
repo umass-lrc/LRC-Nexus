@@ -9,6 +9,8 @@ from .views import (
     load_course_from_line,
     load_faculties,
     load_faculty_from_line,
+    load_classes,
+    load_class_from_line,
 )
 
 urlpatterns = [
@@ -20,4 +22,6 @@ urlpatterns = [
     path('load_courses/load_course_from_line/<int:line_number>/', load_course_from_line, name='load_course_from_line'),
     path('load_faculties/', load_faculties, name='load_faculties'),
     path('load_faculties/load_faculty_from_line/<int:line_number>/', load_faculty_from_line, name='load_faculty_from_line'),
+    path('load_classes/', load_classes, name='load_classes'),
+    path('load_classes/load_class_from_line/<int:line_number>/', load_class_from_line, name='load_class_from_line'),
 ]

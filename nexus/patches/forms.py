@@ -95,3 +95,24 @@ class loadFacultiesForm(forms.Form):
                 css_class='text-center',
             ),
         )
+
+class loadClassesForm(forms.Form):
+    file = forms.FileField()
+
+    def __init__(self, *args, **kwargs):
+        super(loadClassesForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.attrs = {
+            'hx-post': reverse('load_classes'),
+            'hx-swap': 'multi:#load-classes-message:innerHTML,#load-classes-logs:innerHTML',
+        }
+        self.helper.layout = Layout(
+            Fieldset(
+                '',
+                FloatingField('file'),
+            ),
+            Div(
+                Submit('submit', 'Load Classes', css_class='btn btn-primary'),
+                css_class='text-center',
+            ),
+        )
