@@ -422,7 +422,7 @@ class AttendanceInfo(models.Model):
         help_text="Whether or not the shift was signed after the payroll period."
     )
     
-    def attended(self):
+    def did_attend(self):
         pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
         nihr = PayrollNotInHR.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
         start_weekday = self.shift.start.weekday()

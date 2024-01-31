@@ -124,8 +124,8 @@ class SignShiftForm(forms.Form):
                     FloatingField('kind'),
                     FloatingField('reason'),
                     Div(
-                        Submit('submit', 'Attended', css_class='btn btn-primary'),
-                        Submit('submit', "Didn't Attend", css_class='btn btn-danger'),
+                        Submit('did_attend', 'Attended', css_class='btn btn-primary'),
+                        Submit('did_not_attend', "Didn't Attend", css_class='btn btn-danger'),
                         css_class='text-center',
                     ),
                     active=False,

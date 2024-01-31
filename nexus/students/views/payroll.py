@@ -81,7 +81,7 @@ def punch_in_out_position(request, position_id):
             att_info.punch_in_time = punch_in_time.time()
             att_info.attended = True
             att_info.save()
-            att_info.attended()
+            att_info.did_attend()
             messages.success(request, 'Punched in successfully.')
         else:
             punch_out_time = timezone.now()
@@ -108,6 +108,37 @@ def punch_in_out_position(request, position_id):
 @restrict_to_http_methods('GET', 'POST')
 def sign_shift(request, shift_id):
     shift = Shift.objects.get(id=shift_id)
+    if request.method == "POST":
+        form = SignShiftForm(request.POST, initial={
+            'position': shift.position,
+            'start': shift.start,
+            'duration': shift.duration,
+            'building': shift.building, 
+            'room': shift.room, 
+            'kind': shift.kind,
+            'shift_id': shift.id,
+            'shift': shift,
+        })
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'sign_shift_response.html', context={'success': False})
+        data = form.cleaned_data
+        if 'did_attend' in request.POST:
+            att = AttendanceInfo.objects.get(shift=shift)
+            att.attended = True
+            att.signed = True
+            att.sign_datetime = timezone.now()
+            att.save()
+            att.did_attend()
+        elif 'did_not_attend' in request.POST:
+            att = AttendanceInfo.objects.get(shift=shift)
+            att.attended = False
+            att.signed = True
+            att.sign_datetime = timezone.now()
+            att.save()
+            att.did_not_attend()
+        messages.success(request, 'Shift signed successfully.')
+        return render(request, 'sign_shift_response.html', context={'success': True, 'shift_id': shift.id})
     form = SignShiftForm(initial={
         'position': shift.position,
         'start': shift.start,
