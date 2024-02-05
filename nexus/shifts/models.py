@@ -372,6 +372,28 @@ class Shift(models.Model):
         not_signed_payroll.save()
         super(Shift, self).delete()
     
+    def force_delete_from_not_in_hr(self):
+        not_in_hr_payroll = PayrollNotInHR.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
+        start_weekday = self.start.weekday()
+        not_in_hr_payroll.total_hours -= self.duration
+        if start_weekday == 6:
+            not_in_hr_payroll.sunday_hours -= self.duration
+        elif start_weekday == 0:
+            not_in_hr_payroll.monday_hours -= self.duration
+        elif start_weekday == 1:
+            not_in_hr_payroll.tuesday_hours -= self.duration
+        elif start_weekday == 2:
+            not_in_hr_payroll.wednesday_hours -= self.duration
+        elif start_weekday == 3:
+            not_in_hr_payroll.thursday_hours -= self.duration
+        elif start_weekday == 4:
+            not_in_hr_payroll.friday_hours -= self.duration
+        elif start_weekday == 5:
+            not_in_hr_payroll.saturday_hours -= self.duration
+        not_in_hr_payroll.save()
+        self.attendance_info.delete()
+        super(Shift, self).delete()
+    
     def __str__(self):
         return f"{self.kind} {self.building.short_name}-{self.room} {timezone.localtime(self.start).strftime('%m/%d, %I:%M %p')}"
 

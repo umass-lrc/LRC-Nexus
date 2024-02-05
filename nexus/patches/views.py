@@ -29,6 +29,7 @@ from payrolls.models import (
 from shifts.models import (
     get_weekend,
     Shift,
+    ShiftKind,
 )
 
 from .forms import (
@@ -417,3 +418,19 @@ def fix_payroll(request):
         return HttpResponse("DONE!")
         
     return render(request, 'fix_payroll.html')
+
+@login_required
+@restrict_to_groups('Tech')
+@restrict_to_http_methods('GET', 'POST')
+def delete_class_shifts(request):
+    if request.method == 'POST':
+        print("Starting....")
+        shifts = Shift.objects.filter(position__semester=Semester.objects.get_active_semester(), kind=ShiftKind.CLASS).all()
+        for shift in shifts:
+            try:
+                shift.delete()
+            except:
+                shift.force_delete_from_not_in_hr()
+        print("done.")
+        return HttpResponse("DONE!")
+    return render(request, 'delete_class_shift.html')
