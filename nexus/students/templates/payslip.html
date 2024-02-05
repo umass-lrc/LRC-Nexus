@@ -1,0 +1,99 @@
+{% load hours %}
+<!---->
+{% for payroll in payrolls %}
+<tr>
+  {% if forloop.counter0 == 0 %}
+  <th class="text-center align-middle" rowspan="{{payroll_rows}}" scope="row">
+    {{ week_end }}
+  </th>
+  {% endif %}
+  <th class="text-center align-middle" rowspan="5" scope="row">
+    {{payroll.position.get_position_display}}
+  </th>
+  <td class="text-center">On Time</td>
+  <td class="text-end">{{payroll.in_hr.sunday_hours|hours}}</td>
+  <td class="text-end">{{payroll.in_hr.monday_hours|hours}}</td>
+  <td class="text-end">{{payroll.in_hr.tuesday_hours|hours}}</td>
+  <td class="text-end">{{payroll.in_hr.wednesday_hours|hours}}</td>
+  <td class="text-end">{{payroll.in_hr.thursday_hours|hours}}</td>
+  <td class="text-end">{{payroll.in_hr.friday_hours|hours}}</td>
+  <td class="text-end">{{payroll.in_hr.saturday_hours|hours}}</td>
+  <th class="text-end" scope="row">{{payroll.in_hr.total_hours|hours}}</th>
+</tr>
+<tr>
+  <td class="text-center">Late Pay</td>
+  <td class="text-end">{{payroll.late_pay.sunday_hours|hours}}</td>
+  <td class="text-end">{{payroll.late_pay.monday_hours|hours}}</td>
+  <td class="text-end">{{payroll.late_pay.tuesday_hours|hours}}</td>
+  <td class="text-end">{{payroll.late_pay.wednesday_hours|hours}}</td>
+  <td class="text-end">{{payroll.late_pay.thursday_hours|hours}}</td>
+  <td class="text-end">{{payroll.late_pay.friday_hours|hours}}</td>
+  <td class="text-end">{{payroll.late_pay.saturday_hours|hours}}</td>
+  <th class="text-end" scope="row">{{payroll.late_pay.total_hours|hours}}</th>
+</tr>
+<tr>
+  <td class="text-center">Not in HR</td>
+  <td class="text-end">{{payroll.not_in_hr.sunday_hours|hours}}</td>
+  <td class="text-end">{{payroll.not_in_hr.monday_hours|hours}}</td>
+  <td class="text-end">{{payroll.not_in_hr.tuesday_hours|hours}}</td>
+  <td class="text-end">{{payroll.not_in_hr.wednesday_hours|hours}}</td>
+  <td class="text-end">{{payroll.not_in_hr.thursday_hours|hours}}</td>
+  <td class="text-end">{{payroll.not_in_hr.friday_hours|hours}}</td>
+  <td class="text-end">{{payroll.not_in_hr.saturday_hours|hours}}</td>
+  <th class="text-end" scope="row">{{payroll.not_in_hr.total_hours|hours}}</th>
+</tr>
+<tr>
+  <td class="text-center">Total Hours</td>
+  <td class="text-end">
+    {{payroll.in_hr.sunday_hours|add:payroll.late_pay.sunday_hours|add:payroll.not_in_hr.sunday_hours|hours}}
+  </td>
+  <td class="text-end">
+    {{payroll.in_hr.monday_hours|add:payroll.late_pay.monday_hours|add:payroll.not_in_hr.monday_hours|hours}}
+  </td>
+  <td class="text-end">
+    {{payroll.in_hr.tuesday_hours|add:payroll.late_pay.tuesday_hours|add:payroll.not_in_hr.tuesday_hours|hours}}
+  </td>
+  <td class="text-end">
+    {{payroll.in_hr.wednesday_hours|add:payroll.late_pay.wednesday_hours|add:payroll.not_in_hr.wednesday_hours|hours}}
+  </td>
+  <td class="text-end">
+    {{payroll.in_hr.thursday_hours|add:payroll.late_pay.thursday_hours|add:payroll.not_in_hr.thursday_hours|hours}}
+  </td>
+  <td class="text-end">
+    {{payroll.in_hr.friday_hours|add:payroll.late_pay.friday_hours|add:payroll.not_in_hr.friday_hours|hours}}
+  </td>
+  <td class="text-end">
+    {{payroll.in_hr.saturday_hours|add:payroll.late_pay.saturday_hours|add:payroll.not_in_hr.saturday_hours|hours}}
+  </td>
+  <th class="text-end" scope="row">
+    {{payroll.in_hr.total_hours|add:payroll.late_pay.total_hours|add:payroll.not_in_hr.total_hours|hours}}
+  </th>
+</tr>
+<tr>
+  <th class="text-center" scope="row">Total Pay</th>
+  <th class="text-end">
+    ${{payroll.in_hr.sunday_hours|add:payroll.late_pay.sunday_hours|add:payroll.not_in_hr.sunday_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+  <th class="text-end">
+    ${{payroll.in_hr.monday_hours|add:payroll.late_pay.monday_hours|add:payroll.not_in_hr.monday_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+  <th class="text-end">
+    ${{payroll.in_hr.tuesday_hours|add:payroll.late_pay.tuesday_hours|add:payroll.not_in_hr.tuesday_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+  <th class="text-end">
+    ${{payroll.in_hr.wednesday_hours|add:payroll.late_pay.wednesday_hours|add:payroll.not_in_hr.wednesday_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+  <th class="text-end">
+    ${{payroll.in_hr.thursday_hours|add:payroll.late_pay.thursday_hours|add:payroll.not_in_hr.thursday_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+  <th class="text-end">
+    ${{payroll.in_hr.friday_hours|add:payroll.late_pay.friday_hours|add:payroll.not_in_hr.friday_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+  <th class="text-end">
+    ${{payroll.in_hr.saturday_hours|add:payroll.late_pay.saturday_hours|add:payroll.not_in_hr.saturday_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+  <th class="text-end" scope="row">
+    ${{payroll.in_hr.total_hours|add:payroll.late_pay.total_hours|add:payroll.not_in_hr.total_hours|multiply:payroll.position.hourly_pay}}
+  </th>
+</tr>
+{% endfor %}

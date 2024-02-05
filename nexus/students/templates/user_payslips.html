@@ -1,0 +1,9 @@
+{% for week_end in week_ends %}
+<tr
+  style="height: 100px"
+  hx-get="{% url 'get_payslip_for' week_end %}"
+  hx-trigger="intersect"
+  hx-swap="outerHTML"
+  hx-target="this"
+></tr>
+{% endfor %}

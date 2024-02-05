@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from django.contrib.auth.decorators import login_required
 
@@ -39,4 +39,6 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('patches/', include('patches.urls')),
     path('shifts/', include('shifts.urls')),
+    path('SIs/', include('SIs.urls')),
+    path('students/', include('students.urls')),
 ]
