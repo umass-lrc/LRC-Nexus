@@ -296,6 +296,7 @@ class Shift(models.Model):
                 raise Exception("Cannot edit a signed shift.")
             not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=old_shift.position, payroll__week_end=get_weekend(old_shift.start.date()))
             start_weekday = old_shift.start.weekday()
+            not_signed_payroll.total_hours -= old_shift.duration
             if start_weekday == 6:
                 not_signed_payroll.sunday_hours -= old_shift.duration
             elif start_weekday == 0:
@@ -327,6 +328,7 @@ class Shift(models.Model):
         
         not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
         start_weekday = self.start.weekday()
+        not_signed_payroll.total_hours += self.duration
         if start_weekday == 6:
             not_signed_payroll.sunday_hours += self.duration
         elif start_weekday == 0:
@@ -352,6 +354,7 @@ class Shift(models.Model):
         attendance.delete()
         not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
         start_weekday = self.start.weekday()
+        not_signed_payroll.total_hours -= self.duration
         if start_weekday == 6:
             not_signed_payroll.sunday_hours -= self.duration
         elif start_weekday == 0:
