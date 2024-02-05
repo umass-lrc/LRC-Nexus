@@ -25,12 +25,23 @@ from core.models import (
 from shifts.models import (
     AttendanceInfo,
     Shift,
+    get_weekend,
+)
+
+from payrolls.models import (
+    Payroll,
+    PayrollInHR,
+    PayrollInHRViaLatePay,
+    PayrollNotInHR,
+    PayrollStatus,
 )
 
 from ..forms.payroll import (
     PunchInForm,
     PunchOutForm,
     SignShiftForm,
+    ShiftPunchInForm,
+    ShiftPunchOutForm,
 )
 
 @login_required
@@ -39,11 +50,24 @@ def get_user_payroll_page(request):
     user = request.user
     active_sem = Semester.objects.get_active_semester()
     positions_punch_in_out = Positions.objects.filter(Q(user=user) & Q(semester=active_sem) & ~Q(position__in=[PositionChoices.SI, PositionChoices.GROUP_TUTOR])).all()
-    att_not_signed = AttendanceInfo.objects.filter(shift__position__user=user, signed=False).values_list('shift__id', flat=True)
+    att_not_signed = AttendanceInfo.objects.filter(shift__position__user=user, shift__start__lte=timezone.now(), signed=False).values_list('shift__id', flat=True)
     not_signed_shifts = Shift.objects.filter(id__in=att_not_signed).all()
+    punch_in_out_shifts = Shift.objects.filter(
+        (Q(position__user=user) & Q(require_punch_in_out=True)) & 
+        (
+            (Q(attendance_info__punch_in_time__isnull=False) & Q(attendance_info__punch_out_time__isnull=True)) | 
+            (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=(timezone.now() + timedelta(minutes=30))) & Q(attendance_info__punch_in_time__isnull=True))
+        )
+    ).all()
+    not_signed_shifts_ = []
+    for shift in not_signed_shifts:
+        if shift in punch_in_out_shifts:
+            continue
+        not_signed_shifts_.append(shift)
     context = {
         'positions_punch_in_out': positions_punch_in_out,
-        'not_signed_shifts': not_signed_shifts,
+        'not_signed_shifts': not_signed_shifts_,
+        'punch_in_out_shifts': punch_in_out_shifts,
     }
     return render(request, 'user_payroll_main.html', context)
 
@@ -52,7 +76,7 @@ def get_user_payroll_page(request):
 def punch_in_out_position(request, position_id):
     user = request.user
     position = Positions.objects.get(id=position_id)
-    att_info = AttendanceInfo.objects.filter(shift__position=position, punch_in_time__isnull=False, punch_out_time__isnull=True)
+    att_info = AttendanceInfo.objects.filter(shift__position=position, shift__require_punch_in_out=False, punch_in_time__isnull=False, punch_out_time__isnull=True)
     punched_in = att_info.exists()
     if punched_in:
         att_info = att_info.first()
@@ -79,9 +103,7 @@ def punch_in_out_position(request, position_id):
             )
             att_info = AttendanceInfo.objects.get(shift=shift)
             att_info.punch_in_time = punch_in_time.time()
-            att_info.attended = True
             att_info.save()
-            att_info.did_attend()
             messages.success(request, 'Punched in successfully.')
         else:
             punch_out_time = timezone.now()
@@ -89,8 +111,6 @@ def punch_in_out_position(request, position_id):
             att_info.shift.duration = duration
             att_info.shift.save()
             att_info.punch_out_time = punch_out_time.time()
-            att_info.signed = True
-            att_info.sign_datetime = punch_out_time
             att_info.save()
             messages.success(request, 'Punched out successfully.')
         context = {
@@ -99,6 +119,55 @@ def punch_in_out_position(request, position_id):
         }
         return render(request, 'punch_in_out_response.html', context)
     form = PunchInForm(position) if not punched_in else PunchOutForm(position, initial={'building': att_info.shift.building, 'room': att_info.shift.room, 'kind': att_info.shift.kind})
+    context = {
+        'form': form,
+    }
+    return render(request, 'just_form.html', context)
+
+
+@login_required
+@restrict_to_http_methods('GET','POST')
+def shift_punch_in_out(request, shift_id):
+    user = request.user
+    shift = Shift.objects.get(id=shift_id)
+    att_info = AttendanceInfo.objects.filter(shift=shift, punch_in_time__isnull=False, punch_out_time__isnull=True)
+    punched_in = att_info.exists()
+    if punched_in:
+        att_info = att_info.first()
+    
+    if request.method == 'POST':
+        form = None
+        if not punched_in:
+            form = ShiftPunchInForm(shift, request.POST)
+        else:
+            form = ShiftPunchOutForm(shift, request.POST)
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'shift_punch_in_out_response.html', context={'success': False})
+        data = form.cleaned_data
+        if not punched_in:
+            punch_in_time = timezone.now()
+            att_info = AttendanceInfo.objects.get(shift=shift)
+            att_info.punch_in_time = punch_in_time.time()
+            att_info.shift.start = punch_in_time
+            att_info.shift.save()
+            att_info.save()
+            messages.success(request, 'Punched in successfully.')
+        else:
+            punch_out_time = timezone.now()
+            duration = punch_out_time - att_info.shift.start
+            att_info.shift.duration = duration
+            att_info.shift.save()
+            att_info.punch_out_time = punch_out_time.time()
+            att_info.save()
+            messages.success(request, 'Punched out successfully.')
+        context = {
+            'shift': shift,
+            'success': True,
+            'punched_out': punched_in,
+        }
+        return render(request, 'shift_punch_in_out_response.html', context)
+    form = ShiftPunchInForm(shift) if not punched_in else ShiftPunchOutForm(shift)
     context = {
         'form': form,
     }
@@ -150,3 +219,36 @@ def sign_shift(request, shift_id):
         'shift': shift,
     })
     return render(request, 'just_form.html', context={'form': form})
+
+@login_required
+@restrict_to_http_methods('GET')
+def get_user_payslips(request):
+    user = request.user
+    active_sem = Semester.objects.get_active_semester()
+    positions = Positions.objects.filter(user=user, semester=active_sem).all()
+    week_ends = Payroll.objects.filter(position__in=positions, week_end__lte=get_weekend(timezone.now().date())).all().order_by('-week_end').values_list('week_end', flat=True).distinct()
+    context = {
+        'week_ends': week_ends,
+    }
+    return render(request, 'user_payslips.html', context)
+
+@login_required
+@restrict_to_http_methods('GET')
+def get_payslip_for(request, week_end):
+    user = request.user
+    active_sem = Semester.objects.get_active_semester()
+    positions = Positions.objects.filter(user=user, semester=active_sem).all()
+    payrolls = Payroll.objects.filter(position__in=positions, week_end=week_end).all()
+    for position in positions:
+        if not payrolls.filter(position=position, week_end=week_end).exists():
+            Payroll.objects.create(
+                position=position,
+                week_end=week_end,
+                status=PayrollStatus.NOT_IN_HR,
+            )
+    context = {
+        'payrolls': payrolls,
+        'payroll_rows': len(payrolls)*5,
+        'week_end': week_end,
+    }
+    return render(request, 'payslip.html', context)

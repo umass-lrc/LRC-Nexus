@@ -1,0 +1,175 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Calendar</h1>
+<hr />
+<div>
+  <div id="colors"></div>
+  <hr />
+  <div id="calendar">
+    <div
+      hx-get="{% url 'get_student_calendar' %}"
+      hx-swap="multi:#colors:innerHTML,#calendar:innerHTML"
+      hx-trigger="intersect"
+    ></div>
+  </div>
+</div>
+
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Add Shift Request</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        <b
+          >You are gonna request a shift to be added to your calendar. Please
+          confirm with your supervisor if this is the best option. You would
+          usually put a change request for a shift that is already in the
+          calendar.</b
+        >
+      </p>
+      <div id="add-shift-request">
+        <div id="add-shift-message"></div>
+        <div id="add-shift-form">
+          <button
+            hx-get="{% url 'add_shift_request' %}"
+            hx-trigger="click"
+            hx-target="#add-shift-form"
+            class="btn btn-danger d-block mx-auto"
+          >
+            I know what I am doing. Processed.
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingTwo">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseTwo"
+      aria-expanded="false"
+      aria-controls="flush-collapseTwo"
+      id="flush-collapseTwo-button"
+    >
+      <h3>Change/Drop Shift Request</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseTwo"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingTwo"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please click on the shift you want to change/drop.
+      </p>
+      <div id="shift-request-message"></div>
+      <div id="shift-request"></div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let calendar;
+
+  function shiftRequest(url) {
+    if (url === undefined) {
+      return;
+    }
+    let message = document.getElementById("shift-request-message");
+    message.innerHTML = "";
+
+    let accordion = document.getElementById("flush-collapseTwo");
+    if (!accordion.classList.contains("show")) {
+      document.getElementById("flush-collapseTwo-button").click();
+    }
+
+    htmx.ajax("GET", url, "#shift-request");
+  }
+
+  document.body.addEventListener("calendar", function (event) {
+    let calendarElem = document.getElementById("calendar");
+    calendar = new FullCalendar.Calendar(calendarElem, {
+      themeSystem: "bootstrap5",
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+      },
+      editable: false,
+      droppable: false,
+      eventSources: [
+        {
+          url: "{% url 'get_student_shifts' %}",
+          method: "GET",
+          success: function (content, response) {
+            for (let i = 0; i < content.length; i++) {
+              let event = calendar.getEventById(content[i].id);
+              if (event) {
+                event.remove();
+              }
+            }
+          },
+          failure: function () {
+            alert(
+              "There was an error while fetching calendar events! Please report this to the admin, and try again later."
+            );
+          },
+        },
+      ],
+      eventClick: function (info) {
+        shiftRequest(info.event.extendedProps.url);
+      },
+      eventDidMount: function (info) {
+        $(info.el).tooltip({
+          html: true,
+          title: info.event.extendedProps.description,
+        });
+        if (info.event.textColor) {
+          info.el.style.color = info.event.textColor;
+        }
+      },
+    });
+    calendar.render();
+  });
+
+  document.body.addEventListener("addShiftRequest", function (event) {
+    let event_info = JSON.parse(event.detail.value);
+    calendar.addEvent(event_info);
+    calendar.render();
+  });
+
+  document.body.addEventListener("editShift", function (event) {
+    let event_info = JSON.parse(event.detail.value);
+    calendar.getEventById(event_info.id).remove();
+    calendar.addEvent(event_info);
+    calendar.render();
+  });
+</script>
+{% endblock %}
