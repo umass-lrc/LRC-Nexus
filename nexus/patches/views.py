@@ -19,6 +19,19 @@ from core.models import (
     Classes,
 )
 
+from payrolls.models import (
+    Payroll,
+    PayrollNotInHR,
+    PayrollNotSigned,
+    PayrollStatus,
+)
+
+from shifts.models import (
+    get_weekend,
+    Shift,
+    ShiftKind,
+)
+
 from .forms import (
     loadUsersForm,
     loadPositionsForm,
@@ -331,3 +344,93 @@ def load_class_from_line(request, line_number):
                 content += f"<b>==Error Occoured On Line {line_number}, Class Not Added: {e}==</b>"
         content += f"<br/>Line {line_number} Content: {to_read} <br/>"
         return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
+@restrict_to_http_methods('GET', 'POST')
+def fix_payroll(request):
+    if request.method == 'POST':
+        print("Starting....")
+        attended_shifts = Shift.objects.filter(position__semester=Semester.objects.get_active_semester(), attendance_info__attended=True).all()
+        not_attended_shifts = Shift.objects.filter(position__semester=Semester.objects.get_active_semester(), attendance_info__attended=False).all()
+        
+        all_payroll = Payroll.objects.all()
+        for payroll in all_payroll:
+            payroll.status = PayrollStatus.NOT_IN_HR
+            if PayrollNotSigned.objects.filter(payroll=payroll).exists():
+                payroll.not_signed.delete()
+            if PayrollNotInHR.objects.filter(payroll=payroll).exists():
+                payroll.not_in_hr.delete()
+            PayrollNotSigned.objects.create(payroll=payroll)
+            PayrollNotInHR.objects.create(payroll=payroll)
+            payroll.save()
+        print("done-1")
+        
+        for shift in not_attended_shifts:
+            payroll = Payroll.objects.get(
+                position=shift.position,
+                week_end=get_weekend(shift.start.date()),
+            )
+            start_weekday = shift.start.weekday()
+            payroll.not_signed.total_hours += shift.duration
+            if start_weekday == 6:
+                payroll.not_signed.sunday_hours += shift.duration
+            elif start_weekday == 0:
+                payroll.not_signed.monday_hours += shift.duration
+            elif start_weekday == 1:
+                payroll.not_signed.tuesday_hours += shift.duration
+            elif start_weekday == 2:
+                payroll.not_signed.wednesday_hours += shift.duration
+            elif start_weekday == 3:
+                payroll.not_signed.thursday_hours += shift.duration
+            elif start_weekday == 4:
+                payroll.not_signed.friday_hours += shift.duration
+            elif start_weekday == 5:
+                payroll.not_signed.saturday_hours += shift.duration
+            payroll.not_signed.save()
+            payroll.save()
+        print("done-2")
+        
+        for shift in attended_shifts:
+            payroll = Payroll.objects.get(
+                position=shift.position,
+                week_end=get_weekend(shift.start.date()),
+            )
+            start_weekday = shift.start.weekday()
+            payroll.not_in_hr.total_hours += shift.duration
+            if start_weekday == 6:
+                payroll.not_in_hr.sunday_hours += shift.duration
+            elif start_weekday == 0:
+                payroll.not_in_hr.monday_hours += shift.duration
+            elif start_weekday == 1:
+                payroll.not_in_hr.tuesday_hours += shift.duration
+            elif start_weekday == 2:
+                payroll.not_in_hr.wednesday_hours += shift.duration
+            elif start_weekday == 3:
+                payroll.not_in_hr.thursday_hours += shift.duration
+            elif start_weekday == 4:
+                payroll.not_in_hr.friday_hours += shift.duration
+            elif start_weekday == 5:
+                payroll.not_in_hr.saturday_hours += shift.duration
+            payroll.not_in_hr.save()
+            payroll.save()
+        print("done.")
+        return HttpResponse("DONE!")
+        
+    return render(request, 'fix_payroll.html')
+
+@login_required
+@restrict_to_groups('Tech')
+@restrict_to_http_methods('GET', 'POST')
+def delete_class_shifts(request):
+    if request.method == 'POST':
+        print("Starting....")
+        shifts = Shift.objects.filter(position__semester=Semester.objects.get_active_semester(), kind=ShiftKind.CLASS).all()
+        for shift in shifts:
+            try:
+                shift.delete()
+            except:
+                shift.force_delete_from_not_in_hr()
+        print("done.")
+        return HttpResponse("DONE!")
+    return render(request, 'delete_class_shift.html')

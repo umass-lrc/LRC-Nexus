@@ -26,6 +26,73 @@
   {% endfor %}
 </div>
 <hr />
+<h3 class="text-center">Shift with Punch In/Out</h3>
+<div id="shift-punch-in-out-main">
+  <div id="shift-punch-in-out-message"></div>
+  {% for shift in punch_in_out_shifts %}
+  <div id="shift-punch-in-out-form-{{shift.id}}">
+    <div
+      hx-get="{% url 'shift_punch_in_out' shift.id %}"
+      hx-trigger="revealed once"
+      hx-swap="outerHTML"
+      hx-target="this"
+    ></div>
+  </div>
+  {% empty %}
+  <p class="text-center">
+    Looks like you don't have any shift which starts within 30 minutes which
+    requires punch in/out.
+  </p>
+  {% endfor %}
+</div>
+<hr />
+<h3 class="text-center">Shifts to Sign</h3>
+<div id="sign-shift-main">
+  <div id="sign-shift-message"></div>
+  {% for shift in not_signed_shifts %}
+  <div id="sign-shift-form-{{shift.id}}">
+    <div
+      hx-get="{% url 'sign_shift' shift.id %}"
+      hx-trigger="revealed once"
+      hx-swap="outerHTML"
+      hx-target="this"
+    ></div>
+  </div>
+  {% empty %}
+  <p class="text-center">
+    Looks like you don't have any shift which is left to aprove.
+  </p>
+  {% endfor %}
+</div>
+<hr />
+<h3 class="text-center">Pays Till Now</h3>
+<p class="text-center">
+  <b>Please keep in mind the amount shown here are pre-tax.</b>
+</p>
+<div class="table-responsive">
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Week Of</th>
+        <th class="text-center" scope="col">Position</th>
+        <th class="text-center" scope="col">#</th>
+        <th class="text-center" scope="col">Sunday</th>
+        <th class="text-center" scope="col">Monday</th>
+        <th class="text-center" scope="col">Tuesday</th>
+        <th class="text-center" scope="col">Wednesday</th>
+        <th class="text-center" scope="col">Thursday</th>
+        <th class="text-center" scope="col">Friday</th>
+        <th class="text-center" scope="col">Saturday</th>
+        <th class="text-center" scope="col">Total</th>
+      </tr>
+    </thead>
+    <tbody
+      hx-get="{% url 'get_user_payslips' %}"
+      hx-target="this"
+      hx-trigger="load"
+    ></tbody>
+  </table>
+</div>
 {% endblock %} {% block bottom %} {% endblock %}
 <!--Extra Scripts-->
 {% block extra_scripts %}
