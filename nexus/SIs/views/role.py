@@ -76,3 +76,4 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(Q(course__subject__short_name__icontains=self.q) | Q(course__number__icontains=self.q) | Q(faculty__first_name__icontains=self.q) | Q(faculty__last_name__icontains=self.q)).all()
         return qs
+    
