@@ -11,6 +11,7 @@ from .views import (
     load_faculty_from_line,
     load_classes,
     load_class_from_line,
+    fix_payroll,
 )
 
 urlpatterns = [
@@ -24,4 +25,5 @@ urlpatterns = [
     path('load_faculties/load_faculty_from_line/<int:line_number>/', load_faculty_from_line, name='load_faculty_from_line'),
     path('load_classes/', load_classes, name='load_classes'),
     path('load_classes/load_class_from_line/<int:line_number>/', load_class_from_line, name='load_class_from_line'),
+    path('fix_payroll/', fix_payroll, name='fix_payroll')
 ]
