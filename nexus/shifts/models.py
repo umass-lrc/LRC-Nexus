@@ -311,7 +311,6 @@ class Shift(models.Model):
             elif start_weekday == 5:
                 not_signed_payroll.saturday_hours -= old_shift.duration
             not_signed_payroll.save()
-        print(self.start)
         shift = super(Shift, self).save(*args, **kwargs)
         
         if not update:
@@ -381,6 +380,7 @@ class AttendanceInfo(models.Model):
         null=False,
         blank=False,
         help_text="The shift that this attendance info is for.",
+        related_name="attendance_info",
     )
     
     punch_in_time = models.TimeField(
@@ -426,6 +426,8 @@ class AttendanceInfo(models.Model):
         pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
         nihr = PayrollNotInHR.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
         start_weekday = self.shift.start.weekday()
+        pns.total_hours -= self.shift.duration
+        nihr.total_hours += self.shift.duration
         if start_weekday == 6:
             pns.sunday_hours -= self.shift.duration
             nihr.sunday_hours += self.shift.duration
@@ -453,6 +455,7 @@ class AttendanceInfo(models.Model):
     def did_not_attend(self):
         pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
         start_weekday = self.shift.start.weekday()
+        pns.total_hours -= self.shift.duration
         if start_weekday == 6:
             pns.sunday_hours -= self.shift.duration
         elif start_weekday == 0:
@@ -482,9 +485,17 @@ class ChangeRequest(models.Model):
     shift = models.ForeignKey(
         to=Shift,
         on_delete=models.RESTRICT,
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         help_text="The shift that this change request is for."
+    )
+    
+    position = models.ForeignKey(
+        to=Positions,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="The position assosiated with this request."
     )
     
     start = models.DateTimeField(

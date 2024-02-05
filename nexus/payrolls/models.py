@@ -56,7 +56,8 @@ class PayrollInHR(models.Model):
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="in_hr",
     )
     
     sunday_hours = models.DurationField(
@@ -120,7 +121,8 @@ class PayrollInHRViaLatePay(models.Model):
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="late_pay",
     )
     
     sunday_hours = models.DurationField(
@@ -184,7 +186,8 @@ class PayrollNotInHR(models.Model):
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="not_in_hr",
     )
     
     sunday_hours = models.DurationField(
@@ -248,7 +251,8 @@ class PayrollNotSigned(models.Model):
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="not_signed",
     )
     
     sunday_hours = models.DurationField(
