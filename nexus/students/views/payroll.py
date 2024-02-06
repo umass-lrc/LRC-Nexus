@@ -20,11 +20,13 @@ from users.models import (
 
 from core.models import (
     Semester,
+    Buildings,
 )
 
 from shifts.models import (
     AttendanceInfo,
     Shift,
+    ShiftKind,
     get_weekend,
 )
 
@@ -199,6 +201,26 @@ def sign_shift(request, shift_id):
             att.sign_datetime = timezone.now()
             att.save()
             att.did_attend()
+            
+            if shift.kind == ShiftKind.SI_SESSION or shift.kind == ShiftKind.GROUP_TUTORING:
+                duration = timedelta(hours=2)
+                if shift.duration > timedelta(hours=1, minutes=15):
+                    duration += (shift.duration-timedelta(hours=1, minutes=15))*(timedelta(hours=1)/timedelta(minutes=45))
+                if duration > timedelta(hours=3):
+                    duration = timedelta(hours=3)
+                prep_shift = Shift.objects.create(
+                    position=shift.position,
+                    start=shift.start,
+                    duration=duration,
+                    building=Buildings.objects.get(short_name='ZOOM'),
+                    room="Home",
+                    kind=ShiftKind.PREPARATION,
+                )
+                prep_shift.attendance_info.attended = True
+                prep_shift.attendance_info.signed = True
+                prep_shift.attendance_info.sign_datetime = timezone.now()
+                prep_shift.attendance_info.save()
+                prep_shift.attendance_info.did_attend()
         elif 'did_not_attend' in request.POST:
             att = AttendanceInfo.objects.get(shift=shift)
             att.attended = False
