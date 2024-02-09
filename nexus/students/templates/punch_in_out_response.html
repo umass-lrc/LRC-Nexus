@@ -1,0 +1,12 @@
+<div id="punch-in-out-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="punch-in-out-form-{{position.id}}">
+  <div
+    hx-get="{% url 'punch_in_out_position' position.id %}"
+    hx-trigger="revealed once"
+    hx-swap="outerHTML"
+    hx-target="this"
+  ></div>
+</div>
+{% endif %}

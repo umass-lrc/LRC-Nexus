@@ -18,6 +18,7 @@ from .views.positions import (
     get_all_positions,
     add_position,
     delete_position,
+    UserAutocomplete,
 )
 from .views.groups import (
     groups,
@@ -53,6 +54,7 @@ POSITION_URLS = [
     path('positions/add_position_default/', add_position, name='add_position_default'),
     path('positions/add_position/<int:semester_id>/<int:position_id>/', add_position, name='add_position'),
     path('positions/delete/<int:position_id>/', delete_position, name='delete_position'),
+    re_path(r'^positions/autocomplete/users/$', UserAutocomplete.as_view(), name='user_autocomplete'),
 ]
 
 GROUP_URLS = [

@@ -12,6 +12,7 @@ from ..forms.course import (
 from ..models import (
     Course,
     CourseSubject,
+    Semester,
 )
 
 @login_required

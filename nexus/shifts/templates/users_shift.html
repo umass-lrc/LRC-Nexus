@@ -1,0 +1,238 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage User Shifts</h1>
+<div id="look-up-form-message"></div>
+{% crispy form %}
+<hr />
+<p class="text-center"><b>Look up a user to see thier shifts.</b></p>
+<div>
+  <div id="colors"></div>
+  <hr />
+  <div id="calendar"></div>
+</div>
+
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Add Shift</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please look up a user for whom you want to add shift for.
+      </p>
+      <div id="add-shift"></div>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingTwo">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseTwo"
+      aria-expanded="false"
+      aria-controls="flush-collapseTwo"
+      id="flush-collapseTwo-button"
+    >
+      <h3>Edit Shift</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseTwo"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingTwo"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">Please click on the shift you want to edit.</p>
+      <div id="edit-shift-message"></div>
+      <div id="edit-shift-form"></div>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingThree">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseThree"
+      aria-expanded="false"
+      aria-controls="flush-collapseThree"
+      id="flush-collapseOne-button"
+    >
+      <h3>Add/Edit Reccuring Shifts</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseThree"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingThree"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please look up a user for whom you want to add/edit recurring shift.
+      </p>
+      <div id="add-edit-recurring"></div>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingFour">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseFour"
+      aria-expanded="false"
+      aria-controls="flush-collapseFour"
+      id="flush-collapseFour-button"
+    >
+      <h3>Record Meeting</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseFour"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingFour"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please look up a user for whom you want to record a meeting.
+      </p>
+      <div id="record-meeting"></div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let calendar;
+
+  function editShift(url) {
+    let message = document.getElementById("edit-shift-message");
+    message.innerHTML = "";
+
+    let accordion = document.getElementById("flush-collapseTwo");
+    if (!accordion.classList.contains("show")) {
+      document.getElementById("flush-collapseTwo-button").click();
+    }
+
+    htmx.ajax("GET", url, "#edit-shift-form");
+  }
+
+  document.body.addEventListener("userCalendar", function (event) {
+    let user_id = event.detail.value;
+    let calendarElem = document.getElementById("calendar");
+    calendar = new FullCalendar.Calendar(calendarElem, {
+      themeSystem: "bootstrap5",
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+      },
+      editable: false,
+      droppable: false,
+      eventSources: [
+        {
+          url: "{% url 'get_user_shifts' %}",
+          method: "GET",
+          extraParams: {
+            user_id: user_id,
+          },
+          success: function (content, response) {
+            for (let i = 0; i < content.length; i++) {
+              let event = calendar.getEventById(content[i].id);
+              if (event) {
+                event.remove();
+              }
+            }
+          },
+          failure: function () {
+            alert(
+              "There was an error while fetching calendar events! Please report this to the admin, and try again later."
+            );
+          },
+        },
+      ],
+      eventClick: function (info) {
+        editShift(info.event.extendedProps.url);
+      },
+      eventDidMount: function (info) {
+        $(info.el).tooltip({
+          html: true,
+          title: info.event.extendedProps.description,
+        });
+      },
+    });
+    calendar.render();
+  });
+
+  document.body.addEventListener("addEvent", function (event) {
+    let event_info = JSON.parse(event.detail.value);
+    calendar.addEvent(event_info);
+    calendar.render();
+  });
+
+  document.body.addEventListener("addRecurring", function (event) {
+    let events_info = JSON.parse(event.detail.value);
+    for (let i = 0; i < events_info.length; i++) {
+      calendar.addEvent(JSON.parse(events_info[i]));
+    }
+    calendar.render();
+  });
+
+  document.body.addEventListener("changeRecurring", function (event) {
+    let events_info = JSON.parse(event.detail.value);
+    for (let i = 0; i < events_info.length; i++) {
+      let event_info = JSON.parse(events_info[i]);
+      let event = calendar.getEventById(event_info.id);
+      if (event) {
+        event.remove();
+        calendar.addEvent(event_info);
+      }
+    }
+    calendar.render();
+  });
+
+  document.body.addEventListener("editEvent", function (event) {
+    let event_info = JSON.parse(event.detail.value);
+    calendar.getEventById(event_info.id).remove();
+    calendar.addEvent(event_info);
+    calendar.render();
+  });
+
+  let last_updated_id = null;
+  document.body.addEventListener("recurringUpdateClicked", function (e) {
+    if (last_updated_id) {
+      last_updated = document.getElementById(last_updated_id);
+      last_updated.classList.remove("curr-update");
+    }
+    last_updated_id = e.detail.value;
+    document.getElementById(last_updated_id).classList.add("curr-update");
+  });
+</script>
+{% endblock %}

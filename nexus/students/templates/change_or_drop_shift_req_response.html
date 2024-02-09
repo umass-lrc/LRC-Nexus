@@ -1,0 +1,12 @@
+<div id="shift-request-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="shift-request">
+  <div
+    hx-get="{% url 'change_or_drop_shift_request' shift_id %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}
