@@ -1,0 +1,51 @@
+{% load crispy_forms_tags %} {% load hours %}
+<tbody id="payroll-{{id}}" class="{{color}}">
+  <tr>
+    <td class="text-center" rowspan="4">
+      <div>{% include 'alerts.html' %}</div>
+      {% crispy form %}
+    </td>
+    <td class="text-center">InHR</td>
+    <td class="text-center">{{in_hr.sun_hours|hours}}</td>
+    <td class="text-center">{{in_hr.mon_hours|hours}}</td>
+    <td class="text-center">{{in_hr.tue_hours|hours}}</td>
+    <td class="text-center">{{in_hr.wed_hours|hours}}</td>
+    <td class="text-center">{{in_hr.thu_hours|hours}}</td>
+    <td class="text-center">{{in_hr.fri_hours|hours}}</td>
+    <td class="text-center">{{in_hr.sat_hours|hours}}</td>
+    <th class="text-center">{{in_hr.total_hours|hours}}</th>
+  </tr>
+  <tr>
+    <td class="text-center">LateP</td>
+    <td class="text-center">{{late_pay.sun_hours|hours}}</td>
+    <td class="text-center">{{late_pay.mon_hours|hours}}</td>
+    <td class="text-center">{{late_pay.tue_hours|hours}}</td>
+    <td class="text-center">{{late_pay.wed_hours|hours}}</td>
+    <td class="text-center">{{late_pay.thu_hours|hours}}</td>
+    <td class="text-center">{{late_pay.fri_hours|hours}}</td>
+    <td class="text-center">{{late_pay.sat_hours|hours}}</td>
+    <th class="text-center">{{late_pay.total_hours|hours}}</th>
+  </tr>
+  <tr>
+    <td class="text-center">NInHR</td>
+    <td class="text-center">{{not_in_hr.sun_hours|hours}}</td>
+    <td class="text-center">{{not_in_hr.mon_hours|hours}}</td>
+    <td class="text-center">{{not_in_hr.tue_hours|hours}}</td>
+    <td class="text-center">{{not_in_hr.wed_hours|hours}}</td>
+    <td class="text-center">{{not_in_hr.thu_hours|hours}}</td>
+    <td class="text-center">{{not_in_hr.fri_hours|hours}}</td>
+    <td class="text-center">{{not_in_hr.sat_hours|hours}}</td>
+    <th class="text-center">{{not_in_hr.total_hours|hours}}</th>
+  </tr>
+  <tr>
+    <td class="text-center">Total</td>
+    <th class="text-center">{{total.sun_hours|hours}}</th>
+    <th class="text-center">{{total.mon_hours|hours}}</th>
+    <th class="text-center">{{total.tue_hours|hours}}</th>
+    <th class="text-center">{{total.wed_hours|hours}}</th>
+    <th class="text-center">{{total.thu_hours|hours}}</th>
+    <th class="text-center">{{total.fri_hours|hours}}</th>
+    <th class="text-center">{{total.sat_hours|hours}}</th>
+    <th class="text-center">{{total.total_hours|hours}}</th>
+  </tr>
+</tbody>
