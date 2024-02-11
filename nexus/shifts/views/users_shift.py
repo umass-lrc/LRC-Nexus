@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 
 from django.db.models import Q
 
@@ -77,6 +78,16 @@ def get_user_shifts(request):
     shifts = Shift.objects.filter(position__user=user, start__gte=start, start__lte=end).all()
     shifts_data = []
     for shift in shifts:
+        description = f"""
+            <b>{shift.kind}</b>
+            <hr/>
+            <b>Start:</b> {timezone.localtime(shift.start).strftime("%-I:%M %p")}<br/>
+            <b>End:</b> {timezone.localtime(shift.start + shift.duration).strftime("%-I:%M %p")}<br/>
+            <b>Location:</b> {shift.building.short_name}-{shift.room}
+            <hr/>
+            <b>Attended?</b> {shift.attendance_info.attended}<br/>
+            <b>Signed?</b> {shift.attendance_info.signed}
+        """
         shifts_data.append({
             "id": str(shift.id),
             "start": shift.start.isoformat(),
@@ -86,6 +97,7 @@ def get_user_shifts(request):
             "color": color_coder(shift.kind),
             "extendedProps": {
                 "url": reverse("edit_shift", kwargs={"shift_id": shift.id}),
+                "description": description,
             }
         })
     return JsonResponse(shifts_data, safe=False)

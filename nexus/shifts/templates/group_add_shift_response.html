@@ -1,0 +1,12 @@
+<div id="add-shift-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="add-shift-form">
+  <div
+    hx-get="{% url 'group_add_shift' group_id %}"
+    hx-target="this"
+    hx-swap="outerHTML"
+    hx-trigger="load"
+  ></div>
+</div>
+{% endif %}

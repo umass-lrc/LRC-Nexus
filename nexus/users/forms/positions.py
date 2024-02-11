@@ -6,6 +6,8 @@ from crispy_forms.layout import Submit, Layout, Fieldset, Div
 
 from crispy_bootstrap5.bootstrap5 import FloatingField
 
+from dal import autocomplete
+
 from core.models import (
     Semester,
 )
@@ -64,7 +66,7 @@ class PositionForm(forms.ModelForm):
         widgets = {
             'semester': forms.Select(choices=Semester.objects.all(), attrs={'disabled': 'disabled'}),
             'position': forms.Select(choices=PositionChoices.choices, attrs={'disabled': 'disabled'}),
-            'user': forms.Select(choices=NexusUser.objects.all()),
+            'user': autocomplete.ModelSelect2(url='user_autocomplete'),
             'hourly_pay': forms.NumberInput(attrs={'min': 0.00, 'max': 999.99, 'step': 0.01}),
         }
     

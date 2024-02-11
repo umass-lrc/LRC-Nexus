@@ -1,0 +1,14 @@
+<div id="shift-punch-in-out-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="shift-punch-in-out-form-{{shift.id}}">
+  {% if not punched_out%}
+  <div
+    hx-get="{% url 'shift_punch_in_out' shift.id %}"
+    hx-trigger="revealed once"
+    hx-swap="outerHTML"
+    hx-target="this"
+  ></div>
+  {% endif %}
+</div>
+{% endif %}
