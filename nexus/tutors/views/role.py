@@ -15,7 +15,7 @@ from core.views import restrict_to_http_methods, restrict_to_groups
 
 from core.models import (
     Semester,
-    Classes,
+    Course,
 )
 
 from users.models import (
@@ -24,7 +24,7 @@ from users.models import (
 )
 
 from ..models import (
-    SIRoleInfo,
+    TutorRoleInfo,
 )
 
 from ..forms.role import (
@@ -36,44 +36,45 @@ from ..forms.role import (
 @restrict_to_groups("Staff Admin", "SI Supervisor", "Tutor Supervisor", "OURS Supervisor", "Payroll Supervisor")
 def assign_role(request):
     sem = Semester.objects.get_active_semester()
-    si_positions = Positions.objects.filter(semester=sem, position=PositionChoices.SI)
-    for position in si_positions:
-        if not SIRoleInfo.objects.filter(position=position).exists():
-            SIRoleInfo.objects.create(position=position)
-    roles = SIRoleInfo.objects.filter(position__semester=sem).all()
+    tutor_positions = Positions.objects.filter(semester=sem, position=PositionChoices.TUTOR)
+    for position in tutor_positions:
+        if not TutorRoleInfo.objects.filter(position=position).exists():
+            TutorRoleInfo.objects.create(position=position)
+    roles = TutorRoleInfo.objects.filter(position__semester=sem).all()
     context = {
         'roles': roles,
     }
-    return render(request, 'assign_role.html', context)
+    return render(request, 'tutor_assign_role.html', context)
 
 @login_required
 @restrict_to_http_methods("GET", "POST")
 @restrict_to_groups("Staff Admin", "SI Supervisor", "Tutor Supervisor", "OURS Supervisor", "Payroll Supervisor")
 def update_role(request, role_id):
     if request.method == "POST":
-        role = SIRoleInfo.objects.get(id=role_id)
+        role = TutorRoleInfo.objects.get(id=role_id)
         POST = request.POST.copy()
         POST["position"] = role.position.id
-        form = AssignRoleForm(role_id, POST)
+        form = AssignRoleForm(role_id, POST, instance=role)
         if not form.is_valid():
             messages.error(request, f"Form Errors: {form.errors}")
-            return render(request, "update_role_response.html", context={"success": False})
+            return render(request, "tutor_update_role_response.html", context={"success": False})
         data = form.cleaned_data
-        role.assigned_class = data["assigned_class"]
+        role.assigned_courses.clear()
+        for course in data["assigned_courses"]:
+            role.assigned_courses.add(course)
         role.save()
         messages.success(request, "Role updated successfully.")
         context = {"success": True, "role": role}
-        return render(request, "update_role_response.html", context=context)
-    form = AssignRoleForm(role_id)
+        return render(request, "tutor_update_role_response.html", context=context)
+    form = AssignRoleForm(role_id, instance=TutorRoleInfo.objects.get(id=role_id))
     response = render(request, 'just_form.html', {'form': form})
     response["HX-Trigger-After-Settle"] = json.dumps({"updateClicked": f"rt-{role_id}"})
     return response
 
 
-class ClassAutocomplete(autocomplete.Select2QuerySetView):
+class CourseAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Classes.objects.all()
+        qs = Course.objects.all()
         if self.q:
-            qs = qs.filter(Q(course__subject__short_name__icontains=self.q) | Q(course__number__icontains=self.q) | Q(faculty__first_name__icontains=self.q) | Q(faculty__last_name__icontains=self.q)).all()
+            qs = qs.filter(Q(subject__short_name__icontains=self.q) | Q(number__icontains=self.q)).all()
         return qs
-    
