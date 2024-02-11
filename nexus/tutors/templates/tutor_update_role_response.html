@@ -1,0 +1,29 @@
+{% if success %}
+<tr id="rt-{{role.id}}">
+  <td class="text-center">{{ role.position.user.last_name }}</td>
+  <td class="text-center">{{ role.position.user.first_name }}</td>
+  <td class="text-center">{{ role.str_assigned_courses }}</td>
+  <td class="text-center">
+    <a
+      href=""
+      hx-get="{% url 'tutor_update_role' role.id %}"
+      hx-trigger="click"
+      hx-target="#update-role-form"
+      ><i class="bi bi-pencil-square"></i
+    ></a>
+  </td>
+</tr>
+{% endif %}
+
+<div id="update-role-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="update-role-form">
+  <div
+    hx-get="{% url 'update_role' role.id %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}
