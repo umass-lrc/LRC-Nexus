@@ -91,6 +91,7 @@ TEMPLATES = [
             BASE_DIR.joinpath("shifts", "templates"),
             BASE_DIR.joinpath("SIs", "templates"),
             BASE_DIR.joinpath("students", "templates"),
+            BASE_DIR.joinpath("payrolls", "templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {

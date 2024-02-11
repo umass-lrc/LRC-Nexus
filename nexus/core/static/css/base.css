@@ -81,3 +81,15 @@ span.select2.select2-container {
     width: 15px;
     margin: 0 2px;
 }
+
+.tbody-red td, .tbody-red th {
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.tbody-yellow td, .tbody-yellow th {
+    background-color: rgba(255, 255, 159, 0.1);
+}
+
+.tbody-green td, .tbody-green th {
+    background-color: rgba(0,255,0,0.1);
+}
