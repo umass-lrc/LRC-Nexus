@@ -1,0 +1,18 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Delete Class Shifts</h1>
+<p class="text-center">
+  (Please don't do this if you don't know what you are doing)
+</p>
+<hr />
+<button
+  hx-post="{% url 'delete_class_shifts' %}"
+  hx-trigger="click"
+  class="text-center d-flex mx-auto btn btn-primary"
+>
+  Run Script
+</button>
+{% endblock %}

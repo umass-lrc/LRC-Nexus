@@ -67,6 +67,7 @@
     </div>
     <div>
       <ul class="sidebar nav flex-column" id="nav_accordion">
+        {% if user.is_staff %}
         <li class="nav-item has-submenu">
           <a class="nav-link nav-menu-item" href="#"
             ><i class="bi bi-activity me-3"></i>Core</a
@@ -152,7 +153,7 @@
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'weekly_payroll' %}"
                 >Weekly View</a
               >
             </li>
@@ -206,6 +207,11 @@
           >
           <ul class="submenu collapse">
             <li>
+              <a class="nav-link nav-menu-item" href="{% url 'assign_role' %}"
+                >Role</a
+              >
+            </li>
+            <li>
               <a
                 class="nav-link nav-menu-item"
                 href="{% url 'work_in_progress' %}"
@@ -240,6 +246,13 @@
             ><i class="bi bi-heart-pulse-fill me-3"></i>Tutoring</a
           >
           <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Role</a
+              >
+            </li>
             <li>
               <a
                 class="nav-link nav-menu-item"
@@ -314,8 +327,37 @@
                 >Load Classes</a
               >
             </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'fix_payroll' %}"
+                >Fix Payroll</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'delete_class_shifts' %}"
+                >Delete Class Shifts</a
+              >
+            </li>
           </ul>
         </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link nav-menu-item" href="{% url 'student_calendar' %}"
+            ><i class="bi bi-calendar-week-fill me-3"></i>Calendar</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-menu-item" href="{% url 'user_payroll' %}"
+            ><i class="bi bi-cash-coin me-3"></i>Payroll</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-menu-item" href="{% url 'work_in_progress' %}"
+            ><i class="bi bi-info-circle-fill me-3"></i>LRC Schedule</a
+          >
+        </li>
+        {% endif %}
       </ul>
     </div>
   </div>
