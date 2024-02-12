@@ -202,6 +202,10 @@
       new ResizeSensor(navbar, stickyTableHeader);
       navbar.style.position = "sticky";
 
+      document.addEventListener("htmx:afterRequest", function (evt) {
+        stickyTableHeader();
+      });
+
       let bottom_stick = document.getElementById("bottomStick");
       let main_container = document.getElementById("main-container");
       main_container.style.paddingBottom = bottom_stick.offsetHeight + "px";
