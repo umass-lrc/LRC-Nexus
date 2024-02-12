@@ -9,6 +9,7 @@ from core.views import restrict_to_http_methods, restrict_to_groups
 from users.models import (
     NexusUser,
     Positions,
+    PositionChoices,
 )
 
 from core.models import (
@@ -38,6 +39,11 @@ from .forms import (
     loadCoursesForm,
     loadFacultiesForm,
     loadClassesForm,
+    loadTutorRoleForm,
+)
+
+from tutors.models import (
+    TutorRoleInfo,
 )
 
 @login_required
@@ -434,3 +440,76 @@ def delete_class_shifts(request):
         print("done.")
         return HttpResponse("DONE!")
     return render(request, 'delete_class_shift.html')
+
+@login_required
+@restrict_to_groups('Tech')
+@restrict_to_http_methods('GET', 'POST')
+def load_tutor_roles(request):
+    if request.method == 'POST':
+        form = loadTutorRoleForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_tutor_roles_response.html', context={'success': False})
+        with open("temp/tutor_roles.csv", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        return render(request, 'load_tutor_roles_response.html', context={'success': True})
+    form = loadTutorRoleForm()
+    context = {'form': form}
+    return render(request, 'load_tutor_roles.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_tutor_role_from_line(request, line_number):
+    with open("temp/tutor_roles.csv", "r") as f:
+        to_read = None
+        for i, line in enumerate(f):
+            if i == line_number-1:
+                to_read = line
+                break
+        if to_read is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = f"""
+            <div
+                hx-post="{reverse('load_tutor_role_from_line', kwargs={'line_number': line_number+1})}"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="outerHTML"
+            >
+            </div>
+        """
+        if to_read[-1] == '\n':
+            to_read = to_read[:-1]
+        values = to_read.split(',')
+        err_course = None
+        try:
+            first_name = values[0]
+            last_name = values[1]
+            courses = values[2:]
+            sem = Semester.objects.get_active_semester()
+            position = Positions.objects.get(
+                user__first_name=first_name, 
+                user__last_name=last_name, 
+                semester=sem,
+                position=PositionChoices.TUTOR,
+            )
+            role = TutorRoleInfo.objects.get_or_create(
+                position=position,
+            )[0]
+            role.assigned_courses.clear()
+            for course in courses:
+                if course == '':
+                    continue
+                err_course = course
+                info = course.split('-')
+                subject = '-'.join(info[:-1])
+                number = info[-1]
+                course = Course.objects.get(subject__short_name=subject, number=number)
+                role.assigned_courses.add(course)
+            role.save()
+            content += f"<b>==Tutor Role Added Successfully==</b>"
+        except Exception as e:
+            content += f"<b>==Error Occoured On Line {line_number}, Tutor Role Not Added: {e}=={err_course}</b>"
+        content += f"<br/>Line {line_number} Content: {to_read} <br/>"
+        return HttpResponse(content)
