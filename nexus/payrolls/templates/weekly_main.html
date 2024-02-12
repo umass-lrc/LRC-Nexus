@@ -15,41 +15,4 @@
   hx-target="this"
   hx-swap="innerHTML"
 ></div>
-{% endblock %} {% block bottom %}
-<div class="accordion-item">
-  <h2 class="accordion-header" id="flush-headingOne">
-    <button
-      class="accordion-button collapsed d-block text-center"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#flush-collapseOne"
-      aria-expanded="false"
-      aria-controls="flush-collapseOne"
-      id="flush-collapseOne-button"
-    >
-      <h3>Add Position</h3>
-    </button>
-  </h2>
-  <div
-    id="flush-collapseOne"
-    class="accordion-collapse collapse"
-    aria-labelledby="flush-headingOne"
-    data-bs-parent="#accordionFlushExample"
-  >
-    <div class="accordion-body">
-      <div id="add-position-message"></div>
-      <div id="add-position-form">First Search For Semester and Position.</div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-<!--Extra Scripts-->
-{% block extra_scripts %}
-<script>
-  document.body.addEventListener("deletePosition", function (event) {
-    let position_id = event.detail.value;
-    let position_row = document.getElementById(position_id);
-    position_row.remove();
-  });
-</script>
 {% endblock %}
