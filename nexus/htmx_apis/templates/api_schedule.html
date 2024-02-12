@@ -1,0 +1,60 @@
+<table class="table table-bordered text-center equal-col">
+  <thead class="stickyHeader">
+    <tr>
+      <th scope="col" class="text-uppercase align-middle">Course</th>
+      {% for day in dates %}
+      <th scope="col" class="text-uppercase align-middle">
+        <span>{{ day|date:"l" }}</span>
+        <div>{{ day|date:"m/d" }}</div>
+      </th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for course, days in schedule.items %}
+    <tr>
+      <td class="align-middle">{{course}}</td>
+      {% for day in days %} {% if day|length == 0 %}
+      <td class="bg-light-gray"></td>
+      {% else %}
+      <td>
+        {% for s in day %}
+        <div class="margin-10px-top">
+          {% if s.kind == "SI Session" %}
+          <div
+            class="font-size16 text-break text-wrap"
+            style="margin-bottom: 10px"
+          >
+            faculty
+          </div>
+          {% endif %}
+          <div
+            class="padding-5px-tb padding-15px-lr border-radius-5 margin-10px-bottom text-white font-size16 xs-font-size13"
+            style="background-color: {{s.kind|color_coder}}"
+          >
+            {{s.building.short_name}}-{{s.room}}
+          </div>
+          <div class="margin-10px-top font-size14">
+            {{s.start| date:"h:i A" |lower}} -
+            {{s.start|add_datetime:s.duration|date:"h:i A"|lower}}
+          </div>
+          <div class="font-size13 text-break text-wrap">
+            {{s.position.user}}
+          </div>
+        </div>
+        {% if not forloop.last %}
+        <div
+          class="mb-1 mt-1"
+          style="
+            height: 2px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 1px;
+          "
+        ></div>
+        {% endif %} {% endfor %}
+      </td>
+      {% endif %} {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
