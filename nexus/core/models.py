@@ -1,4 +1,3 @@
-from typing import Any
 from django.db import models
 
 class Day(models.IntegerChoices):
@@ -398,4 +397,5 @@ class ClassTimes(models.Model):
     )
     
     def __str__(self):
-        return f'{self.class_day_display()} {self.time.strftime("%I:%M %p")}'
+        return f'{self.get_class_day_display()} {self.start_time.strftime("%I:%M %p")}'
+    

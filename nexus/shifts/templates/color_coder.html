@@ -1,0 +1,11 @@
+<div id="colors">
+  <h5 class="mt-2">&nbsp; Event Color Label:</h5>
+  <p class="justify-content-center text-wrap text-center">
+    {% for type, color in colors.items %}
+    <span class="dot" style="background-color: {{color}};"></span>{{type}}
+    <!---->
+    {% endfor %}
+  </p>
+</div>
+
+<div id="calendar"></div>

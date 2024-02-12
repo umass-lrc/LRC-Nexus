@@ -1,0 +1,14 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Load Classes</h1>
+<hr />
+<div id="load-classes-message"></div>
+{% crispy form %}
+<hr />
+<div id="load-classes-logs"></div>
+{% endblock %}

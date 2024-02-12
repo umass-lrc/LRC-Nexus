@@ -73,3 +73,67 @@ span.select2.select2-container {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.dot {
+    display: inline-block;
+    border-radius: 50%;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+}
+
+.tbody-red td, .tbody-red th {
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.tbody-yellow td, .tbody-yellow th {
+    background-color: rgba(255, 255, 159, 0.1);
+}
+
+.tbody-green td, .tbody-green th {
+    background-color: rgba(0,255,0,0.1);
+}
+
+.padding-15px-lr {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.padding-5px-tb {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.margin-10px-bottom {
+    margin-bottom: 10px;
+}
+
+.border-radius-5 {
+    border-radius: 5px;
+    overflow-wrap: break-word;
+}
+
+.margin-10px-top {
+    margin-top: 10px;
+}
+
+.font-size14 {
+    font-size: 14px;
+}
+
+.text-light-gray {
+    color: #d6d5d5;
+}
+
+.font-size13 {
+    font-size: 13px;
+}
+
+.font-size16 {
+    font-size: 16px;
+}
+
+.stickyHeader, .stickyHeader tr, .stickyHeader th, .stickyHeader td {
+    position: sticky;
+    z-index: 100;
+}
