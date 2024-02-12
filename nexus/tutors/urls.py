@@ -6,6 +6,10 @@ from .views.role import (
     CourseAutocomplete,
 )
 
+from .views.schedule import (
+    tutor_schedule_for_all_course,
+)
+
 ROLE_URLS = [
     path('assign-role/', assign_role, name='tutor_assign_role'),
     path('update-role/<int:role_id>/', update_role, name='tutor_update_role'),
@@ -13,6 +17,7 @@ ROLE_URLS = [
 ]
 
 SCHEDULE_URLS = [
+    path('schedule/', tutor_schedule_for_all_course, name='tutor_schedule_for_all_course'),
 ]
 
 urlpatterns = (

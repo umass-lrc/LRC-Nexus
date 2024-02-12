@@ -100,6 +100,7 @@ def schedule_for_all_course_for_start(request, start_date, shift_kind, remove_em
 def schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()
     context = {
+        "colors": get_color_coder_dict(),
         "dates": [start_date + timedelta(days=i) for i in range(7)],
         "schedule": schedule_for_all_course_for_start(request, start_date, [ShiftKind.SI_SESSION, ShiftKind.TUTOR_DROP_IN, ShiftKind.TUTOR_APPOINTMENT]),
     }

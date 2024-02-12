@@ -22,11 +22,11 @@ from shifts.views import (
 @login_required
 @restrict_to_http_methods("GET")
 @restrict_to_groups("Staff Admin", "SI Supervisor")
-def si_schedule_for_all_course(request):
+def tutor_schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()
     context = {
         "colors": get_color_coder_dict(),
         "dates": [start_date + timedelta(days=i) for i in range(7)],
-        "schedule": schedule_for_all_course_for_start(request, start_date, [ShiftKind.SI_SESSION, ShiftKind.CLASS], True),
+        "schedule": schedule_for_all_course_for_start(request, start_date, [ShiftKind.TUTOR_APPOINTMENT, ShiftKind.TUTOR_DROP_IN], True),
     }
     return render(request, "schedule_all_courses.html", context)
