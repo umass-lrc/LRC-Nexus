@@ -22,14 +22,14 @@
       <td>
         {% for s in day %}
         <div class="margin-10px-top">
-          {% if s.kind == "SI Session" %}
+          {% comment %} {% if s.kind == "SI Session" %}
           <div
             class="font-size16 text-break text-wrap"
             style="margin-bottom: 10px"
           >
             faculty
           </div>
-          {% endif %}
+          {% endif %} {% endcomment %}
           <div
             class="padding-5px-tb padding-15px-lr border-radius-5 margin-10px-bottom text-white font-size16 xs-font-size13"
             style="background-color: {{s.kind|color_coder}}"
