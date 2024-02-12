@@ -13,6 +13,8 @@ from .views import (
     load_class_from_line,
     fix_payroll,
     delete_class_shifts,
+    load_tutor_roles,
+    load_tutor_role_from_line,
 )
 
 urlpatterns = [
@@ -28,4 +30,6 @@ urlpatterns = [
     path('load_classes/load_class_from_line/<int:line_number>/', load_class_from_line, name='load_class_from_line'),
     path('fix_payroll/', fix_payroll, name='fix_payroll'),
     path('delete_class_shifts/', delete_class_shifts, name='delete_class_shifts'),
+    path('load_tutor_roles/', load_tutor_roles, name='load_tutor_roles'),
+    path('load_tutor_roles/load_tutor_role_from_line/<int:line_number>/', load_tutor_role_from_line, name='load_tutor_role_from_line'),
 ]
