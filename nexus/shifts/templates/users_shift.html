@@ -56,7 +56,7 @@
       aria-controls="flush-collapseTwo"
       id="flush-collapseTwo-button"
     >
-      <h3>Edit Shift</h3>
+      <h3>Edit/Drop Shift</h3>
     </button>
   </h2>
   <div
@@ -222,6 +222,12 @@
     let event_info = JSON.parse(event.detail.value);
     calendar.getEventById(event_info.id).remove();
     calendar.addEvent(event_info);
+    calendar.render();
+  });
+
+  document.body.addEventListener("dropEvent", function (event) {
+    let event_info = event.detail.value;
+    calendar.getEventById(event_info).remove();
     calendar.render();
   });
 

@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "SIs",
     "tutors",
     "students",
+    "htmx_apis",
 ]
 
 MIDDLEWARE = [
@@ -91,6 +92,9 @@ TEMPLATES = [
             BASE_DIR.joinpath("shifts", "templates"),
             BASE_DIR.joinpath("SIs", "templates"),
             BASE_DIR.joinpath("students", "templates"),
+            BASE_DIR.joinpath("payrolls", "templates"),
+            BASE_DIR.joinpath("tutors", "templates"),
+            BASE_DIR.joinpath("htmx_apis", "templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {

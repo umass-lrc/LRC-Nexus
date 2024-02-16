@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Any
 from django.utils import timezone
 
 from django.db import models
@@ -207,6 +208,13 @@ def shift_directory_path(instance, filename):
     filename = datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + '_' + filename
     return f'shift_{instance.position.id}/{filename}'
 
+class ShiftManager(models.Manager):
+    def filter(self, *args, **kwargs):
+        return super().filter(*args, **kwargs, dropped=False, changed=False)
+    
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs, dropped=False, changed=False)
+
 class Shift(models.Model):
     position = models.ForeignKey(
         to=Positions,
@@ -287,9 +295,12 @@ class Shift(models.Model):
         help_text="Whether or not the shift has been changed."
     )
     
+    objects = ShiftManager()
     
     def save(self, *args, **kwargs):
         update = self.id is not None
+        if self.dropped or self.changed:
+            return super(Shift, self).save(*args, **kwargs)
         if update:
             old_shift = Shift.objects.get(id=self.id)
             if AttendanceInfo.objects.get(shift=old_shift).signed:
@@ -370,7 +381,8 @@ class Shift(models.Model):
         elif start_weekday == 5:
             not_signed_payroll.saturday_hours -= self.duration
         not_signed_payroll.save()
-        super(Shift, self).delete()
+        self.dropped = True
+        self.save()
     
     def force_delete_from_not_in_hr(self):
         not_in_hr_payroll = PayrollNotInHR.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
