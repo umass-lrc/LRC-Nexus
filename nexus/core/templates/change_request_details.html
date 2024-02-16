@@ -1,0 +1,61 @@
+<div class="table-responsive">
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th class="text-center" colspan="3" scope="col">Change Request</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" class="text-center">Reason</th>
+        <td colspan="2" class="text-center">{{change_request.reason}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">State</th>
+        <td colspan="2" class="text-center">{{change_request.state}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Last Changed By</th>
+        <td colspan="2" class="text-center">
+          {{change_request.last_change_by}}
+        </td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Last Changed On</th>
+        <td colspan="2" class="text-center">
+          {{change_request.last_change_on}}
+        </td>
+      </tr>
+      <tr>
+        <th class="text-center" scope="col">#</th>
+        <th class="text-center" scope="col">Old</th>
+        <th class="text-center" scope="col">New</th>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Start</th>
+        <td class="text-center">{{change_request.shift.start}}</td>
+        <td class="text-center">{{change_request.start}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Duration</th>
+        <td class="text-center">{{change_request.shift.duration}}</td>
+        <td class="text-center">{{change_request.duration}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Building</th>
+        <td class="text-center">{{change_request.shift.building}}</td>
+        <td class="text-center">{{change_request.building}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Room</th>
+        <td class="text-center">{{change_request.shift.room}}</td>
+        <td class="text-center">{{change_request.room}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Kind</th>
+        <td class="text-center">{{change_request.shift.kind}}</td>
+        <td class="text-center">{{change_request.kind}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

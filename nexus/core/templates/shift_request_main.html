@@ -16,6 +16,18 @@
   >
     <button
       class="nav-link active"
+      id="nav-add-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-add"
+      type="button"
+      role="tab"
+      aria-controls="nav-add"
+      aria-selected="true"
+    >
+      Add Requests
+    </button>
+    <button
+      class="nav-link"
       id="nav-change-tab"
       data-bs-toggle="tab"
       data-bs-target="#nav-change"
@@ -43,6 +55,132 @@
 <div class="tab-content" id="nav-tabContent">
   <div
     class="tab-pane fade show active"
+    id="nav-add"
+    role="tabpanel"
+    aria-labelledby="nav-add-tab"
+    tabindex="0"
+  >
+    <nav>
+      <div class="nav nav-pills nav-fill mt-3" role="tablist">
+        <button
+          class="nav-link active"
+          id="nav-add-not-viewed-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-not-viewed"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-not-viewed"
+          aria-selected="true"
+        >
+          Not Viewed
+        </button>
+        <button
+          class="nav-link"
+          id="nav-add-in-progress-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-in-progress"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-in-progress"
+          aria-selected="false"
+        >
+          In Progress
+        </button>
+        <button
+          class="nav-link"
+          id="nav-add-approved-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-approved"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-approved"
+          aria-selected="false"
+        >
+          Approved
+        </button>
+        <button
+          class="nav-link"
+          id="nav-add-denied-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-denied"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-denied"
+          aria-selected="false"
+        >
+          Denied
+        </button>
+      </div>
+    </nav>
+    <div class="tab-content">
+      <div
+        class="tab-pane fade show active"
+        id="nav-add-not-viewed"
+        role="tabpanel"
+        aria-labelledby="nav-add-not-viewed-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Not Viewed - Add Request</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.NOT_VIEWED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-add-in-progress"
+        role="tabpanel"
+        aria-labelledby="nav-add-in-progress-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing In Progress - Add Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.IN_PROGRESS %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-add-approved"
+        role="tabpanel"
+        aria-labelledby="nav-add-approved-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Approved - Add Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.APPROVED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-add-denied"
+        role="tabpanel"
+        aria-labelledby="nav-add-denied-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Denied - Add Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.DENIED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="tab-pane fade"
     id="nav-change"
     role="tabpanel"
     aria-labelledby="nav-change-tab"
@@ -267,40 +405,7 @@
   </div>
 </div>
 
-{% comment %}
-<div class="table-responsive">
-  <table class="table" id="roles">
-    <thead>
-      <tr>
-        <th class="text-center" scope="col">Last Name</th>
-        <th class="text-center" scope="col">First Name</th>
-        <th class="text-center" scope="col">Drop Request?</th>
-        <th class="text-center" scope="col">Orignal Shift Date</th>
-        <th class="text-center" scope="col">Reason</th>
-        <th class="text-center" scope="col">Check</th>
-      </tr>
-    </thead>
-    <tbody id="roles_body">
-      {% for req in requests %}
-      <tr id="rc-{{req.id}}">
-        <td class="text-center">{{ req. }}</td>
-        <td class="text-center">{{ role.position.user.first_name }}</td>
-        <td class="text-center">{{ role.assigned_class }}</td>
-        <td class="text-center">
-          <a
-            href=""
-            hx-get="{% url 'update_role' role.id %}"
-            hx-trigger="click"
-            hx-target="#update-role-form"
-            ><i class="bi bi-pencil-square"></i
-          ></a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endcomment %} {% endblock %} {% block bottom %}
+{% endblock %} {% block bottom %}
 <div class="accordion-item">
   <h2 class="accordion-header" id="flush-headingOne">
     <button
@@ -325,18 +430,20 @@
       <p class="text-center">
         Please go to request row that you want to check and click on the check.
       </p>
-      <div id="update-role-message"></div>
-      <div id="update-role-form"></div>
+      <div id="request-message"></div>
+      <div id="request-form"></div>
     </div>
   </div>
 </div>
 {% endblock %} {% block extra_scripts %}
 <script>
   let last_updated_id = null;
-  document.body.addEventListener("updateClicked", function (e) {
+  document.body.addEventListener("requestClicked", function (e) {
     if (last_updated_id) {
       last_updated = document.getElementById(last_updated_id);
-      last_updated.classList.remove("curr-update");
+      if (last_updated) {
+        last_updated.classList.remove("curr-update");
+      }
     }
     last_updated_id = e.detail.value;
     last_updated = document.getElementById(last_updated_id);
