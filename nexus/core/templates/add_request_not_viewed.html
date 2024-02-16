@@ -1,0 +1,22 @@
+{% include 'add_request_details.html' %}
+
+<div class="row">
+  <button
+    hx-post="{% url url_name req_id %}"
+    hx-vals='{"type": "deny"}'
+    hx-trigger="click"
+    hx-swap="multi:#request-message:innerHTML,#request-form:innerHTML"
+    class="btn btn-danger d-block mx-auto col-4"
+  >
+    Deny Request
+  </button>
+  <button
+    hx-post="{% url url_name req_id %}"
+    hx-vals='{"type": "in_progress"}'
+    hx-trigger="click"
+    hx-swap="multi:#request-message:innerHTML,#request-form:innerHTML"
+    class="btn btn-warning d-block mx-auto col-4"
+  >
+    Put In Progress
+  </button>
+</div>
