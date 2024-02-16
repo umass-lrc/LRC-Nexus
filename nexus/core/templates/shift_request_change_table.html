@@ -1,0 +1,38 @@
+{% load tz %}
+
+<div class="table-responsive">
+  <table class="table" id="change_requests">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Last Name</th>
+        <th class="text-center" scope="col">First Name</th>
+        <th class="text-center" scope="col">Orignal Date</th>
+        <th class="text-center" scope="col">Requested Date</th>
+        <th class="text-center" scope="col">Reason</th>
+        <th class="text-center" scope="col">Check</th>
+      </tr>
+    </thead>
+    <tbody id="change_requests_body">
+      {% for req in c_requests %}
+      <tr id="crt-{{req.id}}">
+        <!-- prettier-ignore -->
+        <td class="text-center">{% if req.shift %}{{ req.shift.position.user.last_name }}{% else %}{{ req.position.user.last_name }}{% endif %}</td>
+        <!-- prettier-ignore -->
+        <td class="text-center">{% if req.shift %}{{ req.shift.position.user.first_name }}{% else %}{{ req.position.user.first_name }}{% endif %}</td>
+        <td class="text-center">{{ req.shift.start|localtime|date }}</td>
+        <td class="text-center">{{ req.start|localtime|date }}</td>
+        <td class="text-center">{{ req.reason }}</td>
+        <td class="text-center">
+          <a
+            href=""
+            hx-get="{% url 'update_role' req.id %}"
+            hx-trigger="click"
+            hx-target="#update-role-form"
+            ><i class="bi bi-pencil-square"></i
+          ></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

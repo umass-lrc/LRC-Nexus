@@ -5,14 +5,10 @@
 
 <!--Content of the page-->
 {% block content %}
-<h1 class="text-center">Manage Weekly Payroll</h1>
+<h1 class="text-center">Load Tutor Roles</h1>
 <hr />
+<div id="load-tutor-roles-message"></div>
 {% crispy form %}
-<div
-  id="payroll-body"
-  hx-get="{% url 'all_weekly_payroll' %}"
-  hx-trigger="load"
-  hx-target="this"
-  hx-swap="innerHTML"
-></div>
+<hr />
+<div id="load-tutor-roles-logs"></div>
 {% endblock %}

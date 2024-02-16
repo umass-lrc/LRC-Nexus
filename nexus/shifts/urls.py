@@ -5,6 +5,8 @@ from .views.users_shift import (
     user_calendar,
     get_user_shifts,
     add_shift,
+    edit_or_drop_shift,
+    drop_shift,
     edit_shift,
     add_edit_recurring,
     add_recurring,
@@ -19,11 +21,17 @@ from .views.bulk_shift import (
     GroupAutocomplete,
 )
 
+from .views.schedule import (
+    schedule_for_all_course,
+)
+
 USERS_SHIFT_URLS = [
     path('users_shift/', users_shift, name='users_shift'),
     path('user_calender/<int:user_id>/', user_calendar, name='user_calendar'),
     path('user_calender/get_user_shifts/', get_user_shifts, name='get_user_shifts'),
     path('add_shift/<int:user_id>/', add_shift, name='add_shift'),
+    path('edit_or_drop_shift/<int:shift_id>/', edit_or_drop_shift, name='edit_or_drop_shift'),
+    path('drop_shift/<int:shift_id>/', drop_shift, name='drop_shift'),
     path('edit_shift/<int:shift_id>/', edit_shift, name='edit_shift'),
     path('add_edit_recurring/<int:user_id>/', add_edit_recurring, name='add_edit_recurring'),
     path('add_recurring/<int:user_id>/', add_recurring, name='add_recurring'),
@@ -38,7 +46,12 @@ BULK_SHIFT_URLS = [
     re_path(r'^group_shift/autocomplete/$', GroupAutocomplete.as_view(), name='group-autocomplete'),
 ]
 
+SCHEDULE_URLS = [
+    path('schedule_for_all_course/', schedule_for_all_course, name='schedule_for_all_course')
+]
+
 urlpatterns = (
     USERS_SHIFT_URLS +
-    BULK_SHIFT_URLS
+    BULK_SHIFT_URLS +
+    SCHEDULE_URLS
 )
