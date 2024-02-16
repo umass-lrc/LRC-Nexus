@@ -290,16 +290,11 @@ class Shift(models.Model):
         help_text="Whether or not the shift is dropped."
     )
     
-    changed = models.BooleanField(
-        default=False,
-        help_text="Whether or not the shift has been changed."
-    )
-    
     objects = ShiftManager()
     
     def save(self, *args, **kwargs):
         update = self.id is not None
-        if self.dropped or self.changed:
+        if self.dropped:
             return super(Shift, self).save(*args, **kwargs)
         if update:
             old_shift = Shift.objects.get(id=self.id)
@@ -381,6 +376,7 @@ class Shift(models.Model):
         elif start_weekday == 5:
             not_signed_payroll.saturday_hours -= self.duration
         not_signed_payroll.save()
+        self.recurring_shift = None
         self.dropped = True
         self.save()
     
@@ -404,7 +400,9 @@ class Shift(models.Model):
             not_in_hr_payroll.saturday_hours -= self.duration
         not_in_hr_payroll.save()
         self.attendance_info.delete()
-        super(Shift, self).delete()
+        self.recurring_shift = None
+        self.dropped = True
+        self.save()
     
     def __str__(self):
         return f"{self.kind} {self.building.short_name}-{self.room} {timezone.localtime(self.start).strftime('%m/%d, %I:%M %p')}"
@@ -597,6 +595,39 @@ class ChangeRequest(models.Model):
         blank=True,
         help_text="The date/time the change request was last changed."
     )
+    
+    def change_status_to_in_progress(self, user):
+        self.state = State.IN_PROGRESS
+        self.last_change_by = user
+        self.last_changed_on = datetime.now()
+        self.save()
+    
+    def change_status_to_denied(self, user):
+        self.state = State.DENIED
+        self.last_change_by = user
+        self.last_changed_on = datetime.now()
+        self.save()
+    
+    def change_status_to_approved(self, user, start, duration, building, room, kind, require_punch_in_out):
+        self.shift.delete()
+        Shift.objects.create(
+            position=self.position,
+            start=start,
+            duration=duration,
+            building=building,
+            room=room,
+            kind=kind,
+            require_punch_in_out=require_punch_in_out,
+        )
+        self.state = State.APPROVED
+        self.start = start
+        self.duration = duration
+        self.building = building
+        self.room = room
+        self.kind = kind
+        self.last_change_by = user
+        self.last_changed_on = datetime.now()
+        self.save()
 
 class DropRequest(models.Model):
     shift = models.ForeignKey(
@@ -634,3 +665,16 @@ class DropRequest(models.Model):
         blank=True,
         help_text="The date/time the drop request was last changed."
     )
+    
+    def change_status_to_denied(self, user):
+        self.state = State.DENIED
+        self.last_change_by = user
+        self.last_changed_on = datetime.now()
+        self.save()
+    
+    def change_status_to_approved(self, user):
+        self.shift.delete()
+        self.state = State.APPROVED
+        self.last_change_by = user
+        self.last_changed_on = datetime.now()
+        self.save()
