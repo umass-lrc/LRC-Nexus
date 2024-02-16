@@ -210,10 +210,7 @@ def shift_directory_path(instance, filename):
 
 class ShiftManager(models.Manager):
     def filter(self, *args, **kwargs):
-        return super().filter(*args, **kwargs, dropped=False, changed=False)
-    
-    def get(self, *args, **kwargs):
-        return super().get(*args, **kwargs, dropped=False, changed=False)
+        return super().filter(*args, **kwargs, dropped=False)
 
 class Shift(models.Model):
     position = models.ForeignKey(
@@ -568,6 +565,11 @@ class ChangeRequest(models.Model):
         help_text="The kind of shift."
     )
     
+    require_punch_in_out = models.BooleanField(
+        default=False,
+        help_text="Whether or not the shift requires punch in/out."
+    )
+    
     reason = models.TextField(
         null=False,
         blank=False,
@@ -596,37 +598,21 @@ class ChangeRequest(models.Model):
         help_text="The date/time the change request was last changed."
     )
     
-    def change_status_to_in_progress(self, user):
-        self.state = State.IN_PROGRESS
-        self.last_change_by = user
-        self.last_changed_on = datetime.now()
-        self.save()
-    
-    def change_status_to_denied(self, user):
-        self.state = State.DENIED
-        self.last_change_by = user
-        self.last_changed_on = datetime.now()
-        self.save()
-    
-    def change_status_to_approved(self, user, start, duration, building, room, kind, require_punch_in_out):
-        self.shift.delete()
+    def change_status_to_approved(self, user):
+        if self.shift is not None:
+            self.shift.delete()
         Shift.objects.create(
             position=self.position,
-            start=start,
-            duration=duration,
-            building=building,
-            room=room,
-            kind=kind,
-            require_punch_in_out=require_punch_in_out,
+            start=self.start,
+            duration=self.duration,
+            building=self.building,
+            room=self.room,
+            kind=self.kind,
+            require_punch_in_out=self.require_punch_in_out,
         )
         self.state = State.APPROVED
-        self.start = start
-        self.duration = duration
-        self.building = building
-        self.room = room
-        self.kind = kind
         self.last_change_by = user
-        self.last_changed_on = datetime.now()
+        self.last_changed_on = timezone.now()
         self.save()
 
 class DropRequest(models.Model):
@@ -669,12 +655,12 @@ class DropRequest(models.Model):
     def change_status_to_denied(self, user):
         self.state = State.DENIED
         self.last_change_by = user
-        self.last_changed_on = datetime.now()
+        self.last_changed_on = timezone.now()
         self.save()
     
     def change_status_to_approved(self, user):
         self.shift.delete()
         self.state = State.APPROVED
         self.last_change_by = user
-        self.last_changed_on = datetime.now()
+        self.last_changed_on = timezone.now()
         self.save()

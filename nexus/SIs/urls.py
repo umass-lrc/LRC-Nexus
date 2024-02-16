@@ -15,6 +15,9 @@ from .views.shift_request import (
     change_request,
     drop_request,
     add_request,
+    add_request_form,
+    change_request_form,
+    drop_request_form,
 )
 
 SI_ROLE_URLS = [
@@ -32,6 +35,9 @@ SHIFT_REQUEST = [
     path('add_request/<str:request_state>/', add_request, name='si_add_request'),
     path('change_request/<str:request_state>/', change_request, name='si_change_request'),
     path('drop_request/<str:request_state>/', drop_request, name='si_drop_request'),
+    path('add_request_form/<int:req_id>/', add_request_form, name='si_add_request_form'),
+    path('change_request_form/<int:req_id>/', change_request_form, name='si_change_request_form'),
+    path('drop_request_form/<int:req_id>/', drop_request_form, name='si_drop_request_form'),
 ]
 
 urlpatterns = (
