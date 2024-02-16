@@ -1,7 +1,7 @@
 {% load tz %}
 
 <div class="table-responsive">
-  <table class="table" id="change_requests">
+  <table class="table" id="drop_requests">
     <thead>
       <tr>
         <th class="text-center" scope="col">Last Name</th>
@@ -11,9 +11,9 @@
         <th class="text-center" scope="col">Check</th>
       </tr>
     </thead>
-    <tbody id="change_requests_body">
-      {% for req in c_requests %}
-      <tr id="crt-{{req.id}}">
+    <tbody id="drop_requests_body">
+      {% for req in d_requests %}
+      <tr id="drt-{{req.id}}">
         <td class="text-center">{{ req.shift.position.user.last_name }}</td>
         <td class="text-center">{{ req.shift.position.user.first_name }}</td>
         <td class="text-center">{{ req.shift.start|localtime|date }}</td>
@@ -21,10 +21,10 @@
         <td class="text-center">
           <a
             href=""
-            hx-get="{% url 'update_role' req.id %}"
+            hx-get="{% url url_name req.id %}"
             hx-trigger="click"
-            hx-target="#update-role-form"
-            ><i class="bi bi-pencil-square"></i
+            hx-target="#request-form"
+            ><i class="bi bi-zoom-in"></i
           ></a>
         </td>
       </tr>

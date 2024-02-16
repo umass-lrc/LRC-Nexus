@@ -1,4 +1,4 @@
-{% include 'change_request_details.html' %}
+{% include 'drop_request_details.html' %}
 
 <div class="row">
   <button
@@ -12,11 +12,11 @@
   </button>
   <button
     hx-post="{% url url_name req_id %}"
-    hx-vals='{"type": "in_progress"}'
+    hx-vals='{"type": "approve"}'
     hx-trigger="click"
     hx-swap="multi:#request-message:innerHTML,#request-form:innerHTML"
-    class="btn btn-warning d-block mx-auto col-4"
+    class="btn btn-primary d-block mx-auto col-4"
   >
-    Put In Progress
+    Approve Request
   </button>
 </div>

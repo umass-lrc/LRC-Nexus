@@ -1,0 +1,33 @@
+{% load tz %}
+
+<tr id="crt-{{change_request.id}}" class="curr-update">
+  <td class="text-center">
+    {{ change_request.shift.position.user.last_name }}
+  </td>
+  <td class="text-center">
+    {{ change_request.shift.position.user.first_name }}
+  </td>
+  <td class="text-center">{{ change_request.shift.start|localtime|date }}</td>
+  <td class="text-center">{{ change_request.start|localtime|date }}</td>
+  <td class="text-center">{{ change_request.reason }}</td>
+  <td class="text-center">
+    <a
+      href=""
+      hx-get="{% url url_name change_request.id %}"
+      hx-trigger="click"
+      hx-target="#request-form"
+      ><i class="bi bi-zoom-in"></i
+    ></a>
+  </td>
+</tr>
+
+<div id="request-message">{% include 'alerts.html' %}</div>
+
+<div id="request-form">
+  <div
+    hx-get="{% url url_name change_request.id %}"
+    hx-trigger="intersect once"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>

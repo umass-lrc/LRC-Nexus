@@ -452,7 +452,13 @@
     if (!accordion.classList.contains("show")) {
       document.getElementById("flush-collapseOne-button").click();
     }
-    document.getElementById("update_user_form_message").innerHTML = "";
+    document.getElementById("request-message").innerHTML = "";
+  });
+
+  document.body.addEventListener("stateChanged", function (e) {
+    let id = e.detail.value;
+    let row = document.getElementById(id);
+    row.remove();
   });
 </script>
 {% endblock %}
