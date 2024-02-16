@@ -14,6 +14,7 @@ from .views.shift_request import (
     shift_requests,
     change_request,
     drop_request,
+    add_request,
 )
 
 SI_ROLE_URLS = [
@@ -28,6 +29,7 @@ SCHEDULE_URLS = [
 
 SHIFT_REQUEST = [
     path('shift_requests/', shift_requests, name='si_shift_requests'),
+    path('add_request/<str:request_state>/', add_request, name='si_add_request'),
     path('change_request/<str:request_state>/', change_request, name='si_change_request'),
     path('drop_request/<str:request_state>/', drop_request, name='si_drop_request'),
 ]

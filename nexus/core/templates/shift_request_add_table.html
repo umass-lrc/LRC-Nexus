@@ -1,23 +1,21 @@
 {% load tz %}
 
 <div class="table-responsive">
-  <table class="table" id="change_requests">
+  <table class="table" id="add_requests">
     <thead>
       <tr>
         <th class="text-center" scope="col">Last Name</th>
         <th class="text-center" scope="col">First Name</th>
-        <th class="text-center" scope="col">Orignal Date</th>
         <th class="text-center" scope="col">Requested Date</th>
         <th class="text-center" scope="col">Reason</th>
         <th class="text-center" scope="col">Check</th>
       </tr>
     </thead>
-    <tbody id="change_requests_body">
-      {% for req in c_requests %}
-      <tr id="crt-{{req.id}}">
-        <td class="text-center">{{ req.shift.position.user.last_name }}</td>
-        <td class="text-center">{{ req.shift.position.user.first_name }}</td>
-        <td class="text-center">{{ req.shift.start|localtime|date }}</td>
+    <tbody id="add_requests_body">
+      {% for req in a_requests %}
+      <tr id="art-{{req.id}}">
+        <td class="text-center">{{ req.position.user.last_name }}</td>
+        <td class="text-center">{{ req.position.user.first_name }}</td>
         <td class="text-center">{{ req.start|localtime|date }}</td>
         <td class="text-center">{{ req.reason }}</td>
         <td class="text-center">
