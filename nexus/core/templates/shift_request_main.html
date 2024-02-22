@@ -1,0 +1,464 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Change/Drop Request For {{position}}</h1>
+<hr />
+
+<nav>
+  <div
+    class="nav nav-tabs nav-fill justify-content-center"
+    id="nav-tab"
+    role="tablist"
+  >
+    <button
+      class="nav-link active"
+      id="nav-add-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-add"
+      type="button"
+      role="tab"
+      aria-controls="nav-add"
+      aria-selected="true"
+    >
+      Add Requests
+    </button>
+    <button
+      class="nav-link"
+      id="nav-change-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-change"
+      type="button"
+      role="tab"
+      aria-controls="nav-change"
+      aria-selected="true"
+    >
+      Change Requests
+    </button>
+    <button
+      class="nav-link"
+      id="nav-drop-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-drop"
+      type="button"
+      role="tab"
+      aria-controls="nav-drop"
+      aria-selected="false"
+    >
+      Drop Requests
+    </button>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div
+    class="tab-pane fade show active"
+    id="nav-add"
+    role="tabpanel"
+    aria-labelledby="nav-add-tab"
+    tabindex="0"
+  >
+    <nav>
+      <div class="nav nav-pills nav-fill mt-3" role="tablist">
+        <button
+          class="nav-link active"
+          id="nav-add-not-viewed-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-not-viewed"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-not-viewed"
+          aria-selected="true"
+        >
+          Not Viewed
+        </button>
+        <button
+          class="nav-link"
+          id="nav-add-in-progress-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-in-progress"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-in-progress"
+          aria-selected="false"
+        >
+          In Progress
+        </button>
+        <button
+          class="nav-link"
+          id="nav-add-approved-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-approved"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-approved"
+          aria-selected="false"
+        >
+          Approved
+        </button>
+        <button
+          class="nav-link"
+          id="nav-add-denied-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-add-denied"
+          type="button"
+          role="tab"
+          aria-controls="nav-add-denied"
+          aria-selected="false"
+        >
+          Denied
+        </button>
+      </div>
+    </nav>
+    <div class="tab-content">
+      <div
+        class="tab-pane fade show active"
+        id="nav-add-not-viewed"
+        role="tabpanel"
+        aria-labelledby="nav-add-not-viewed-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Not Viewed - Add Request</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.NOT_VIEWED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-add-in-progress"
+        role="tabpanel"
+        aria-labelledby="nav-add-in-progress-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing In Progress - Add Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.IN_PROGRESS %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-add-approved"
+        role="tabpanel"
+        aria-labelledby="nav-add-approved-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Approved - Add Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.APPROVED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-add-denied"
+        role="tabpanel"
+        aria-labelledby="nav-add-denied-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Denied - Add Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url add_url_name state.DENIED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="tab-pane fade"
+    id="nav-change"
+    role="tabpanel"
+    aria-labelledby="nav-change-tab"
+    tabindex="0"
+  >
+    <nav>
+      <div class="nav nav-pills nav-fill mt-3" role="tablist">
+        <button
+          class="nav-link active"
+          id="nav-change-not-viewed-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-change-not-viewed"
+          type="button"
+          role="tab"
+          aria-controls="nav-change-not-viewed"
+          aria-selected="true"
+        >
+          Not Viewed
+        </button>
+        <button
+          class="nav-link"
+          id="nav-change-in-progress-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-change-in-progress"
+          type="button"
+          role="tab"
+          aria-controls="nav-change-in-progress"
+          aria-selected="false"
+        >
+          In Progress
+        </button>
+        <button
+          class="nav-link"
+          id="nav-change-approved-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-change-approved"
+          type="button"
+          role="tab"
+          aria-controls="nav-change-approved"
+          aria-selected="false"
+        >
+          Approved
+        </button>
+        <button
+          class="nav-link"
+          id="nav-change-denied-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-change-denied"
+          type="button"
+          role="tab"
+          aria-controls="nav-change-denied"
+          aria-selected="false"
+        >
+          Denied
+        </button>
+      </div>
+    </nav>
+    <div class="tab-content">
+      <div
+        class="tab-pane fade show active"
+        id="nav-change-not-viewed"
+        role="tabpanel"
+        aria-labelledby="nav-change-not-viewed-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Not Viewed - Change Request</h3>
+        <hr />
+        <div
+          hx-get="{% url change_url_name state.NOT_VIEWED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-change-in-progress"
+        role="tabpanel"
+        aria-labelledby="nav-change-in-progress-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing In Progress - Change Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url change_url_name state.IN_PROGRESS %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-change-approved"
+        role="tabpanel"
+        aria-labelledby="nav-change-approved-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Approved - Change Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url change_url_name state.APPROVED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-change-denied"
+        role="tabpanel"
+        aria-labelledby="nav-change-denied-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Denied - Change Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url change_url_name state.DENIED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="tab-pane fade"
+    id="nav-drop"
+    role="tabpanel"
+    aria-labelledby="nav-drop-tab"
+    tabindex="0"
+  >
+    <nav>
+      <div class="nav nav-pills nav-fill mt-3" role="tablist">
+        <button
+          class="nav-link active"
+          id="nav-drop-not-viewed-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-drop-not-viewed"
+          type="button"
+          role="tab"
+          aria-controls="nav-drop-not-viewed"
+          aria-selected="true"
+        >
+          Not Viewed
+        </button>
+        <button
+          class="nav-link"
+          id="nav-drop-approved-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-drop-approved"
+          type="button"
+          role="tab"
+          aria-controls="nav-drop-approved"
+          aria-selected="false"
+        >
+          Approved
+        </button>
+        <button
+          class="nav-link"
+          id="nav-drop-denied-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-drop-denied"
+          type="button"
+          role="tab"
+          aria-controls="nav-drop-denied"
+          aria-selected="false"
+        >
+          Denied
+        </button>
+      </div>
+    </nav>
+    <div class="tab-content">
+      <div
+        class="tab-pane fade show active"
+        id="nav-drop-not-viewed"
+        role="tabpanel"
+        aria-labelledby="nav-drop-not-viewed-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Not Viwed - Drop Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url drop_url_name state.NOT_VIEWED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-drop-approved"
+        role="tabpanel"
+        aria-labelledby="nav-drop-approved-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Approved - Drop Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url drop_url_name state.APPROVED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="nav-drop-denied"
+        role="tabpanel"
+        aria-labelledby="nav-drop-denied-tab"
+        tabindex="0"
+      >
+        <h3 class="text-center mt-3">Showing Denied - Drop Requests</h3>
+        <hr />
+        <div
+          hx-get="{% url drop_url_name state.DENIED %}"
+          hx-trigger="intersect once"
+          hx-target="this"
+          hx-swap="outerHTML"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Check Request</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please go to request row that you want to check and click on the check.
+      </p>
+      <div id="request-message"></div>
+      <div id="request-form"></div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let last_updated_id = null;
+  document.body.addEventListener("requestClicked", function (e) {
+    if (last_updated_id) {
+      last_updated = document.getElementById(last_updated_id);
+      if (last_updated) {
+        last_updated.classList.remove("curr-update");
+      }
+    }
+    last_updated_id = e.detail.value;
+    last_updated = document.getElementById(last_updated_id);
+    last_updated.classList.add("curr-update");
+    let accordion = document.getElementById("flush-collapseOne");
+    if (!accordion.classList.contains("show")) {
+      document.getElementById("flush-collapseOne-button").click();
+    }
+    document.getElementById("request-message").innerHTML = "";
+  });
+
+  document.body.addEventListener("stateChanged", function (e) {
+    let id = e.detail.value;
+    let row = document.getElementById(id);
+    row.remove();
+  });
+</script>
+{% endblock %}

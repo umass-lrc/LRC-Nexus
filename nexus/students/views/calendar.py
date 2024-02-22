@@ -65,8 +65,9 @@ def get_student_shifts(request):
     events_data = []
     
     shifts = Shift.objects.filter(position__user=user, start__gte=start, start__lte=end).all()
-    change_shifts = ChangeRequest.objects.filter(Q(shift__position__user=user) & ((Q(start__gte=start) & Q(start__lte=end)) | (Q(shift__start__gte=start) & Q(shift__start__lte=end)))).all()
-    drop_shifts = DropRequest.objects.filter(shift__position__user=user, shift__start__gte=start, shift__start__lte=end).all()
+    change_shifts = ChangeRequest.objects.filter(Q(shift__isnull=False) & Q(shift__position__user=user) & Q(state__in=[State.IN_PROGRESS, State.NOT_VIEWED]) & ((Q(start__gte=start) & Q(start__lte=end)) | (Q(shift__start__gte=start) & Q(shift__start__lte=end)))).all()
+    add_req = ChangeRequest.objects.filter(shift__isnull=True, position__user=user, start__gte=start, start__lte=end, state__in=[State.IN_PROGRESS, State.NOT_VIEWED]).all()
+    drop_shifts = DropRequest.objects.filter(shift__position__user=user, shift__start__gte=start, shift__start__lte=end, state__in=[State.IN_PROGRESS, State.NOT_VIEWED]).all()
     for shift in shifts:
         if change_shifts.filter(shift=shift).exists() or drop_shifts.filter(shift=shift).exists():
             continue
@@ -168,7 +169,6 @@ def get_student_shifts(request):
             }
         })
     
-    add_req = ChangeRequest.objects.filter(shift__isnull=True, position__user=user, start__gte=start, start__lte=end).all()
     for req in add_req:
         description = f"""
             <b>Add Request: {req.kind} - {req.position}</b>

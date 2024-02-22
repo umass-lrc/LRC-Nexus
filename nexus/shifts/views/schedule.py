@@ -83,7 +83,7 @@ def schedule_for_all_course_for_start(request, start_date, shift_kind, remove_em
         )
 
         for shift in Shifts:
-            index = (shift.start.date() - start_date).days
+            index = (timezone.localtime(shift.start).date() - start_date).days
             if index < 0 or index > 6:
                 continue
             shifts_info[index].append(shift)
