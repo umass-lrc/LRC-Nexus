@@ -121,11 +121,11 @@
 
   function stickyTableHeader() {
     let scroll = $(window).scrollTop();
-    if (scroll >= initial_t_head) {
+    if (scroll > initial_t_head) {
       table_head.style.top = parseInt(scroll - initial_t_head) + "px";
     } else {
-      console.log(initial_t_head, scroll);
-      table_head.style.top = parseInt(initial_t_head + scroll) + "px";
+      console.log(initial_t_head, scroll, parseInt(initial_t_head - scroll));
+      table_head.style.top = parseInt(initial_t_head - scroll) + "px";
     }
   }
 
