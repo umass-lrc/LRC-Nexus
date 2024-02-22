@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.views.decorators.cache import cache_page
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -23,6 +24,7 @@ from shifts.views import (
     get_color_coder_dict,
 )
 
+@cache_page(60 * 60)
 @restrict_to_http_methods("GET")
 def api_si_schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()
@@ -41,6 +43,7 @@ def api_si_schedule_for_all_course(request):
     }
     return render(request, "api_schedule_si.html", context)
 
+@cache_page(60 * 60)
 @restrict_to_http_methods("GET")
 def api_tutor_schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()

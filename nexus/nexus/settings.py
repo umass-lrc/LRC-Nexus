@@ -122,6 +122,16 @@ DATABASES = {
     }
 }
 
+# Cache
+# https://docs.djangoproject.com/en/5.0/topics/cache/
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "127.0.0.1:11211",
+    }
+}
+
 AUTH_USER_MODEL = "users.NexusUser"
 LOGIN_URL = '/users/login'
 
