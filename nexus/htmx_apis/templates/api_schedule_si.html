@@ -39,6 +39,14 @@
   .font-size16 {
     font-size: 16px;
   }
+
+  .stickyHeader,
+  .stickyHeader tr,
+  .stickyHeader th,
+  .stickyHeader td {
+    position: sticky;
+    z-index: 100;
+  }
 </style>
 
 <div class="table-responsive px-3">
@@ -101,3 +109,18 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  let table_head = document.getElementsByClassName("stickyHeader")[0];
+  let initial_t_head = table_head.getBoundingClientRect().top;
+
+  function stickyTableHeader() {
+    let scroll = $(window).scrollTop();
+    if (scroll >= initial_t_head) {
+      table_head.style.top = parseInt(scroll - initial_t_head) + "px";
+      console.log("here!");
+    }
+  }
+
+  document.addEventListener("scroll", stickyTableHeader);
+</script>
