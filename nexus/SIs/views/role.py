@@ -54,12 +54,13 @@ def update_role(request, role_id):
         role = SIRoleInfo.objects.get(id=role_id)
         POST = request.POST.copy()
         POST["position"] = role.position.id
-        form = AssignRoleForm(role_id, POST)
+        form = AssignRoleForm(role_id, POST, instance=role)
         if not form.is_valid():
             messages.error(request, f"Form Errors: {form.errors}")
             return render(request, "update_role_response.html", context={"success": False})
         data = form.cleaned_data
         role.assigned_class = data["assigned_class"]
+        role.all_sections = data["all_sections"]
         role.save()
         messages.success(request, "Role updated successfully.")
         context = {"success": True, "role": role}

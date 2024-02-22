@@ -31,7 +31,8 @@ def api_si_schedule_for_all_course(request):
         for i, day in enumerate(days):
             new_day = []
             for shift in day:
-                faculty = SIRoleInfo.objects.get(position=shift.position).assigned_class.faculty
+                role = SIRoleInfo.objects.get(position=shift.position)
+                faculty = role.assigned_class.faculty if not role.all_sections else "All Sections"
                 new_day.append((shift, faculty))
             si_schedule[course][i] = new_day
     context = {
