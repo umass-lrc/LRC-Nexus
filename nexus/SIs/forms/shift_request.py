@@ -47,7 +47,7 @@ class AddRequestForm(forms.ModelForm):
             'hx-swap': f'multi:#art-{kwargs["instance"].id}:innerHTML,#request-message:innerHTML,#request-form:innerHTML',
         }
         self.helper.layout = Layout(
-            HTML('{% include "add_request_details.HTML" %}'),
+            HTML('{% include "add_request_details.html" %}'),
             Fieldset(
                 'Edit Request',
                 'position',
@@ -123,7 +123,7 @@ class ChangeRequestForm(forms.ModelForm):
             'hx-swap': f'multi:#crt-{kwargs["instance"].id}:innerHTML,#request-message:innerHTML,#request-form:innerHTML',
         }
         self.helper.layout = Layout(
-            HTML('{% include "change_request_details.HTML" %}'),
+            HTML('{% include "change_request_details.html" %}'),
             Fieldset(
                 'Edit Request',
                 'position',

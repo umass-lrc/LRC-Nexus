@@ -64,26 +64,24 @@
         <td>
           {% for s in day %}
           <div class="margin-10px-top">
-            {% comment %} {% if s.kind == "SI Session" %}
             <div
               class="font-size16 text-break text-wrap"
               style="margin-bottom: 10px"
             >
-              faculty
+              {{s.1}}
             </div>
-            {% endif %} {% endcomment %}
             <div
               class="padding-5px-tb padding-15px-lr border-radius-5 margin-10px-bottom text-white font-size16 xs-font-size13"
-              style="background-color: {{s.kind|color_coder}}"
+              style="background-color: {{s.0.kind|color_coder}}"
             >
-              {{s.building.short_name}}-{{s.room}}
+              {{s.0.building.short_name}}-{{s.0.room}}
             </div>
             <div class="margin-10px-top font-size14">
-              {{s.start| date:"h:i A" |lower}} -
-              {{s.start|add_datetime:s.duration|date:"h:i A"|lower}}
+              {{s.0.start| date:"h:i A" |lower}} -
+              {{s.0.start|add_datetime:s.0.duration|date:"h:i A"|lower}}
             </div>
             <div class="font-size13 text-break text-wrap">
-              {{s.position.user}}
+              {{s.0.position.user}}
             </div>
           </div>
           {% if not forloop.last %}
