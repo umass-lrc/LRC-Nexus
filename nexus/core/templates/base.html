@@ -196,14 +196,18 @@
     <script src="/static/autocomplete_light/i18n/en.js"></script>
     <script>
       let navbar = document.getElementById("menuHolder");
+      let table_head = document.getElementsByClassName("stickyHeader")[0];
+      let nb = navbar.getBoundingClientRect();
+      let initial_t_head = table_head.getBoundingClientRect().top;
       function stickyTableHeader() {
-        let table_heads = document.querySelectorAll(".stickyHeader");
-        for (let table_head of table_heads) {
-          table_head.style.top = navbar.offsetHeight + "px";
+        let scroll = $(window).scrollTop();
+        if (scroll >= initial_t_head - nb.bottom) {
+          table_head.style.top =
+            parseInt(scroll - initial_t_head + nb.bottom) + "px";
+          console.log("here!");
         }
       }
-      stickyTableHeader();
-      new ResizeSensor(navbar, stickyTableHeader);
+      document.addEventListener("scroll", stickyTableHeader);
       navbar.style.position = "sticky";
 
       document.addEventListener("htmx:afterRequest", function (evt) {

@@ -43,7 +43,7 @@ class AddRequestForm(forms.ModelForm):
         self.fields['minutes'].initial = (kwargs['instance'].duration.seconds // 60) % 60
         self.helper = FormHelper()
         self.helper.attrs = {
-            'hx-post': reverse('si_add_request_form', kwargs={'req_id': kwargs['instance'].id}),
+            'hx-post': reverse('tutor_add_request_form', kwargs={'req_id': kwargs['instance'].id}),
             'hx-swap': f'multi:#art-{kwargs["instance"].id}:innerHTML,#request-message:innerHTML,#request-form:innerHTML',
         }
         self.helper.layout = Layout(
@@ -119,7 +119,7 @@ class ChangeRequestForm(forms.ModelForm):
         self.fields['minutes'].initial = (kwargs['instance'].duration.seconds // 60) % 60
         self.helper = FormHelper()
         self.helper.attrs = {
-            'hx-post': reverse('si_change_request_form', kwargs={'req_id': kwargs['instance'].id}),
+            'hx-post': reverse('tutor_change_request_form', kwargs={'req_id': kwargs['instance'].id}),
             'hx-swap': f'multi:#crt-{kwargs["instance"].id}:innerHTML,#request-message:innerHTML,#request-form:innerHTML',
         }
         self.helper.layout = Layout(

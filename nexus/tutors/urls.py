@@ -13,7 +13,11 @@ from .views.schedule import (
 from .views.shift_request import (
     shift_requests,
     change_request,
+    add_request,
     drop_request,
+    change_request_form,
+    add_request_form,
+    drop_request_form,
 )
 
 ROLE_URLS = [
@@ -28,8 +32,12 @@ SCHEDULE_URLS = [
 
 SHIFT_REQUEST = [
     path('shift-requests/', shift_requests, name='tutor_shift_requests'),
+    path('add-request/<str:request_state>/', add_request, name='tutor_add_request'),
     path('change-request/<str:request_state>/', change_request, name='tutor_change_request'),
     path('drop-request/<str:request_state>/', drop_request, name='tutor_drop_request'),
+    path('add-request-form/<int:req_id>/', add_request_form, name='tutor_add_request_form'),
+    path('change-request-form/<int:req_id>/', change_request_form, name='tutor_change_request_form'),
+    path('drop-request-form/<int:req_id>/', drop_request_form, name='tutor_drop_request_form'),
 ]
 
 urlpatterns = (
