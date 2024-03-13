@@ -44,6 +44,9 @@ class SIRoleInfo(models.Model):
             "assigned_class",
         ]
     
+    def __str__(self):
+        return f"{self.position.user.first_name} - {self.assigned_class}"
+    
     def save(self, *args, **kwargs):
         if self.position.position != PositionChoices.SI:
             raise ValueError("This role is not for an SI position.")
