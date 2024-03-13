@@ -197,22 +197,24 @@
     <script>
       let navbar = document.getElementById("menuHolder");
       let table_head = document.getElementsByClassName("stickyHeader")[0];
-      let nb = navbar.getBoundingClientRect();
-      let initial_t_head = table_head.getBoundingClientRect().top;
-      function stickyTableHeader() {
-        let scroll = $(window).scrollTop();
-        if (scroll >= initial_t_head - nb.bottom) {
-          table_head.style.top =
-            parseInt(scroll - initial_t_head + nb.bottom) + "px";
-          console.log("here!");
+      if (table_head) {
+        let nb = navbar.getBoundingClientRect();
+        let initial_t_head = table_head.getBoundingClientRect().top;
+        function stickyTableHeader() {
+          let scroll = $(window).scrollTop();
+          if (scroll >= initial_t_head - nb.bottom) {
+            table_head.style.top =
+              parseInt(scroll - initial_t_head + nb.bottom) + "px";
+            console.log("here!");
+          }
         }
-      }
-      document.addEventListener("scroll", stickyTableHeader);
-      navbar.style.position = "sticky";
+        document.addEventListener("scroll", stickyTableHeader);
+        navbar.style.position = "sticky";
 
-      document.addEventListener("htmx:afterRequest", function (evt) {
-        stickyTableHeader();
-      });
+        document.addEventListener("htmx:afterRequest", function (evt) {
+          stickyTableHeader();
+        });
+      }
 
       let bottom_stick = document.getElementById("bottomStick");
       let main_container = document.getElementById("main-container");
