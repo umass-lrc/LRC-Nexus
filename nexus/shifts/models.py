@@ -16,6 +16,7 @@ from core.models import (
 from users.models import (
     Positions,
     NexusUser,
+    PositionChoices,
 )
 
 from payrolls.models import (
@@ -597,6 +598,20 @@ class ChangeRequest(models.Model):
         blank=True,
         help_text="The date/time the change request was last changed."
     )
+    
+    def get_role_info(self):
+        position = self.position if self.position is not None else self.shift.position
+        if position.position == PositionChoices.SI:
+            from SIs.models import (
+                SIRoleInfo,
+            )
+            return SIRoleInfo.objects.get(position=position)
+        elif position.position == PositionChoices.TUTOR:
+            from tutors.models import (
+                TutorRoleInfo,
+            )
+            return TutorRoleInfo.objects.get(position=position)
+        return position.position
     
     def change_status_to_approved(self, user):
         if self.shift is not None:
