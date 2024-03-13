@@ -44,4 +44,5 @@ urlpatterns = [
     path('payrolls/', include('payrolls.urls')),
     path('tutors/', include('tutors.urls')),
     path('htmx_apis/', include('htmx_apis.urls')),
+    path('ours/', include('ours.urls')),
 ]
