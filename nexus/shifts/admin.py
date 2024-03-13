@@ -25,10 +25,10 @@ class ShiftAdmin(admin.ModelAdmin):
 
 @admin.register(AttendanceInfo)
 class AttendanceInfoAdmin(admin.ModelAdmin):
-    list_display = ('shift', 'attended', 'signed', 'flag_late')
-    list_filter = ('shift', 'attended', 'signed', 'flag_late')
-    search_fields = ('shift', 'attended', 'signed', 'flag_late')
-    ordering = ('shift', 'attended', 'signed', 'flag_late')
+    list_display = ('shift', 'attended', 'signed', 'flag_late', 'punch_in_time', 'punch_out_time')
+    list_filter = ('shift', 'attended', 'signed', 'flag_late', 'punch_in_time', 'punch_out_time')
+    search_fields = ('shift', 'attended', 'signed', 'flag_late', 'punch_in_time', 'punch_out_time')
+    ordering = ('shift', 'attended', 'signed', 'flag_late', 'punch_in_time', 'punch_out_time')
 
 @admin.register(ChangeRequest)
 class ChangeRequestAdmin(admin.ModelAdmin):

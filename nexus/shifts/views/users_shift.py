@@ -78,43 +78,28 @@ def get_user_shifts(request):
     shifts = Shift.objects.filter(position__user=user, start__gte=start, start__lte=end).all()
     shifts_data = []
     for shift in shifts:
-        try:
-            description = f"""
-                <b>{shift.kind}</b>
-                <hr/>
-                <b>Start:</b> {timezone.localtime(shift.start).strftime("%-I:%M %p")}<br/>
-                <b>End:</b> {timezone.localtime(shift.start + shift.duration).strftime("%-I:%M %p")}<br/>
-                <b>Location:</b> {shift.building.short_name}-{shift.room}
-                <hr/>
-                <b>Attended?</b> {shift.attendance_info.attended}<br/>
-                <b>Signed?</b> {shift.attendance_info.signed}
-            """
-            shifts_data.append({
-                "id": str(shift.id),
-                "start": shift.start.isoformat(),
-                "end": (shift.start + shift.duration).isoformat(),
-                "title": str(shift),
-                "allDay": False,
-                "color": color_coder(shift.kind),
-                "extendedProps": {
-                    "url": reverse("edit_or_drop_shift", kwargs={"shift_id": shift.id}),
-                    "description": description,
-                }
-            })
-        except:
-            # print(f"Error: {shift.id}")
-            old_shift = Shift.objects.get(id=shift.id)
-            Shift.objects.create(
-                position=old_shift.position,
-                start=old_shift.start,
-                duration=old_shift.duration,
-                building=old_shift.building,
-                room=old_shift.room,
-                kind=old_shift.kind,
-                note=old_shift.note,
-                document=old_shift.document,
-                require_punch_in_out=old_shift.require_punch_in_out,
-            )
+        description = f"""
+            <b>{shift.kind}</b>
+            <hr/>
+            <b>Start:</b> {timezone.localtime(shift.start).strftime("%-I:%M %p")}<br/>
+            <b>End:</b> {timezone.localtime(shift.start + shift.duration).strftime("%-I:%M %p")}<br/>
+            <b>Location:</b> {shift.building.short_name}-{shift.room}
+            <hr/>
+            <b>Attended?</b> {shift.attendance_info.attended}<br/>
+            <b>Signed?</b> {shift.attendance_info.signed}
+        """
+        shifts_data.append({
+            "id": str(shift.id),
+            "start": shift.start.isoformat(),
+            "end": (shift.start + shift.duration).isoformat(),
+            "title": str(shift),
+            "allDay": False,
+            "color": color_coder(shift.kind),
+            "extendedProps": {
+                "url": reverse("edit_or_drop_shift", kwargs={"shift_id": shift.id}),
+                "description": description,
+            }
+        })
     return JsonResponse(shifts_data, safe=False)
 
 @login_required
