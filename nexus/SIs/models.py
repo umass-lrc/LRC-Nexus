@@ -52,7 +52,9 @@ class SIRoleInfo(models.Model):
             if old_role.assigned_class == self.assigned_class:
                 return super(SIRoleInfo, self).save(*args, **kwargs)
             SIReccuringShiftInfo.objects.filter(role=old_role).delete()
-        super(SIRoleInfo, self).save(*args, **kwargs)
+        ret = super(SIRoleInfo, self).save(*args, **kwargs)
+        if self.assigned_class is None:
+            return ret
         class_times = ClassTimes.objects.filter(orignal_class=self.assigned_class)
         active_semester = Semester.objects.get_active_semester()
         for class_time in class_times:
@@ -72,6 +74,7 @@ class SIRoleInfo(models.Model):
                 class_time=class_time,
                 recuring_shift=rs,
             )
+        return ret
 
 class SIReccuringShiftInfo(models.Model):
     role = models.ForeignKey(
