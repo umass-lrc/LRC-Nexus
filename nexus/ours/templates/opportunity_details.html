@@ -1,0 +1,32 @@
+<h4 class="text-center">{{opportunity.title}}</h4>
+<h6 class="text-center">
+  <a href="{{opportunity.link}}">Link to Opportunity</a>
+</h6>
+<hr />
+<h5>Description:</h5>
+{{ opportunity.description|safe }}
+<hr />
+<h5>Keywords:</h5>
+{{ keywords }}
+<hr />
+<h5>Related To Major:</h5>
+{{ rtm }}
+<hr />
+<h5>Related To Track:</h5>
+{{ rtt }}
+<hr />
+<h5>Location:</h5>
+{% if opportunity.on_campus %} On Campus {% else %} {{ opportunity.location }}
+{% endif %}
+<hr />
+<h5>Deadline:</h5>
+{{ opportunity.deadline }}
+<hr />
+<h5>Additional Informtion:</h5>
+{{ opportunity.additional_info }}
+<hr />
+<h5>Is Paid?</h5>
+{{ opportunity.is_paid }}
+<hr />
+<h5>Is For Credit?</h5>
+{{ opportunity.is_for_credit }}

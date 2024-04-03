@@ -33,19 +33,16 @@ class FacultyDetails(models.Model):
     positions = models.ManyToManyField(
         to=FacultyPosition,
         blank=True,
-        null=True,
     )
     
     subjects = models.ManyToManyField(
         to=CourseSubject,
         blank=True,
-        null=True,
     )
     
     keywords = models.ManyToManyField(
         to=Keyword,
         blank=True,
-        null=True,
     )
     
     personal_website = models.URLField(
@@ -125,19 +122,16 @@ class Opportunity(models.Model):
     keywords = models.ManyToManyField(
         to=Keyword,
         blank=True,
-        null=True,
     )
     
     related_to_major = models.ManyToManyField(
         to=Majors,
         blank=True,
-        null=True,
     )
     
     related_to_track = models.ManyToManyField(
         to=Tracks,
         blank=True,
-        null=True,
     )
     
     on_campus = models.BooleanField(
@@ -198,7 +192,7 @@ class MinGPARestriction(models.Model):
     )
     
     gpa = models.DecimalField(
-        max_digits=1,
+        max_digits=3,
         decimal_places=2,
         null=False,
         blank=False

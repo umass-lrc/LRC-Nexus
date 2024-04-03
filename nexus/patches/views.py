@@ -31,6 +31,7 @@ from shifts.models import (
     get_weekend,
     Shift,
     ShiftKind,
+    DropRequest,
 )
 
 from .forms import (
@@ -513,3 +514,11 @@ def load_tutor_role_from_line(request, line_number):
             content += f"<b>==Error Occoured On Line {line_number}, Tutor Role Not Added: {e}=={err_course}</b>"
         content += f"<br/>Line {line_number} Content: {to_read} <br/>"
         return HttpResponse(content)
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Tech')
+def delete_error_drop_req(request):
+    dr = DropRequest.objects.get(id=1)
+    dr.delete()
+    return HttpResponse("DONE!")

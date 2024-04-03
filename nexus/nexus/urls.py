@@ -35,6 +35,7 @@ urlpatterns = [
     path('work_in_progress/', work_in_progress, name='work_in_progress'),
     path('admin/', admin.site.urls),
     path('explorer/', include('explorer.urls')),
+    path('tinymce/', include('tinymce.urls')),
     path('core/', include('core.urls')),
     path('users/', include('users.urls')),
     path('patches/', include('patches.urls')),
