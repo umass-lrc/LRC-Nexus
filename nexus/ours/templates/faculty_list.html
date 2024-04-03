@@ -1,0 +1,137 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Faculties Details</h1>
+<hr />
+<div class="table-responsive">
+  <table class="table" id="roles">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Last Name</th>
+        <th class="text-center" scope="col">First Name</th>
+        <th class="text-center" scope="col">Email</th>
+        <th class="text-center" scope="col">View</th>
+        <th class="text-center" scope="col">Edit</th>
+      </tr>
+    </thead>
+    <tbody id="roles_body">
+      {% for faculty_id in faculties %}
+      <tr
+        id="ft-{{faculty_id}}"
+        hx-get="{% url 'get_faculty_row' faculty_id %}"
+        hx-trigger="intersect once"
+        hx-target="this"
+        hx-swap="outerHTML"
+        style="height: 100px"
+      ></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Update Faculty</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please click on the edit button in the faculty row to update that
+        faculty information.
+      </p>
+      <div id="update-faculty-message"></div>
+      <div id="update-faculty-form"></div>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingTwo">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseTwo"
+      aria-expanded="false"
+      aria-controls="flush-collapseTwo"
+      id="flush-collapseTwo-button"
+    >
+      <h3>Faculty Details</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseTwo"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingTwo"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please click on the view button in the faculty row to view that faculty
+        information.
+      </p>
+      <div id="view-faculty"></div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let last_updated_id = null;
+  document.body.addEventListener("updateClicked", function (e) {
+    if (last_updated_id) {
+      last_updated = document.getElementById(last_updated_id);
+      last_updated.classList.remove("curr-update");
+    }
+    last_updated_id = e.detail.value;
+    last_updated = document.getElementById(last_updated_id);
+    last_updated.classList.add("curr-update");
+    let accordion1 = document.getElementById("flush-collapseOne");
+    let accordion2 = document.getElementById("flush-collapseTwo");
+    if (!accordion1.classList.contains("show")) {
+      document.getElementById("flush-collapseOne-button").click();
+    }
+    if (accordion2.classList.contains("show")) {
+      document.getElementById("flush-collapseTwo-button").click();
+    }
+    document.getElementById("update-faculty-message").innerHTML = "";
+    document.getElementById("view-faculty").innerHTML = "";
+  });
+  document.body.addEventListener("viewClicked", function (e) {
+    if (last_updated_id) {
+      last_updated = document.getElementById(last_updated_id);
+      last_updated.classList.remove("curr-update");
+    }
+    last_updated_id = e.detail.value;
+    last_updated = document.getElementById(last_updated_id);
+    last_updated.classList.add("curr-update");
+    let accordion1 = document.getElementById("flush-collapseOne");
+    let accordion2 = document.getElementById("flush-collapseTwo");
+    if (accordion1.classList.contains("show")) {
+      document.getElementById("flush-collapseOne-button").click();
+    }
+    if (!accordion2.classList.contains("show")) {
+      document.getElementById("flush-collapseTwo-button").click();
+    }
+    document.getElementById("update-faculty-message").innerHTML = "";
+    document.getElementById("update-faculty-form").innerHTML = "";
+  });
+</script>
+{% endblock %}

@@ -15,6 +15,7 @@ from .views import (
     delete_class_shifts,
     load_tutor_roles,
     load_tutor_role_from_line,
+    delete_error_drop_req,
 )
 
 urlpatterns = [
@@ -32,4 +33,5 @@ urlpatterns = [
     path('delete_class_shifts/', delete_class_shifts, name='delete_class_shifts'),
     path('load_tutor_roles/', load_tutor_roles, name='load_tutor_roles'),
     path('load_tutor_roles/load_tutor_role_from_line/<int:line_number>/', load_tutor_role_from_line, name='load_tutor_role_from_line'),
+    path('delete_error_drop_req/', delete_error_drop_req, name='delete_error_drop_req'),
 ]

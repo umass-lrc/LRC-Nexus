@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "corsheaders",
     "explorer",
+    "tinymce",
     # Local apps
     "core",
     "users",
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     "tutors",
     "students",
     "htmx_apis",
+    "ours"
 ]
 
 MIDDLEWARE = [
