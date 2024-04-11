@@ -2,15 +2,18 @@ from django.db import models
 
 from shifts.models import (
     RecurringShift,
+    ShiftKind,
 )
 
 from users.models import (
     Positions,
+    PositionChoices
 )
 
 from core.models import (
     Classes,
     ClassTimes,
+    Semester,
 )
 
 class SIRoleInfo(models.Model):
@@ -30,19 +33,51 @@ class SIRoleInfo(models.Model):
         help_text="The class that this role is for."
     )
     
+    all_sections = models.BooleanField(
+        default=False,
+        help_text="If this role is for all sections of the class."
+    )
+    
     class Meta:
         unique_together = [
             "position",
             "assigned_class",
         ]
     
+    def __str__(self):
+        return f"{self.position.user.first_name} - {self.assigned_class}"
+    
     def save(self, *args, **kwargs):
-        if self.position.position != "SI":
+        if self.position.position != PositionChoices.SI:
             raise ValueError("This role is not for an SI position.")
         if self.id is not None:
             old_role = SIRoleInfo.objects.get(id=self.id)
-            
-        new_role = super(SIRoleInfo, self).save(*args, **kwargs)
+            if old_role.assigned_class == self.assigned_class:
+                return super(SIRoleInfo, self).save(*args, **kwargs)
+            SIReccuringShiftInfo.objects.filter(role=old_role).delete()
+        ret = super(SIRoleInfo, self).save(*args, **kwargs)
+        if self.assigned_class is None:
+            return ret
+        class_times = ClassTimes.objects.filter(orignal_class=self.assigned_class)
+        active_semester = Semester.objects.get_active_semester()
+        for class_time in class_times:
+            rs = RecurringShift.objects.create(
+                position=self.position,
+                day=class_time.class_day,
+                start_time=class_time.start_time,
+                duration=class_time.duration,
+                building=class_time.building,
+                room=class_time.room,
+                kind=ShiftKind.CLASS,
+                start_date=active_semester.classes_start,
+                end_date=active_semester.classes_end,
+            )
+            SIReccuringShiftInfo.objects.create(
+                role=self,
+                class_time=class_time,
+                recuring_shift=rs,
+            )
+        return ret
 
 class SIReccuringShiftInfo(models.Model):
     role = models.ForeignKey(
@@ -71,4 +106,7 @@ class SIReccuringShiftInfo(models.Model):
             "role",
             "class_time",
         ]
-
+    
+    def delete(self):
+        self.recuring_shift.delete()
+        super(SIReccuringShiftInfo, self).delete()

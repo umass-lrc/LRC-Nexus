@@ -139,8 +139,15 @@
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'schedule_for_all_course' %}"
                 >Schedule</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Schedule By Course</a
               >
             </li>
           </ul>
@@ -153,7 +160,7 @@
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'weekly_payroll' %}"
                 >Weekly View</a
               >
             </li>
@@ -179,16 +186,14 @@
           >
           <ul class="submenu collapse">
             <li>
-              <a
-                class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+              <a class="nav-link nav-menu-item" href="{% url 'faculty_list' %}"
                 >Faculties</a
               >
             </li>
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'opportunities_list' %}"
                 >Opportunities</a
               >
             </li>
@@ -214,14 +219,14 @@
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'si_schedule_for_all_course' %}"
                 >Schedule</a
               >
             </li>
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'si_shift_requests' %}"
                 >Shift Requests</a
               >
             </li>
@@ -249,21 +254,21 @@
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'tutor_assign_role' %}"
                 >Role</a
               >
             </li>
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'tutor_schedule_for_all_course' %}"
                 >Schedule</a
               >
             </li>
             <li>
               <a
                 class="nav-link nav-menu-item"
-                href="{% url 'work_in_progress' %}"
+                href="{% url 'tutor_shift_requests' %}"
                 >Shift Request</a
               >
             </li>
@@ -325,6 +330,25 @@
             <li>
               <a class="nav-link nav-menu-item" href="{% url 'load_classes' %}"
                 >Load Classes</a
+              >
+            </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'fix_payroll' %}"
+                >Fix Payroll</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'delete_class_shifts' %}"
+                >Delete Class Shifts</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'load_tutor_roles' %}"
+                >Load Tutor Roles</a
               >
             </li>
           </ul>

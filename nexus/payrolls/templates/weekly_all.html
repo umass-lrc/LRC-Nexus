@@ -1,0 +1,30 @@
+<div id="payroll-body">
+  <hr />
+  <h3 class="text-center">Showing Payroll for Week of {{week}}</h3>
+  <hr />
+  <table class="table">
+    <thead class="stickyHeader">
+      <tr>
+        <th class="text-center" scope="col">Status</th>
+        <th class="text-center" scope="col">#</th>
+        <th class="text-center" scope="col">Sunday</th>
+        <th class="text-center" scope="col">Monday</th>
+        <th class="text-center" scope="col">Tuesday</th>
+        <th class="text-center" scope="col">Wednesday</th>
+        <th class="text-center" scope="col">Thursday</th>
+        <th class="text-center" scope="col">Friday</th>
+        <th class="text-center" scope="col">Saturday</th>
+        <th class="text-center" scope="col">Total</th>
+      </tr>
+    </thead>
+    {% for payroll in payrolls %}
+    <tbody
+      hx-get="{% url 'single_weekly_payroll' payroll.id %}"
+      hx-swap="outerHTML"
+      hx-target="this"
+      hx-trigger="intersect once"
+      style="height: 100px"
+    ></tbody>
+    {% endfor %}
+  </table>
+</div>

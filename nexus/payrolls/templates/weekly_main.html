@@ -1,0 +1,18 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Weekly Payroll</h1>
+<hr />
+{% crispy form %}
+<div
+  id="payroll-body"
+  hx-get="{% url 'all_weekly_payroll' %}"
+  hx-trigger="load"
+  hx-target="this"
+  hx-swap="innerHTML"
+></div>
+{% endblock %}

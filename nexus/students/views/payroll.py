@@ -20,11 +20,13 @@ from users.models import (
 
 from core.models import (
     Semester,
+    Buildings,
 )
 
 from shifts.models import (
     AttendanceInfo,
     Shift,
+    ShiftKind,
     get_weekend,
 )
 
@@ -50,8 +52,8 @@ def get_user_payroll_page(request):
     user = request.user
     active_sem = Semester.objects.get_active_semester()
     positions_punch_in_out = Positions.objects.filter(Q(user=user) & Q(semester=active_sem) & ~Q(position__in=[PositionChoices.SI, PositionChoices.GROUP_TUTOR])).all()
-    att_not_signed = AttendanceInfo.objects.filter(shift__position__user=user, shift__start__lte=timezone.now(), signed=False).values_list('shift__id', flat=True)
-    not_signed_shifts = Shift.objects.filter(id__in=att_not_signed).all()
+    # att_not_signed = AttendanceInfo.objects.filter(shift__position__user=user, shift__start__lte=timezone.now(), signed=False).values_list('shift__id', flat=True)
+    not_signed_shifts = Shift.objects.filter(position__user=user, start__lte=timezone.now(), attendance_info__signed=False).all()
     punch_in_out_shifts = Shift.objects.filter(
         (Q(position__user=user) & Q(require_punch_in_out=True)) & 
         (
@@ -59,9 +61,10 @@ def get_user_payroll_page(request):
             (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=(timezone.now() + timedelta(minutes=30))) & Q(attendance_info__punch_in_time__isnull=True))
         )
     ).all()
+    shifts_punch_in_but_not_out = Shift.objects.filter(position__user=user, attendance_info__punch_in_time__isnull=False, attendance_info__punch_out_time__isnull=True).all()
     not_signed_shifts_ = []
     for shift in not_signed_shifts:
-        if shift in punch_in_out_shifts:
+        if shift in shifts_punch_in_but_not_out:
             continue
         not_signed_shifts_.append(shift)
     context = {
@@ -76,7 +79,7 @@ def get_user_payroll_page(request):
 def punch_in_out_position(request, position_id):
     user = request.user
     position = Positions.objects.get(id=position_id)
-    att_info = AttendanceInfo.objects.filter(shift__position=position, shift__require_punch_in_out=False, punch_in_time__isnull=False, punch_out_time__isnull=True)
+    att_info = AttendanceInfo.objects.filter(shift__position=position, shift__require_punch_in_out=False, punch_in_time__isnull=False, punch_out_time__isnull=True, attended=False)
     punched_in = att_info.exists()
     if punched_in:
         att_info = att_info.first()
@@ -149,14 +152,15 @@ def shift_punch_in_out(request, shift_id):
             punch_in_time = timezone.now()
             att_info = AttendanceInfo.objects.get(shift=shift)
             att_info.punch_in_time = punch_in_time.time()
-            att_info.shift.start = punch_in_time
-            att_info.shift.save()
             att_info.save()
             messages.success(request, 'Punched in successfully.')
         else:
             punch_out_time = timezone.now()
-            duration = punch_out_time - att_info.shift.start
-            att_info.shift.duration = duration
+            start = punch_out_time.replace(hour=att_info.punch_in_time.hour, minute=att_info.punch_in_time.minute, second=att_info.punch_in_time.second)
+            if punch_out_time < start:
+                start = start - timedelta(days=1)
+            att_info.shift.start = start
+            att_info.shift.duration = punch_out_time - start
             att_info.shift.save()
             att_info.punch_out_time = punch_out_time.time()
             att_info.save()
@@ -199,6 +203,26 @@ def sign_shift(request, shift_id):
             att.sign_datetime = timezone.now()
             att.save()
             att.did_attend()
+            
+            if shift.kind == ShiftKind.SI_SESSION or shift.kind == ShiftKind.GROUP_TUTORING:
+                duration = timedelta(hours=2)
+                if shift.duration > timedelta(hours=1, minutes=15):
+                    duration += (shift.duration-timedelta(hours=1, minutes=15))*(timedelta(hours=1)/timedelta(minutes=45))
+                if duration > timedelta(hours=3):
+                    duration = timedelta(hours=3)
+                prep_shift = Shift.objects.create(
+                    position=shift.position,
+                    start=shift.start,
+                    duration=duration,
+                    building=Buildings.objects.get(short_name='ZOOM'),
+                    room="Home",
+                    kind=ShiftKind.PREPARATION,
+                )
+                prep_shift.attendance_info.attended = True
+                prep_shift.attendance_info.signed = True
+                prep_shift.attendance_info.sign_datetime = timezone.now()
+                prep_shift.attendance_info.save()
+                prep_shift.attendance_info.did_attend()
         elif 'did_not_attend' in request.POST:
             att = AttendanceInfo.objects.get(shift=shift)
             att.attended = False

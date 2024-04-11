@@ -165,13 +165,18 @@
     ></script>
     <!--Bootstrap-->
     <script
-      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
-      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+      crossorigin="anonymous"
+    ></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
+    <script src="https://unpkg.com/sticky-table-headers"></script>
     <script src="{% static 'js/ResizeSensor.js'%}"></script>
     <script src="{% static 'js/ElementQueries.js'%}"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
@@ -191,15 +196,25 @@
     <script src="/static/autocomplete_light/i18n/en.js"></script>
     <script>
       let navbar = document.getElementById("menuHolder");
-      function stickyTableHeader() {
-        let table_heads = document.querySelectorAll(".stickyHeader");
-        for (let table_head of table_heads) {
-          table_head.style.top = navbar.offsetHeight + "px";
+      let table_head = document.getElementsByClassName("stickyHeader")[0];
+      if (table_head) {
+        let nb = navbar.getBoundingClientRect();
+        let initial_t_head = table_head.getBoundingClientRect().top;
+        function stickyTableHeader() {
+          let scroll = $(window).scrollTop();
+          if (scroll >= initial_t_head - nb.bottom) {
+            table_head.style.top =
+              parseInt(scroll - initial_t_head + nb.bottom) + "px";
+            console.log("here!");
+          }
         }
+        document.addEventListener("scroll", stickyTableHeader);
+        navbar.style.position = "sticky";
+
+        document.addEventListener("htmx:afterRequest", function (evt) {
+          stickyTableHeader();
+        });
       }
-      stickyTableHeader();
-      new ResizeSensor(navbar, stickyTableHeader);
-      navbar.style.position = "sticky";
 
       let bottom_stick = document.getElementById("bottomStick");
       let main_container = document.getElementById("main-container");

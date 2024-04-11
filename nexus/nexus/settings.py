@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "corsheaders",
     "explorer",
+    "tinymce",
     # Local apps
     "core",
     "users",
@@ -64,6 +65,8 @@ INSTALLED_APPS = [
     "SIs",
     "tutors",
     "students",
+    "htmx_apis",
+    "ours"
 ]
 
 MIDDLEWARE = [
@@ -91,6 +94,9 @@ TEMPLATES = [
             BASE_DIR.joinpath("shifts", "templates"),
             BASE_DIR.joinpath("SIs", "templates"),
             BASE_DIR.joinpath("students", "templates"),
+            BASE_DIR.joinpath("payrolls", "templates"),
+            BASE_DIR.joinpath("tutors", "templates"),
+            BASE_DIR.joinpath("htmx_apis", "templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -115,6 +121,16 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "database.sqlite3",
+    }
+}
+
+# Cache
+# https://docs.djangoproject.com/en/5.0/topics/cache/
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "127.0.0.1:11211",
     }
 }
 
