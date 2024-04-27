@@ -1,13 +1,24 @@
 asgiref==3.7.2
+certifi==2024.2.2
+charset-normalizer==3.3.2
 crispy-bootstrap5==2023.10
 Django==5.0.1
 django-autocomplete-light==3.9.7
 django-cors-headers==4.3.1
 django-crispy-forms==2.1
+django-haystack @ git+https://github.com/django-haystack/django-haystack.git@1b61fd9d0553b157027eba508f08046b2bff310b
 django-sql-explorer==3.2.1
+django-tinymce==4.0.0
+elastic-transport==8.13.0
+elasticsearch==8.13.0
+idna==3.6
+packaging==24.0
 pymemcache==4.0.0
+pysolr==3.9.0
 pytz==2023.4
+requests==2.31.0
 six==1.16.0
 soupsieve==2.5
 sqlparse==0.4.4
 typing_extensions==4.9.0
+urllib3==2.2.1
