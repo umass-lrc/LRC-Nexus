@@ -74,6 +74,9 @@ class FacultyDetails(models.Model):
     allowed_to_post_oportunities = models.BooleanField(
         default=False
     )
+    
+    class Meta:
+        ordering = ['faculty__last_name', 'faculty__first_name']
 
 class Majors(models.Model):
     major = models.CharField(
