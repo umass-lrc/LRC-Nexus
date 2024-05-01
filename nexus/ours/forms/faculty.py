@@ -2,7 +2,7 @@ from django import forms
 from django.urls import reverse
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, Div
+from crispy_forms.layout import Submit, Layout, Fieldset, Div, Button
 
 from crispy_bootstrap5.bootstrap5 import FloatingField
 
@@ -11,6 +11,8 @@ from tinymce.widgets import TinyMCE
 
 from ..models import (
     FacultyDetails,
+    FacultyPosition,
+    Keyword,
 )
 
 class UpdateFacultyDetailsForm(forms.ModelForm):
@@ -33,9 +35,9 @@ class UpdateFacultyDetailsForm(forms.ModelForm):
         model = FacultyDetails
         fields = ['positions', 'subjects', 'keywords', 'personal_website', 'lab_name', 'lab_website', 'research_outline', 'miscellaneous', 'allowed_to_post_oportunities']
         widgets = {
-            'positions': autocomplete.ModelSelect2Multiple(),
+            'positions': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
             'subjects': autocomplete.ModelSelect2Multiple(),
-            'keywords': autocomplete.ModelSelect2Multiple(),
+            'keywords': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
             'personal_website': forms.URLInput(),
             'lab_website': forms.URLInput(),
             'research_outline': TinyMCE(attrs={'cols': 80, 'rows': 30}),
@@ -58,13 +60,19 @@ class UpdateFacultyDetailsForm(forms.ModelForm):
             Fieldset(
                 '',
                 Div(
-                    FloatingField('first_name'),
-                    FloatingField('last_name'),
-                    css_class="row align-items-center justify-content-center"
+                    Div(
+                        FloatingField('first_name'),
+                        css_class='col-md-6',
+                    ),
+                    Div(
+                        FloatingField('last_name'),
+                        css_class='col-md-6',
+                    ),
+                    css_class="row"
                 ),
                 FloatingField('email'),
-                FloatingField('positions'),
                 FloatingField('subjects'),
+                FloatingField('positions'),
                 FloatingField('keywords'),
                 FloatingField('personal_website'),
                 FloatingField('lab_name'),

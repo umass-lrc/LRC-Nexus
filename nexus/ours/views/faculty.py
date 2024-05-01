@@ -9,6 +9,8 @@ from core.views import restrict_to_http_methods, restrict_to_groups
 from ..models import (
     Faculty,
     FacultyDetails,
+    FacultyPosition,
+    Keyword,
 )
 
 from ..forms.faculty import UpdateFacultyDetailsForm
@@ -41,7 +43,22 @@ def get_faculty_row(request, faculty_id):
 def update_faculty_details(request, faculty_id):
     faculty = FacultyDetails.objects.get(faculty_id=faculty_id)
     if request.method == 'POST':
-        form = UpdateFacultyDetailsForm(request.POST, instance=faculty)
+        updated_post = request.POST.copy()
+        positions = request.POST.getlist('positions')
+        keywords = request.POST.getlist('keywords')
+        for i, position in enumerate(positions):
+            if position.isnumeric() and FacultyPosition.objects.filter(id=int(position)).exists():
+                continue
+            pos = FacultyPosition.objects.create(position=position)
+            positions[i] = str(pos.id)
+        updated_post.setlist('positions', positions)
+        for i, keyword in enumerate(keywords):
+            if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
+                continue
+            key = Keyword.objects.create(keyword=keyword)
+            keywords[i] = str(key.id)
+        updated_post.setlist('keywords', keywords)
+        form = UpdateFacultyDetailsForm(updated_post, instance=faculty)
         if not form.is_valid():
             messages.error(request, f'Form Errors: {form.errors}')
         else:
