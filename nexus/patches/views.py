@@ -34,6 +34,10 @@ from shifts.models import (
     DropRequest,
 )
 
+from ours.models import (
+    FacultyPosition,
+)
+
 from .forms import (
     loadUsersForm,
     loadPositionsForm,
@@ -41,6 +45,7 @@ from .forms import (
     loadFacultiesForm,
     loadClassesForm,
     loadTutorRoleForm,
+    loadFacultyPositionsForm,
 )
 
 from tutors.models import (
@@ -349,6 +354,60 @@ def load_class_from_line(request, line_number):
                 content += f"<b>==Class Added Successfully==</b>"
             except Exception as e:
                 content += f"<b>==Error Occoured On Line {line_number}, Class Not Added: {e}==</b>"
+        content += f"<br/>Line {line_number} Content: {to_read} <br/>"
+        return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
+def load_faculty_positions(request):
+    if request.method == 'POST':
+        form = loadFacultyPositionsForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_faculty_positions_response.html', context={'success': False})
+        with open("temp/faculty_positions.csv", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        return render(request, 'load_faculty_positions_response.html', context={'success': True})
+    form = loadFacultyPositionsForm()
+    context = {'form': form}
+    return render(request, 'load_faculty_positions.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_faculty_position_from_line(request, line_number):
+    with open("temp/faculty_positions.csv", "r") as f:
+        to_read = None
+        for i, line in enumerate(f):
+            if i == line_number-1:
+                to_read = line
+                break
+        if to_read is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = f"""
+            <div
+                hx-post="{reverse('load_faculty_position_from_line', kwargs={'line_number': line_number+1})}"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="outerHTML"
+            >
+            </div>
+        """
+        if to_read[-1] == '\n':
+            to_read = to_read[:-1]
+        values = to_read.split(',')
+        if len(values) != 1:
+            content += f"<b>==Invalid Format On Line {line_number}==</b>"
+        else:
+            try:
+                position = values[0]
+                FacultyPosition.objects.create(
+                    position=position,
+                )
+                content += f"<b>==Position Added Successfully==</b>"
+            except Exception as e:
+                content += f"<b>==Error Occoured On Line {line_number}, Position Not Added: {e}==</b>"
         content += f"<br/>Line {line_number} Content: {to_read} <br/>"
         return HttpResponse(content)
 

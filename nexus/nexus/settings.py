@@ -200,3 +200,7 @@ MESSAGE_TAGS = {
     messages.WARNING: "warning",
     messages.ERROR: "danger",
 }
+
+TINYMCE_JS_URL = "tinymce/tinymce.min.js"
+TINYMCE_JS_ROOT = "tinymce/"
+TINYMCE_SPELLCHECKER = False

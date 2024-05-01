@@ -96,6 +96,10 @@
 <script>
   let last_updated_id = null;
   document.body.addEventListener("updateClicked", function (e) {
+    tinymce.remove();
+    tinymce.init({
+      selector: "textarea",
+    });
     if (last_updated_id) {
       last_updated = document.getElementById(last_updated_id);
       last_updated.classList.remove("curr-update");
@@ -132,6 +136,10 @@
     }
     document.getElementById("update-faculty-message").innerHTML = "";
     document.getElementById("update-faculty-form").innerHTML = "";
+  });
+  document.body.addEventListener("facultyDetailsUpdated", function (e) {
+    elem = document.querySelector("#update-faculty-message");
+    elem.scrollIntoView();
   });
 </script>
 {% endblock %}

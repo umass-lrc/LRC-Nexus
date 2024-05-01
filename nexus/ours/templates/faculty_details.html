@@ -12,13 +12,20 @@
 {{ keywords }}
 <hr />
 <h5>Personal Website:</h5>
-<<a href="{{ faculty.personal_website }}">Personal Website</a>>
+{% if faculty.personal_website %}
+<!--prettier-ignore-->
+<<a href="{{ faculty.personal_website }}">Personal Website</a>> {% else %}
+<-None-> {% endif %}
 <hr />
 <h5>Lab Info:</h5>
-{{ faculty.lab_name }} <<a href="{{faculty.lab_website}}">Lab Website</a>>
+<!--prettier-ignore-->
+{{ faculty.lab_name }} <{%if faculty.lab_website %}<a
+  href="{{faculty.lab_website}}"
+  >Lab Website</a
+>{% else %}-None-{%endif%}>
 <hr />
 <h5>Research Outline:</h5>
 {{ faculty.research_outline|safe }}
 <hr />
 <h5>Miscellaneous:</h5>
-{{ faculty.miscellaneous }}
+{{ faculty.miscellaneous|safe }}

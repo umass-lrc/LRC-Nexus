@@ -14,14 +14,13 @@ from ..models import (
 )
 
 class CreateOpportunityForm(forms.ModelForm):
-    
     class Meta:
         model = Opportunity
         fields = ['title', 'short_description', 'description', 'keywords', 'related_to_major', 'related_to_track', 'on_campus', 'location', 'link', 'deadline', 'additional_info', 'is_paid', 'is_for_credit', 'active', 'show_on_website', 'show_on_website_start_date', 'show_on_website_end_date']
         widgets = {
-            'related_to_track': autocomplete.ModelSelect2Multiple(),
-            'related_to_major': autocomplete.ModelSelect2Multiple(),
-            'keywords': autocomplete.ModelSelect2Multiple(),
+            'related_to_track': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
+            'related_to_major': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
+            'keywords': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
             'link': forms.URLInput(),
             'short_description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
             'description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
@@ -38,12 +37,14 @@ class CreateOpportunityForm(forms.ModelForm):
         if self.instance.id is not None:
             self.helper.attrs = {
                 'hx-post': reverse('update_opportunity', kwargs={'opp_id': self.instance.id}),
-                'hx-swap': f'multi:#ot-{self.instance.id}:outerHTML,#update-faculty-message',
+                'hx-swap': f'multi:#ot-{self.instance.id}:outerHTML,#update-opportunity-message',
+                'onsubmit': 'tinyMCE.triggerSave()',
             }
         else:
             self.helper.attrs = {
                 'hx-post': reverse('create_opportunity_form'),
                 'hx-swap': f'multi:#create-opportunity-message:outerHTML,#create-opportunity-form:outerHTML',
+                'onsubmit': 'tinyMCE.triggerSave()',
             }
         self.helper.layout = Layout(
             Fieldset(

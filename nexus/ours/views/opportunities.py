@@ -43,7 +43,9 @@ def update_opportunity(request, opp_id):
             form.save()
             messages.success(request, 'Opportunity updated successfully.')
         context = {'success': True, 'opportunity': opportunity}
-        return render(request, 'update_opportunity.html', context)
+        response = render(request, 'update_opportunity.html', context)
+        response['HX-Trigger-After-Settle'] = json.dumps({"formScroll": "#update-opportunity-message"})
+        return response
     context = {'success':False, 'opportunity': opportunity}
     response = render(request, 'update_opportunity.html', context)
     response["HX-Trigger-After-Settle"] = json.dumps({"updateClicked": f"ot-{opportunity.id}"})
@@ -56,7 +58,7 @@ def update_opportunity_form(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
     form = CreateOpportunityForm(instance=opportunity)
     context = {'form': form}
-    return render(request, 'just_form_with_media.html', context)
+    return render(request, 'just_form.html', context)
 
 @login_required
 @restrict_to_http_methods('GET')
@@ -88,7 +90,9 @@ def create_opportunity_form(request):
         else:
             messages.error(request, f'Form Errors: {form.errors}')
         context = {'success': success}
-        return render(request, 'create_opportunity_message.html', context)
+        response = render(request, 'create_opportunity_message.html', context)
+        response['HX-Trigger-After-Settle'] = json.dumps({"formScroll": "#create-opportunity-message"})
+        return response
     form = CreateOpportunityForm()
     context = {'form': form}
-    return render(request, 'just_form_with_media.html', context)
+    return render(request, 'just_form.html', context)

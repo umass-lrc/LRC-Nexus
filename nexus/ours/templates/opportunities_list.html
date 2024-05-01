@@ -12,7 +12,6 @@
     <thead>
       <tr>
         <th class="text-center" scope="col">Informtion</th>
-        <th class="text-center" scope="col">View</th>
         <th class="text-center" scope="col">Edit</th>
       </tr>
     </thead>
@@ -28,7 +27,7 @@
       ></tr>
       {% empty %}
       <tr>
-        <th scope="row" colspan="3" class="text-center">None.</th>
+        <th scope="row" colspan="2" class="text-center">None.</th>
       </tr>
       {% endfor %}
     </tbody>
@@ -166,6 +165,10 @@
     }
     document.getElementById("update-opportunity-message").innerHTML = "";
     document.getElementById("update-opportunity-form").innerHTML = "";
+  });
+  document.body.addEventListener("formScroll", function (e) {
+    elem = document.querySelector(e.detail.value);
+    elem.scrollIntoView();
   });
 </script>
 {% endblock %}
