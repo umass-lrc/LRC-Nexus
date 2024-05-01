@@ -65,7 +65,9 @@ def update_faculty_details(request, faculty_id):
             form.save()
             messages.success(request, 'Faculty details updated successfully.')
         context = {'success': True, 'faculty': faculty, 'faculty_id': faculty_id}
-        return render(request, 'update_faculty.html', context)
+        response = render(request, 'update_faculty.html', context)
+        response["HX-Trigger-After-Settle"] = json.dumps({"facultyDetailsUpdated": ""})
+        return response
     context = {'success':False, 'faculty': faculty, 'faculty_id': faculty_id}
     response = render(request, 'update_faculty.html', context)
     response["HX-Trigger-After-Settle"] = json.dumps({"updateClicked": f"ft-{faculty.faculty_id}"})
@@ -78,7 +80,7 @@ def update_faculty_details_form(request, faculty_id):
     faculty = FacultyDetails.objects.get(faculty_id=faculty_id)
     form = UpdateFacultyDetailsForm(instance=faculty)
     context = {'form': form}
-    return render(request, 'just_form_with_media.html', context)
+    return render(request, 'just_form.html', context)
 
 @login_required
 @restrict_to_http_methods('GET')

@@ -113,13 +113,13 @@ class Opportunity(models.Model):
     )
     
     short_description = models.TextField(
-        null=False,
-        blank=False
+        null=True,
+        blank=True
     )
     
     description = models.TextField(
-        null=False,
-        blank=False
+        null=True,
+        blank=True
     )
     
     keywords = models.ManyToManyField(

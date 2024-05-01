@@ -55,6 +55,7 @@ class UpdateFacultyDetailsForm(forms.ModelForm):
         self.helper.attrs = {
             'hx-post': reverse('update_faculty_details', kwargs={'faculty_id': self.instance.faculty_id}),
             'hx-swap': f'multi:#ft-{self.instance.faculty_id}:outerHTML,#update-faculty-message',
+            'onsubmit': 'tinyMCE.triggerSave()',
         }
         self.helper.layout = Layout(
             Fieldset(
