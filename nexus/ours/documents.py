@@ -72,6 +72,15 @@ class FacultyDetailsDocument(Document):
             "lab_name",
         ]
         related_models = [FacultyPosition, Keyword, CourseSubject]
+        
+    def get_instances_from_related(self, related_instance):
+        if isinstance(related_instance, FacultyPosition):
+            return related_instance.facultydetails_set.all()
+        elif isinstance(related_instance, Keyword):
+            return related_instance.facultydetails_set.all()
+        elif isinstance(related_instance, CourseSubject):
+            return related_instance.facultydetails_set.all()
+        return related_instance
 
 @registry.register_document
 class OpportunityDocument(Document):
@@ -106,3 +115,12 @@ class OpportunityDocument(Document):
             "deadline",
         ]
         related_models = [Majors, Tracks, CitizenshipStatus]
+    
+    def get_instances_from_related(self, related_instance):
+        if isinstance(related_instance, Majors):
+            return related_instance.opportunity_set.all()
+        elif isinstance(related_instance, Tracks):
+            return related_instance.opportunity_set.all()
+        elif isinstance(related_instance, CitizenshipStatus):
+            return related_instance.opportunity_set.all()
+        return related_instance
