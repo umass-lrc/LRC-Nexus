@@ -1,0 +1,16 @@
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">{{opportunity.title}}</h5>
+    <div class="h6" style="--bs-bg-opacity: 1">
+      {% if opportunity.is_paid %}
+      <span class="badge text-bg-success">Paid</span>
+      {% endif %}{% if opportunity.on_campus %}
+      <span class="badge text-bg-primary">On Campus</span>
+      {% endif %}{% if opportunity.is_for_credit %}
+      <span class="badge text-bg-danger">For Credit</span>
+      {% endif %}
+    </div>
+    <p class="card-text">{{opportunity.short_description|safe}}</p>
+    <a href="#" class="btn btn-primary">Learn More</a>
+  </div>
+</div>

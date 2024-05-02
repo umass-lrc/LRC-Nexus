@@ -17,6 +17,12 @@ from .views.opportunities import (
     create_opportunity_form,
 )
 
+from .views.search import (
+    opportunity_search,
+    search_no_result,
+    opportunity_card,
+)
+
 
 FACULTY_URLS = [
     path('faculty/', faculty_list, name='faculty_list'),
@@ -35,7 +41,11 @@ OPPORTUNITY_URLS = [
     path('create_opportunity_form/', create_opportunity_form, name='create_opportunity_form'),
 ]
 
-SEARCH_URLS = []
+SEARCH_URLS = [
+    path('opportunity_search/', opportunity_search, name='opportunity_search'),
+    path('search_no_result/', search_no_result, name='search_no_result'),
+    path('opportunity_card/<int:opp_id>/', opportunity_card, name='opportunity_card'),
+]
 
 urlpatterns = (
     FACULTY_URLS +

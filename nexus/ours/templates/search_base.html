@@ -1,0 +1,68 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}" />
+{% endblock %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Search for Opportunities</h1>
+<div
+  class="row height d-flex justify-content-center align-items-center"
+  style="z-index: 10000"
+>
+  <div class="col-md-10">
+    <form
+      class="search"
+      hx-post="{% url 'opportunity_search' %}"
+      hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+      hx-trigger="click"
+      placeholder="Searching..."
+    >
+      <i class="fa fa-search"></i>
+      <input
+        type="text"
+        name="search_query"
+        class="form-control"
+        placeholder="Want to find some job/research opportunities? Search here!"
+      />
+      <input
+        type="submit"
+        name="submit"
+        value="Search"
+        class="btn btn-primary btn btn-primary text-center"
+        id="submit-id-submit"
+      />
+    </form>
+  </div>
+</div>
+<hr />
+<p id="result_stats">
+  Showing results for: "<b></b>", Found <b>0</b> opportunities.
+</p>
+<div id="results">
+  <div
+    hx-get="{% url 'search_no_result'%}"
+    hx-trigger="load"
+    hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+  ></div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  // get both pupils
+  let pupils = [];
+  document.body.addEventListener("noResult", function (e) {
+    pupils = document.querySelectorAll(".eye .pupil");
+  });
+  window.addEventListener("mousemove", (e) => {
+    pupils.forEach((pupil) => {
+      // get x and y postion of cursor
+      var rect = pupil.getBoundingClientRect();
+      var x = (e.pageX - rect.left) / 30 + "px";
+      var y = (e.pageY - rect.top) / 30 + "px";
+      pupil.style.transform = "translate3d(" + x + "," + y + ", 0px)";
+    });
+  });
+</script>
+{% endblock %}
