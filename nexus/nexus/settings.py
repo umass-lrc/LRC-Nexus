@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "explorer",
     "tinymce",
+    "django_elasticsearch_dsl",
     # Local apps
     "core",
     "users",
@@ -204,3 +205,11 @@ MESSAGE_TAGS = {
 TINYMCE_JS_URL = "tinymce/tinymce.min.js"
 TINYMCE_JS_ROOT = "tinymce/"
 TINYMCE_SPELLCHECKER = False
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'https://localhost:9200', 
+        'http_auth': ('django', os.environ.get("ES_DJANGO_PASS", "ES4LRC!!")),
+        'ssl_assert_fingerprint': "91d3dcd44b40de733de0e099f71a0b5a74af7a0c4697cbdc5646bc01974f12c8",
+    }
+}
