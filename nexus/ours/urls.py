@@ -15,6 +15,7 @@ from .views.opportunities import (
     update_opportunity_form,
     view_opportunity,
     create_opportunity_form,
+    view_opportunity_full_page,
 )
 
 from .views.search import (
@@ -39,6 +40,7 @@ OPPORTUNITY_URLS = [
     path('update_opportunity_form/<int:opp_id>/', update_opportunity_form, name='update_opportunity_form'),
     path('view_opportunity/<int:opp_id>/', view_opportunity, name='view_opportunity'),
     path('create_opportunity_form/', create_opportunity_form, name='create_opportunity_form'),
+    path('view_opportunity_full_page/<int:opp_id>/', view_opportunity_full_page, name='view_opportunity_full_page'),
 ]
 
 SEARCH_URLS = [

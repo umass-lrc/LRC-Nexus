@@ -100,7 +100,7 @@ def update_opportunity_form(request, opp_id):
 @login_required
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'OURS Supervisor')
-def view_opportunity(request, opp_id):
+def view_opportunity(request, opp_id, full_page=False):
     opportunity = Opportunity.objects.get(id=opp_id)
     keywords = [obj.keyword for obj in opportunity.keywords.all()]
     rtm = [obj.major for obj in opportunity.related_to_major.all()]
@@ -120,9 +120,19 @@ def view_opportunity(request, opp_id):
     if study_level_restriction and study_level_restriction.study_level.count() > 0:
         restrictions['restricted_to_study_level'] = ', '.join([obj.study_level for obj in study_level_restriction.study_level.all()])
     context = {'opportunity': opportunity, 'keywords': keywords, 'rtm': rtm, 'rtt': rtt, 'restrictions': restrictions}
+    if full_page:
+        return render(request, 'opportunity_details_full_page.html', context)
     response = render(request, 'opportunity_details.html', context)
     response["HX-Trigger-After-Settle"] = json.dumps({"viewClicked": f"ot-{opportunity.id}"})
     return response
+
+
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor')
+def view_opportunity_full_page(request, opp_id):
+    return view_opportunity(request, opp_id, full_page=True)
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
