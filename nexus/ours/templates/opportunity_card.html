@@ -10,7 +10,13 @@
       <span class="badge text-bg-danger">For Credit</span>
       {% endif %}
     </div>
-    <p class="card-text">{{opportunity.short_description|safe}}</p>
-    <a href="#" class="btn btn-primary">Learn More</a>
+    <p class="card-text" style="font-size: 1rem">
+      {{opportunity.short_description|striptags|truncatewords:40}}
+    </p>
+    <a
+      href="{% url 'view_opportunity_full_page' opportunity.id %}"
+      class="btn btn-primary"
+      >Learn More</a
+    >
   </div>
 </div>
