@@ -103,7 +103,7 @@ class CitizenshipStatus(models.Model):
     )
     
     def __str__(self):
-        return self.citizenship
+        return self.citizenship_status
 
 class Opportunity(models.Model):
     title = models.CharField(

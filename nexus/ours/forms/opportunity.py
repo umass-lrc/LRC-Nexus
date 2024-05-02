@@ -2,7 +2,7 @@ from django import forms
 from django.urls import reverse
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, Div
+from crispy_forms.layout import Submit, Layout, Fieldset, Div, HTML
 
 from crispy_bootstrap5.bootstrap5 import FloatingField
 
@@ -11,15 +11,61 @@ from tinymce.widgets import TinyMCE
 
 from ..models import (
     Opportunity,
+    Majors,
+    CitizenshipStatus,
+    StudyLevel,
+    MinGPARestriction,
+    MajorRestriction,
+    CitizenshipRestriction,
+    StudyLevelRestriction,
 )
 
 class CreateOpportunityForm(forms.ModelForm):
+    min_gpa = forms.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        required=False,
+        label='Minimum GPA',
+        help_text='Minimum GPA required to apply for this opportunity.',
+    )
+    
+    restricted_majors = forms.ModelMultipleChoiceField(
+        queryset=Majors.objects.all(),
+        required=False,
+        label='Restricted to Majors',
+        widget=autocomplete.ModelSelect2Multiple(),
+        help_text='Select the majors that are allowed to apply for this opportunity.',
+    )
+    
+    require_all_majors = forms.BooleanField(
+        required=False,
+        initial=False,
+        label='Require All Majors',
+        help_text='Check this box if the applicant must be part of all the majors listed as part of restricted to majors.',
+    )
+    
+    restricted_to_citizenship_status = forms.ModelMultipleChoiceField(
+        queryset=CitizenshipStatus.objects.all(),
+        required=False,
+        label='Restricted to Citizenship Status',
+        widget=autocomplete.ModelSelect2Multiple(),
+        help_text='Select the citizenship statuses that are allowed to apply for this opportunity.',
+    )
+    
+    restricted_to_study_level = forms.ModelMultipleChoiceField(
+        queryset=StudyLevel.objects.all(),
+        required=False,
+        label='Restricted to Study Level',
+        widget=autocomplete.ModelSelect2Multiple(),
+        help_text='Select the study levels that are allowed to apply for this opportunity.',
+    )
+    
     class Meta:
         model = Opportunity
         fields = ['title', 'short_description', 'description', 'keywords', 'related_to_major', 'related_to_track', 'on_campus', 'location', 'link', 'deadline', 'additional_info', 'is_paid', 'is_for_credit', 'active', 'show_on_website', 'show_on_website_start_date', 'show_on_website_end_date']
         widgets = {
-            'related_to_track': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
-            'related_to_major': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
+            'related_to_track': autocomplete.ModelSelect2Multiple(),
+            'related_to_major': autocomplete.ModelSelect2Multiple(),
             'keywords': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
             'link': forms.URLInput(),
             'short_description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
@@ -40,6 +86,21 @@ class CreateOpportunityForm(forms.ModelForm):
                 'hx-swap': f'multi:#ot-{self.instance.id}:outerHTML,#update-opportunity-message',
                 'onsubmit': 'tinyMCE.triggerSave()',
             }
+            
+            min_gpa = MinGPARestriction.objects.filter(opportunity=self.instance).first()
+            if min_gpa:
+                self.initial['min_gpa'] = min_gpa.gpa
+            major_restriction = MajorRestriction.objects.filter(opportunity=self.instance).first()
+            if major_restriction:
+                self.initial['restricted_majors'] = major_restriction.majors.all()
+                self.initial['require_all_majors'] = major_restriction.must_be_all_majors
+            citizenship_restriction = CitizenshipRestriction.objects.filter(opportunity=self.instance).first()
+            if citizenship_restriction:
+                self.initial['restricted_to_citizenship_status'] = citizenship_restriction.citizenship_status.all()
+            study_level_restriction = StudyLevelRestriction.objects.filter(opportunity=self.instance).first()
+            if study_level_restriction:
+                self.initial['restricted_to_study_level'] = study_level_restriction.study_level.all()
+            
         else:
             self.helper.attrs = {
                 'hx-post': reverse('create_opportunity_form'),
@@ -62,6 +123,17 @@ class CreateOpportunityForm(forms.ModelForm):
                 'additional_info',
                 'is_paid',
                 'is_for_credit',
+                Div(
+                    HTML('<h4>Restrictions</h4>'),
+                    Div(
+                        FloatingField('min_gpa'),
+                        FloatingField('restricted_majors'),
+                        'require_all_majors',
+                        FloatingField('restricted_to_citizenship_status'),
+                        FloatingField('restricted_to_study_level'),
+                        style="margin-left: 2rem;"
+                    ),
+                ),
                 'active',
                 'show_on_website',
                 Div(

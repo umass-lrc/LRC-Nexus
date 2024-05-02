@@ -1,32 +1,79 @@
-<h4 class="text-center">{{opportunity.title}}</h4>
-<h6 class="text-center">
-  <a href="{{opportunity.link}}">Link to Opportunity</a>
-</h6>
-<hr />
-<h5>Description:</h5>
-{{ opportunity.description|safe }}
-<hr />
-<h5>Keywords:</h5>
-{{ keywords }}
-<hr />
-<h5>Related To Major:</h5>
-{{ rtm }}
-<hr />
-<h5>Related To Track:</h5>
-{{ rtt }}
-<hr />
-<h5>Location:</h5>
-{% if opportunity.on_campus %} On Campus {% else %} {{ opportunity.location }}
+<h2 class="text-center">{{opportunity.title}}</h2>
+{% if opportunity.link %}
+<div class="text-center">
+  <a href="{{opportunity.link}}"
+    >Link to Opportunity <i class="bi bi-box-arrow-up-right"></i
+  ></a>
+</div>
+{%endif%}
+<div class="h6 text-center">
+  {% if opportunity.is_paid %}
+  <span class="badge text-bg-success">Paid</span>
+  {% endif %}{% if opportunity.on_campus %}
+  <span class="badge text-bg-primary">On Campus</span>
+  {% endif %}{% if opportunity.is_for_credit %}
+  <span class="badge text-bg-danger">For Credit</span>
+  {% endif %}
+</div>
+{% if keywords|length != 0 %}
+<div class="text-center">
+  keywords: {% for keyword in keywords %}
+  <span class="badge rounded-pill text-bg-secondary">{{keyword}}</span>
+  {% endfor %}
+</div>
 {% endif %}
-<hr />
-<h5>Deadline:</h5>
-{{ opportunity.deadline }}
-<hr />
+<!--Majors-->
+{% if rtm|length != 0 %}
+<div class="text-center">
+  majors: {% for major in rtm %}
+  <span class="badge rounded-pill text-bg-warning">{{major}}</span>
+  {% endfor %}
+</div>
+{% endif %}
+<!--Tracks-->
+{% if rtt|length != 0 %}
+<div class="text-center">
+  tracks: {% for track in rtt %}
+  <span class="badge rounded-pill text-bg-info">{{track}}</span>
+  {% endfor %}
+</div>
+{% endif %} {% if not opportunity.on_campus %}
+<div class="fs-5">
+  <span class="h5">Location:</span> {{ opportunity.location }}
+</div>
+{% endif %} {% if opportunity.deadline %}
+<div class="fs-5">
+  <span class="h5">Deadline:</span> {{ opportunity.deadline }}
+</div>
+{% endif %}
+<h5>Description:</h5>
+{{ opportunity.description|safe }} {% if restrictions|length != 0 %}
+<h5>Restrictions:</h5>
+<table class="table">
+  <tbody>
+    {% if 'min_gpa' in restrictions %}
+    <tr>
+      <td>Minimum GPA</td>
+      <td>{{ restrictions.min_gpa }}</td>
+    </tr>
+    {% endif %} {% if 'restricted_majors' in restrictions %}
+    <tr>
+      <td>Restricted Majors</td>
+      <td>{{ restrictions.restricted_majors }}</td>
+    </tr>
+    {% endif %} {% if 'restricted_to_citizenship_status' in restrictions %}
+    <tr>
+      <td>Citizenship Status</td>
+      <td>{{ restrictions.restricted_to_citizenship_status }}</td>
+    </tr>
+    {% endif %} {% if 'restricted_to_study_level' in restrictions %}
+    <tr>
+      <td>Study Level</td>
+      <td>{{ restrictions.restricted_to_study_level }}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endif %} {% if opportunity.additional_info %}
 <h5>Additional Informtion:</h5>
-{{ opportunity.additional_info }}
-<hr />
-<h5>Is Paid?</h5>
-{{ opportunity.is_paid }}
-<hr />
-<h5>Is For Credit?</h5>
-{{ opportunity.is_for_credit }}
+{{ opportunity.additional_info|safe }} {% endif %}
