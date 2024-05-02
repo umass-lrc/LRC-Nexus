@@ -16,9 +16,9 @@
     <form
       class="search"
       hx-post="{% url 'opportunity_search' %}"
-      hx-swap="innerHTML"
+      hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
       hx-trigger="click"
-      hx-target="#results"
+      placeholder="Searching..."
     >
       <i class="fa fa-search"></i>
       <input
@@ -38,11 +38,14 @@
   </div>
 </div>
 <hr />
+<p id="result_stats">
+  Showing results for: "<b></b>", Found <b>0</b> opportunities.
+</p>
 <div id="results">
   <div
     hx-get="{% url 'search_no_result'%}"
     hx-trigger="load"
-    hx-swap="outterHTML"
+    hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
   ></div>
 </div>
 {% endblock %} {% block extra_scripts %}

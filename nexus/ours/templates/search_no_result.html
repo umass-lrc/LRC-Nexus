@@ -1,16 +1,23 @@
-<div class="d-flex align-items-center justify-content-center">
-  <div class="align-items-center justify-content-center">
-    <div class="eyes">
-      <div class="eye">
-        <div class="pupil"></div>
+<p id="result_stats">
+  Showing results for: "<b>{{query}}</b>", Found
+  <b>{{num_results}}</b> opportunities.
+</p>
+
+<div id="results">
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="align-items-center justify-content-center">
+      <div class="eyes">
+        <div class="eye">
+          <div class="pupil"></div>
+        </div>
+        <div class="eye">
+          <div class="pupil"></div>
+        </div>
       </div>
-      <div class="eye">
-        <div class="pupil"></div>
-      </div>
+      <p class="fs-4 text-center text-muted mt-5">
+        Looks like we couldn't find any opportunities for you. Try searching for
+        something else!
+      </p>
     </div>
-    <p class="fs-4 text-center text-muted mt-5">
-      Looks like we couldn't find any opportunities for you. Try searching for
-      something else!
-    </p>
   </div>
 </div>

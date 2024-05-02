@@ -1,26 +1,29 @@
-<div class="container">
-  <p>
-    Showing results for: <b>{{search_query}}</b>, Found
-    <b>{{num_results}}</b> opportunities.
-  </p>
-  <div class="row">
-    {% for opp_id in result_opp %}
-    <div
-      class="col-sm-6 mb-3"
-      hx-get="{% url 'opportunity_card' opp_id %}"
-      hx-trigger="intersect once"
-      hx-swap="innerHTML"
-    >
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Loading</h5>
-          <p class="card-text">
-            Please wait while we load the opportunity details.
-          </p>
-          <a href="#" class="btn btn-primary">Learn More</a>
+<p id="result_stats">
+  Showing results for: "<b>{{query}}</b>", Found
+  <b>{{num_results}}</b> opportunities.
+</p>
+
+<div id="results">
+  <div class="container">
+    <div class="row">
+      {% for opp_id in result_opp %}
+      <div
+        class="col-sm-6 mb-3"
+        hx-get="{% url 'opportunity_card' opp_id %}"
+        hx-trigger="intersect once"
+        hx-swap="innerHTML"
+      >
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Loading</h5>
+            <p class="card-text">
+              Please wait while we load the opportunity details.
+            </p>
+            <a href="#" class="btn btn-primary">Learn More</a>
+          </div>
         </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
 </div>
