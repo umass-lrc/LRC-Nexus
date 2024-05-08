@@ -18,6 +18,8 @@ from .views import (
     delete_error_drop_req,
     load_faculty_positions,
     load_faculty_position_from_line,
+    load_ours_opportunities,
+    load_ours_opportunity_from_line,
 )
 
 urlpatterns = [
@@ -38,4 +40,6 @@ urlpatterns = [
     path('delete_error_drop_req/', delete_error_drop_req, name='delete_error_drop_req'),
     path('load_faculty_positions/', load_faculty_positions, name='load_faculty_positions'),
     path('load_faculty_positions/load_faculty_position_from_line/<int:line_number>/', load_faculty_position_from_line, name='load_faculty_position_from_line'),
+    path('load_ours_opportunities/', load_ours_opportunities, name='load_ours_opportunities'),
+    path('load_ours_opportunities/load_ours_opportunity_from_line/<int:line_number>/', load_ours_opportunity_from_line, name='load_ours_opportunity_from_line'),
 ]

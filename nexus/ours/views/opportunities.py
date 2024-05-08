@@ -12,6 +12,7 @@ from ..models import (
     MajorRestriction,
     CitizenshipRestriction,
     StudyLevelRestriction,
+    Keyword,
 )
 
 from ..forms.opportunity import CreateOpportunityForm
@@ -40,7 +41,15 @@ def get_opportunity_row(request, opp_id):
 def update_opportunity(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
     if request.method == 'POST':
-        form = CreateOpportunityForm(request.POST, instance=opportunity)
+        updated_post = request.POST.copy()
+        keywords = request.POST.getlist('keywords')
+        for i, keyword in enumerate(keywords):
+            if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
+                continue
+            key = Keyword.objects.create(keyword=keyword)
+            keywords[i] = str(key.id)
+        updated_post.setlist('keywords', keywords)
+        form = CreateOpportunityForm(updated_post, instance=opportunity)
         if not form.is_valid():
             messages.error(request, f'Form Errors: {form.errors}')
         else:
@@ -139,7 +148,15 @@ def view_opportunity_full_page(request, opp_id):
 @restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def create_opportunity_form(request):
     if request.method == 'POST':
-        form = CreateOpportunityForm(request.POST)
+        updated_post = request.POST.copy()
+        keywords = request.POST.getlist('keywords')
+        for i, keyword in enumerate(keywords):
+            if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
+                continue
+            key = Keyword.objects.create(keyword=keyword)
+            keywords[i] = str(key.id)
+        updated_post.setlist('keywords', keywords)
+        form = CreateOpportunityForm(updated_post)
         success = False
         if form.is_valid():
             data = form.cleaned_data
