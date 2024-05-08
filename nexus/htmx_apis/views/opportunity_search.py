@@ -18,6 +18,7 @@ from ours.documents import OpportunityDocument
 @restrict_to_http_methods('GET', 'POST')
 def opportunity_search(request):
     if request.method == 'POST':
+        print("POST detected!")
         search_query = request.POST.get('search_query', '')
         if len(search_query) == 0:
             return redirect('search_no_result')
