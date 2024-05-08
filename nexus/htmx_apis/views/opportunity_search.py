@@ -34,7 +34,7 @@ def opportunity_search(request):
             'num_results': num_results,
             'result_opp': result_opp,
         }
-        return render(request, 'search_result.html', context)
+        return render(request, 'api_search_result.html', context)
     return render(request, 'api_search_base.html')
 
 @restrict_to_http_methods('GET', 'POST')
