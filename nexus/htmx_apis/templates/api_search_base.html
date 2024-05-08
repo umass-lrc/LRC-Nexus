@@ -13,7 +13,7 @@
   <div class="col-md-10">
     <form
       class="search"
-      hx-post="{% url 'opportunity_search' %}"
+      hx-post="{% url 'api_opportunity_search' %}"
       hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
       hx-trigger="click"
       placeholder="Searching..."
@@ -41,7 +41,7 @@
 </p>
 <div id="results">
   <div
-    hx-get="{% url 'search_no_result'%}"
+    hx-get="{% url 'api_search_no_result'%}"
     hx-trigger="load"
     hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
   ></div>
