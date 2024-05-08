@@ -114,10 +114,12 @@ class OpportunityDocument(Document):
             "location",
             "deadline",
         ]
-        related_models = [Majors, Tracks, CitizenshipStatus]
+        related_models = [Keyword, Majors, Tracks, CitizenshipStatus]
     
     def get_instances_from_related(self, related_instance):
-        if isinstance(related_instance, Majors):
+        if isinstance(related_instance, Keyword):
+            return related_instance.opportunity_set.all()
+        elif isinstance(related_instance, Majors):
             return related_instance.opportunity_set.all()
         elif isinstance(related_instance, Tracks):
             return related_instance.opportunity_set.all()

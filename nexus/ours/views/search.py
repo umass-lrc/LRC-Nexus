@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from elasticsearch_dsl.query import MultiMatch
+from elasticsearch_dsl import Q
 
 import json
 
@@ -26,7 +27,11 @@ def opportunity_search(request):
         if len(search_query) == 0:
             return redirect('search_no_result')
         # result_opp = Opportunity.objects.filter(title__icontains=search_query).values_list('id', flat=True)
-        result_opp = OpportunityDocument.search().query(MultiMatch(query=search_query))
+        # result_opp = OpportunityDocument.search().query(MultiMatch(query=search_query))
+        result_opp = OpportunityDocument.search().query(
+            Q(MultiMatch(query=search_query)) |
+            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))
+        )
         result_opp = [opp.meta.id for opp in result_opp]
         num_results = len(result_opp)
         if num_results == 0:

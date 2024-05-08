@@ -18,7 +18,7 @@
 {% if keywords|length != 0 %}
 <div class="text-center">
   keywords: {% for keyword in keywords %}
-  <span class="badge rounded-pill text-bg-secondary">{{keyword}}</span>
+  <span class="badge rounded-pill text-bg-info">{{keyword}}</span>
   {% endfor %}
 </div>
 {% endif %}
@@ -34,7 +34,7 @@
 {% if rtt|length != 0 %}
 <div class="text-center">
   tracks: {% for track in rtt %}
-  <span class="badge rounded-pill text-bg-info">{{track}}</span>
+  <span class="badge rounded-pill text-bg-primary">{{track}}</span>
   {% endfor %}
 </div>
 {% endif %} {% if not opportunity.on_campus %}
