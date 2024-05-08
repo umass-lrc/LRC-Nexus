@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 import json
+from dal import autocomplete
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -15,21 +17,32 @@ from ..models import (
     Keyword,
 )
 
-from ..forms.opportunity import CreateOpportunityForm
+from ..forms.opportunity import CreateOpportunityForm, SimpleSearchForm
 
 @login_required
-@restrict_to_http_methods('GET')
-@restrict_to_groups('Staff Admin', 'OURS Supervisor')
+@restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def opportunities_list(request):
+    if request.method == 'POST':
+        search = request.POST.get('search').strip()
+        if len(search) == 0:
+            opportunities = Opportunity.objects.all()
+        else:
+            opportunities = Opportunity.objects.filter(Q(title__icontains=search))
+        context = {
+            'opportunities': opportunities.values_list('id', flat=True),
+        }
+        return render(request, 'opportunities_simple_search_result.html', context)
     opportunities = Opportunity.objects.all().values_list('id', flat=True)
     context = {
         'opportunities': opportunities,
+        'form': SimpleSearchForm(),
     }
     return render(request, 'opportunities_list.html', context)
 
 @login_required
 @restrict_to_http_methods('GET')
-@restrict_to_groups('Staff Admin', 'OURS Supervisor')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def get_opportunity_row(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
     context = {'opportunity': opportunity}
@@ -37,7 +50,7 @@ def get_opportunity_row(request, opp_id):
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
-@restrict_to_groups('Staff Admin', 'OURS Supervisor')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def update_opportunity(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
     if request.method == 'POST':
@@ -99,7 +112,7 @@ def update_opportunity(request, opp_id):
 
 @login_required
 @restrict_to_http_methods('GET')
-@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def update_opportunity_form(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
     form = CreateOpportunityForm(instance=opportunity)
@@ -108,7 +121,7 @@ def update_opportunity_form(request, opp_id):
 
 @login_required
 @restrict_to_http_methods('GET')
-@restrict_to_groups('Staff Admin', 'OURS Supervisor')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def view_opportunity(request, opp_id, full_page=False):
     opportunity = Opportunity.objects.get(id=opp_id)
     keywords = [obj.keyword for obj in opportunity.keywords.all()]
@@ -139,13 +152,13 @@ def view_opportunity(request, opp_id, full_page=False):
 
 @login_required
 @restrict_to_http_methods('GET')
-@restrict_to_groups('Staff Admin', 'OURS Supervisor')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def view_opportunity_full_page(request, opp_id):
     return view_opportunity(request, opp_id, full_page=True)
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
-@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def create_opportunity_form(request):
     if request.method == 'POST':
         updated_post = request.POST.copy()
@@ -193,3 +206,10 @@ def create_opportunity_form(request):
     form = CreateOpportunityForm()
     context = {'form': form}
     return render(request, 'just_form.html', context)
+
+class OpportunityAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Opportunity.objects.all()
+        if self.q:
+            qs = qs.filter(Q(title__icontains=self.q)).all()
+        return qs

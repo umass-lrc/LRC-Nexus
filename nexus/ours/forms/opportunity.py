@@ -147,3 +147,37 @@ class CreateOpportunityForm(forms.ModelForm):
                 css_class='text-center',
             ),
         )
+
+class SimpleSearchForm(forms.Form):
+    search = forms.ModelChoiceField(
+        required=False,
+        label='',
+        queryset=Opportunity.objects.all(),
+        widget=autocomplete.ModelSelect2(url='autocomplete-opportunity', attrs={'data-tags': 'true'}),
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super(SimpleSearchForm, self).__init__(*args, **kwargs)
+        
+        self.helper = FormHelper(self)
+        self.helper.attrs = {
+            'hx-post': reverse('opportunities_list'),
+            'hx-target': f'#roles_body',
+        }
+        self.helper.form_method = 'POST'
+        self.helper.layout = Layout(
+            Fieldset(
+                'Basic Search',
+                Div(
+                    Div(
+                        FloatingField('search'),
+                        css_class='col-md-9 justify-content-center',
+                    ),
+                    Div(
+                        Submit('submit', 'Search', css_class='btn btn-primary'),
+                        css_class='col-md-3 text-center justify-content-center',
+                    ),
+                    css_class='row',
+                ),
+            ),
+        )

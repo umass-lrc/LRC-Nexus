@@ -31,7 +31,7 @@ def opportunity_search(request):
         result_opp = OpportunityDocument.search().query(
             Q(MultiMatch(query=search_query)) |
             Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))
-        )
+        ).scan()
         result_opp = [opp.meta.id for opp in result_opp]
         num_results = len(result_opp)
         if num_results == 0:

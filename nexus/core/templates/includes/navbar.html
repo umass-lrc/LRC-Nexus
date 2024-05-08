@@ -383,7 +383,42 @@
             ><i class="bi bi-info-circle-fill me-3"></i>LRC Schedule</a
           >
         </li>
-        {% endif %}
+        {% if user.is_ours_mentor %}
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-search me-3"></i>OURS</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'faculty_list' %}"
+                >Faculties</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'opportunities_list' %}"
+                >Opportunities</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'opportunity_search' %}"
+                >Search</a
+              >
+            </li>
+          </ul>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a
+            class="nav-link nav-menu-item"
+            href="{% url 'opportunity_search' %}"
+            ><i class="bi bi-search me-3"></i>OURS Opportunities Search</a
+          >
+        </li>
+        {% endif %} {% endif %}
       </ul>
     </div>
   </div>
