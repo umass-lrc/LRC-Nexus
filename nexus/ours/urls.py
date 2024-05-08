@@ -6,6 +6,7 @@ from .views.faculty import (
     update_faculty_details,
     update_faculty_details_form,
     view_faculty_details,
+    FacultyAutocomplete,
 )
 
 from .views.opportunities import (
@@ -16,6 +17,7 @@ from .views.opportunities import (
     view_opportunity,
     create_opportunity_form,
     view_opportunity_full_page,
+    OpportunityAutocomplete,
 )
 
 from .views.search import (
@@ -31,6 +33,7 @@ FACULTY_URLS = [
     path('update_faculty/<int:faculty_id>/', update_faculty_details, name='update_faculty_details'),
     path('update_faculty_form/<int:faculty_id>/', update_faculty_details_form, name='update_faculty_details_form'),
     path('view_faculty/<int:faculty_id>/', view_faculty_details, name='view_faculty_details'),
+    re_path(r'^faculty/autocomplete/$', FacultyAutocomplete.as_view(), name='autocomplete-faculty'),
 ]
 
 OPPORTUNITY_URLS = [
@@ -41,6 +44,7 @@ OPPORTUNITY_URLS = [
     path('view_opportunity/<int:opp_id>/', view_opportunity, name='view_opportunity'),
     path('create_opportunity_form/', create_opportunity_form, name='create_opportunity_form'),
     path('view_opportunity_full_page/<int:opp_id>/', view_opportunity_full_page, name='view_opportunity_full_page'),
+    re_path(r'^opportunity/autocomplete/$', OpportunityAutocomplete.as_view(), name='autocomplete-opportunity'),
 ]
 
 SEARCH_URLS = [

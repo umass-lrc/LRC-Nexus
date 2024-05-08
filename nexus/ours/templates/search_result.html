@@ -8,12 +8,12 @@
     <div class="row">
       {% for opp_id in result_opp %}
       <div
-        class="col-sm-6 mb-3 align-items-stretch"
+        class="col-sm-6 mb-3 d-flex align-items-stretch"
         hx-get="{% url 'opportunity_card' opp_id %}"
         hx-trigger="intersect once"
         hx-swap="innerHTML"
       >
-        <div class="card">
+        <div class="card w-100">
           <div class="card-body">
             <h5 class="card-title">Loading</h5>
             <p class="card-text">

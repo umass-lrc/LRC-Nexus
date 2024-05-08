@@ -75,6 +75,9 @@ class FacultyDetails(models.Model):
         default=False
     )
     
+    def __str__(self):
+        return str(self.faculty)
+    
     class Meta:
         ordering = ['faculty__last_name', 'faculty__first_name']
 
@@ -187,6 +190,9 @@ class Opportunity(models.Model):
         blank=True,
         null=True
     )
+    
+    def __str__(self):
+        return self.title
 
 class MinGPARestriction(models.Model):
     opportunity = models.OneToOneField(
