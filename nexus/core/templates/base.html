@@ -47,6 +47,23 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}" />
     <!--Navbar CSS-->
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+    <!--TinyMCE-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      id="mce-u0"
+      href="/static/tinymce/skins/ui/oxide/skin.min.css"
+    />
+    <script
+      src="https://cdn.tiny.cloud/1/zdn8r15qlv0yyfxq5ojxjgzegqjtpq195br5yps6qno924ff/tinymce/7/tinymce.min.js"
+      referrerpolicy="origin"
+    ></script>
+    <script>
+      window.tinymce.dom.Event.domLoaded = true;
+      tinymce.init({
+        language: "en-us",
+      });
+    </script>
     <!--Extra Head-->
     {% block extra_head %} {% endblock %}
   </head>
@@ -56,7 +73,6 @@
     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
   >
     {% include "includes/navbar.html" %}
-
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
       <symbol id="check-circle-fill" viewBox="0 0 16 16">
         <path
@@ -197,22 +213,24 @@
     <script>
       let navbar = document.getElementById("menuHolder");
       let table_head = document.getElementsByClassName("stickyHeader")[0];
-      let nb = navbar.getBoundingClientRect();
-      let initial_t_head = table_head.getBoundingClientRect().top;
-      function stickyTableHeader() {
-        let scroll = $(window).scrollTop();
-        if (scroll >= initial_t_head - nb.bottom) {
-          table_head.style.top =
-            parseInt(scroll - initial_t_head + nb.bottom) + "px";
-          console.log("here!");
+      if (table_head) {
+        let nb = navbar.getBoundingClientRect();
+        let initial_t_head = table_head.getBoundingClientRect().top;
+        function stickyTableHeader() {
+          let scroll = $(window).scrollTop();
+          if (scroll >= initial_t_head - nb.bottom) {
+            table_head.style.top =
+              parseInt(scroll - initial_t_head + nb.bottom) + "px";
+            console.log("here!");
+          }
         }
-      }
-      document.addEventListener("scroll", stickyTableHeader);
-      navbar.style.position = "sticky";
+        document.addEventListener("scroll", stickyTableHeader);
+        navbar.style.position = "sticky";
 
-      document.addEventListener("htmx:afterRequest", function (evt) {
-        stickyTableHeader();
-      });
+        document.addEventListener("htmx:afterRequest", function (evt) {
+          stickyTableHeader();
+        });
+      }
 
       let bottom_stick = document.getElementById("bottomStick");
       let main_container = document.getElementById("main-container");

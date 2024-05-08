@@ -56,7 +56,10 @@ class NexusUser(AbstractUser):
     
     class Meta(AbstractUser.Meta):
         ordering = ['last_name', 'first_name', 'email']
-        
+    
+    def is_ours_mentor(self):
+        return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OURS_MENTOR).exists()
+
 class PositionChoices(models.IntegerChoices):
     TECH = 0, 'Tech'
     SI = 1, 'SI'
