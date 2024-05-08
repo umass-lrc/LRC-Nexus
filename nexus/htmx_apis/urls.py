@@ -23,6 +23,6 @@ OPP_SEARCH_URLS = [
 ]
 
 urlpatterns = (
-    SCHEDULE_URLS,
-    OPP_SEARCH_URLS,
+    SCHEDULE_URLS +
+    OPP_SEARCH_URLS
 )
