@@ -19,11 +19,19 @@ from ..models import (
     Keyword,
 )
 
+import datetime
+
 from ..documents import OpportunityDocument, KeywordDocument
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
 def opportunity_search(request):
+    all_opportunities = Opportunity.objects.all()
+    for opp in all_opportunities:
+        opp.show_on_website = True
+        opp.show_on_website_start_date = datetime.date.today()
+        opp.show_on_website_end_date = datetime.date(2099, 12, 31)
+        opp.save()
     if request.method == 'POST':
         search_query = request.POST.get('search_query', '')
         if len(search_query) == 0:
