@@ -1,5 +1,7 @@
 from django.db import models
 
+import datetime
+
 from core.models import (
     Faculty,
     CourseSubject,
@@ -187,12 +189,14 @@ class Opportunity(models.Model):
     
     show_on_website_start_date = models.DateField(
         blank=True,
-        null=True
+        null=True,
+        default=datetime.date.today
     )
     
     show_on_website_end_date = models.DateField(
         blank=True,
-        null=True
+        null=True,
+        default=datetime.date(2099, 12, 31)
     )
     
     def __str__(self):
