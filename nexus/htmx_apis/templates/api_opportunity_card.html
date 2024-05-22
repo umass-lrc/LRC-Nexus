@@ -29,7 +29,7 @@
       {{opportunity.short_description|striptags|truncatewords:40}}
     </p>
     <button
-      hx-get="http://127.0.0.1:8000{% url 'api_opportunity_details' opportunity.id %}"
+      hx-get="https://lrcstaff.umass.edu{% url 'api_opportunity_details' opportunity.id %}"
       hx-trigger="click"
       hx-swap="multi:#opportunity-div:innerHTML"
       class="btn"

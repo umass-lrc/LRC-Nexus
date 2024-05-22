@@ -9,7 +9,7 @@
       {% for opp_id in result_opp %}
       <div
         class="col-sm-6 mb-3 d-flex align-items-stretch"
-        hx-get="http://127.0.0.1:8000{% url 'api_opportunity_card' opp_id %}"
+        hx-get="https://lrcstaff.umass.edu{% url 'api_opportunity_card' opp_id %}"
         hx-trigger="intersect once"
         hx-swap="innerHTML"
       >

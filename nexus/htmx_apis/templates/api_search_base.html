@@ -87,7 +87,7 @@
     <div class="col-md-10">
       <form
         class="search"
-        hx-post="http://127.0.0.1:8000{% url 'api_opportunity_search' %}"
+        hx-post="https://lrcstaff.umass.edu{% url 'api_opportunity_search' %}"
         hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
         hx-trigger="click"
         placeholder="Searching..."
@@ -116,7 +116,7 @@
     </p>
     <div id="results">
       <div
-        hx-get="http:/127.0.0.1:8000{% url 'api_search_no_result'%}"
+        hx-get="https://lrcstaff.umass.edu{% url 'api_search_no_result'%}"
         hx-trigger="load"
         hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
       ></div>
