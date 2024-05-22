@@ -1,0 +1,120 @@
+{% load schedule %}
+
+<style>
+  .padding-15px-lr {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .padding-5px-tb {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .margin-10px-bottom {
+    margin-bottom: 10px;
+  }
+
+  .border-radius-5 {
+    border-radius: 5px;
+    overflow-wrap: break-word;
+  }
+
+  .margin-10px-top {
+    margin-top: 10px;
+  }
+
+  .font-size14 {
+    font-size: 14px;
+  }
+
+  .text-light-gray {
+    color: #d6d5d5;
+  }
+
+  .font-size13 {
+    font-size: 13px;
+  }
+
+  .font-size16 {
+    font-size: 16px;
+  }
+
+  .stickyHeader,
+  .stickyHeader tr,
+  .stickyHeader th,
+  .stickyHeader td {
+    position: sticky;
+    z-index: 100;
+  }
+</style>
+
+<div class="table-responsive px-3">
+  <table class="table table-bordered text-center equal-col">
+    <thead class="stickyHeader">
+      <tr>
+        <th scope="col" class="text-uppercase align-middle">Course</th>
+        {% for day in dates %}
+        <th scope="col" class="text-uppercase align-middle">
+          <span>{{ day|date:"l" }}</span>
+          <div>{{ day|date:"m/d" }}</div>
+        </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for course, days in schedule.items %}
+      <tr>
+        <td class="align-middle">{{course}}</td>
+        {% for day in days %} {% if day|length == 0 %}
+        <td class="bg-light-gray"></td>
+        {% else %}
+        <td>
+          {% for s in day %}
+          <div class="margin-10px-top">
+            <div
+              class="padding-5px-tb padding-15px-lr border-radius-5 margin-10px-bottom text-white font-size16 xs-font-size13"
+              style="background-color: {{kind|color_coder}}"
+            >
+              {{s.start| date:"h:i A" |lower}} - {{s.end|date:"h:i A"|lower}}
+            </div>
+          </div>
+          {% if not forloop.last %}
+          <div
+            class="mb-1 mt-1"
+            style="
+              height: 2px;
+              background-color: rgba(0, 0, 0, 0.2);
+              border-radius: 1px;
+            "
+          ></div>
+          {% endif %} {% endfor %}
+        </td>
+        {% endif %} {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script
+  src="https://code.jquery.com/jquery-3.7.1.js"
+  integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+  crossorigin="anonymous"
+></script>
+<script>
+  let table_head = document.getElementsByClassName("stickyHeader")[0];
+  let initial_t_head = table_head.getBoundingClientRect().top;
+
+  function stickyTableHeader() {
+    let scroll = $(window).scrollTop();
+    if (scroll > initial_t_head) {
+      table_head.style.top = parseInt(scroll - initial_t_head) + "px";
+    } else {
+      table_head.style.top = "0px";
+    }
+  }
+
+  const interval = setInterval(stickyTableHeader, 1000);
+  document.addEventListener("scroll", stickyTableHeader);
+</script>
