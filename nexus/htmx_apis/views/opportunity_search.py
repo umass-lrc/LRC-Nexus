@@ -9,6 +9,7 @@ from elasticsearch_dsl.query import MultiMatch
 from elasticsearch_dsl import Q
 
 import json
+from random import randint
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -18,6 +19,7 @@ from ours.models import (
     MajorRestriction,
     CitizenshipRestriction,
     StudyLevelRestriction,
+    Keyword,
 )
 
 from ours.documents import OpportunityDocument
@@ -50,7 +52,11 @@ def opportunity_search(request):
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')
 def search_no_result(request, query="", num_results=0):
+    count = Keyword.objects.count()
+    random_ints = [randint(0, count - 1) for _ in range(10)]
+    keywords = Keyword.objects.filter(id__in=random_ints)[:5]
     context = {
+        'keywords': keywords,
         'query': query,
         'num_results': num_results,
     }
