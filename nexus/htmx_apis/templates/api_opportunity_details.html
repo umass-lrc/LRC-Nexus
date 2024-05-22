@@ -20,7 +20,9 @@
     {% if keywords|length != 0 %}
     <div class="text-center">
       keywords: {% for keyword in keywords %}
-      <span class="badge rounded-pill text-bg-info">{{keyword}}</span>
+      <span class="badge rounded-pill text-bg-info badge-gray"
+        >{{keyword}}</span
+      >
       {% endfor %}
     </div>
     {% endif %}
@@ -28,7 +30,9 @@
     {% if rtm|length != 0 %}
     <div class="text-center">
       majors: {% for major in rtm %}
-      <span class="badge rounded-pill text-bg-warning">{{major}}</span>
+      <span class="badge rounded-pill text-bg-warning badge-warning"
+        >{{major}}</span
+      >
       {% endfor %}
     </div>
     {% endif %}
@@ -36,7 +40,9 @@
     {% if rtt|length != 0 %}
     <div class="text-center">
       tracks: {% for track in rtt %}
-      <span class="badge rounded-pill text-bg-primary">{{track}}</span>
+      <span class="badge rounded-pill text-bg-primary badge-info"
+        >{{track}}</span
+      >
       {% endfor %}
     </div>
     {% endif %} {% if not opportunity.on_campus %}
