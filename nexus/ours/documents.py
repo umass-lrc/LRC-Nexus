@@ -124,5 +124,5 @@ class OpportunityDocument(Document):
         elif isinstance(related_instance, Tracks):
             return related_instance.opportunity_set.all()
         elif isinstance(related_instance, CitizenshipStatus):
-            return related_instance.opportunity_set.all()
+            return related_instance.opportunity_set().all()
         return related_instance

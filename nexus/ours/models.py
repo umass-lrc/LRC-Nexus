@@ -107,6 +107,10 @@ class CitizenshipStatus(models.Model):
     
     def __str__(self):
         return self.citizenship_status
+    
+    def opportunity_set(self):
+        opp_ids = CitizenshipRestriction.objects.filter(citizenship_status__in=[self]).values_list('opportunity__id', flat=True)
+        return Opportunity.objects.filter(id__in=opp_ids)
 
 class Opportunity(models.Model):
     title = models.CharField(
