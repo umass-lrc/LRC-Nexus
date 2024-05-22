@@ -3,16 +3,39 @@
     <h5 class="card-title">{{opportunity.title}}</h5>
     <div class="h6" style="--bs-bg-opacity: 1">
       {% if opportunity.is_paid %}
-      <span class="badge text-bg-success">Paid</span>
+      <span
+        class="badge"
+        style="
+          color: #fff !important;
+          background-color: var(--green) !important;
+        "
+        >Paid</span
+      >
       {% endif %}{% if opportunity.on_campus %}
-      <span class="badge text-bg-primary">On Campus</span>
+      <span
+        class="badge"
+        style="color: #fff !important; background-color: var(--blue) !important"
+        >On Campus</span
+      >
       {% endif %}{% if opportunity.is_for_credit %}
-      <span class="badge text-bg-danger">For Credit</span>
+      <span
+        class="badge"
+        style="color: #fff !important; background-color: var(--red) !important"
+        >For Credit</span
+      >
       {% endif %}
     </div>
-    <p class="card-text" style="font-size: 1rem">
+    <p class="card-text" style="font-size: 1rem; line-height: revert">
       {{opportunity.short_description|striptags|truncatewords:40}}
     </p>
-    <a href="" class="btn btn-primary">Learn More</a>
+    <button
+      hx-get="http://127.0.0.1:8000{% url 'api_opportunity_details' opportunity.id %}"
+      hx-trigger="click"
+      hx-swap="multi:#opportunity-div:innerHTML"
+      class="btn"
+      style="background-color: #730f1e; color: white"
+    >
+      Learn More
+    </button>
   </div>
 </div>

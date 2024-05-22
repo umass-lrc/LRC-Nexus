@@ -6,19 +6,22 @@
 
 <style>
   .search {
+    padding: 0px;
     position: relative;
-    box-shadow: 0 0 40px rgba(51, 51, 51, 0.1);
+    box-shadow: 0 0 40px rgba(45, 6, 12, 0.1);
   }
 
   .search input {
-    height: 60px;
-    text-indent: 25px;
-    border: 2px solid #d6d4d4;
+    padding: 6px 12px !important;
+    height: 60px !important;
+    text-indent: 25px !important;
+    border: 2px solid #d6d4d4 !important;
+    width: 100% !important;
   }
 
   .search input:focus {
-    box-shadow: none;
-    border: 2px solid #0d6efd;
+    box-shadow: none !important;
+    border: 2px solid #730f1e !important;
   }
 
   .search .fa-search {
@@ -28,13 +31,16 @@
   }
 
   .search .btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    height: 50px;
-    width: 110px;
-    background: #0d6efd;
-    text-indent: 0%;
+    margin: 0px !important;
+    padding: 6px 12px !important;
+    position: absolute !important;
+    top: 5px !important;
+    right: 5px !important;
+    height: 50px !important;
+    width: 110px !important;
+    background: #730f1e !important;
+    text-indent: 0% !important;
+    line-height: var(--bs-btn-line-height) !important;
   }
 
   .eyes {
@@ -45,7 +51,7 @@
     align-items: center;
     flex-direction: row;
     column-gap: 15%;
-    border-color: #0d6efd;
+    border-color: #730f1e;
   }
 
   .eye {
@@ -55,67 +61,91 @@
     justify-content: center;
     align-items: center;
     border-radius: 100%;
-    border: thick solid #0d6efd;
+    border: thick solid #730f1e;
   }
 
   .pupil {
     width: 50%;
     height: 50%;
     border-radius: 100%;
-    background-color: #0d6efd;
+    background-color: #730f1e;
+  }
+
+  .card-title {
+    font-size: 1.25rem !important;
+    font-weight: 500;
+    line-height: 1.2;
   }
 </style>
 
 <!--Content of the page-->
-<h1 class="text-center">Search for Opportunities</h1>
-<div
-  class="row height d-flex justify-content-center align-items-center"
-  style="z-index: 10000"
->
-  <div class="col-md-10">
-    <form
-      class="search"
-      hx-post="{% url 'api_opportunity_search' %}"
-      hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
-      hx-trigger="click"
-      placeholder="Searching..."
-    >
-      <i class="fa fa-search"></i>
-      <input
-        type="text"
-        name="search_query"
-        class="form-control"
-        placeholder="Want to find some job/research opportunities? Search here!"
-      />
-      <input
-        type="submit"
-        name="submit"
-        value="Search"
-        class="btn btn-primary btn btn-primary text-center"
-        id="submit-id-submit"
-      />
-    </form>
-  </div>
-</div>
-<hr />
-<p id="result_stats">
-  Showing results for: "<b></b>", Found <b>0</b> opportunities.
-</p>
-<div id="results">
+<div class="container">
   <div
-    hx-get="{% url 'api_search_no_result'%}"
-    hx-trigger="load"
-    hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
-  ></div>
+    class="row height d-flex justify-content-center align-items-center"
+    style="z-index: 10000"
+  >
+    <div class="col-md-10">
+      <form
+        class="search"
+        hx-post="http://127.0.0.1:8000{% url 'api_opportunity_search' %}"
+        hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+        hx-trigger="click"
+        placeholder="Searching..."
+      >
+        <i class="fa fa-search"></i>
+        <input
+          type="text"
+          name="search_query"
+          class="form-control"
+          placeholder="Want to find some job/research opportunities? Search here!"
+        />
+        <input
+          type="submit"
+          name="submit"
+          value="Search"
+          class="btn btn-primary btn btn-primary text-center"
+          id="submit-id-submit"
+        />
+      </form>
+    </div>
+  </div>
+  <hr />
+  <div id="results-div">
+    <p id="result_stats">
+      Showing results for: "<b></b>", Found <b>0</b> opportunities.
+    </p>
+    <div id="results">
+      <div
+        hx-get="http:/127.0.0.1:8000{% url 'api_search_no_result'%}"
+        hx-trigger="load"
+        hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+      ></div>
+    </div>
+  </div>
+  <div id="opportunity-div" class="d-none"></div>
 </div>
 
 <script>
   // get both pupils
   let pupils = [];
-  document.body.addEventListener("noResult", function (e) {
-    pupils = document.querySelectorAll(".eye .pupil");
+
+  document.body.addEventListener("htmx:afterSettle", function (e) {
+    let path = e.detail.requestConfig.path.split("/");
+    path.pop();
+    if (path.pop() == "search") {
+      pupils = document.querySelectorAll(".eye .pupil");
+      document.getElementById("results-div").classList.remove("d-none");
+      document.getElementById("opportunity-div").classList.add("d-none");
+    } else if (path.pop() == "opportunity_details") {
+      document.getElementById("opportunity-div").classList.remove("d-none");
+      document.getElementById("results-div").classList.add("d-none");
+    }
   });
+
   window.addEventListener("mousemove", (e) => {
+    if (pupils.length == 0) {
+      pupils = document.querySelectorAll(".eye .pupil");
+    }
     pupils.forEach((pupil) => {
       // get x and y postion of cursor
       var rect = pupil.getBoundingClientRect();
