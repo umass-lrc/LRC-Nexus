@@ -64,5 +64,10 @@
       pupil.style.transform = "translate3d(" + x + "," + y + ", 0px)";
     });
   });
+
+  function search_keyword(keyword) {
+    document.querySelector("input[name='search_query']").value = keyword;
+    document.querySelector("input[name='submit']").click();
+  }
 </script>
 {% endblock %}

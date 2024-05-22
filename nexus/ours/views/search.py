@@ -6,6 +6,7 @@ from elasticsearch_dsl.query import MultiMatch
 from elasticsearch_dsl import Q
 
 import json
+from random import randint
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -15,9 +16,10 @@ from ..models import (
     MajorRestriction,
     CitizenshipRestriction,
     StudyLevelRestriction,
+    Keyword,
 )
 
-from ..documents import OpportunityDocument
+from ..documents import OpportunityDocument, KeywordDocument
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
@@ -29,7 +31,7 @@ def opportunity_search(request):
         # result_opp = Opportunity.objects.filter(title__icontains=search_query).values_list('id', flat=True)
         # result_opp = OpportunityDocument.search().query(MultiMatch(query=search_query))
         result_opp = OpportunityDocument.search().query(
-            Q(MultiMatch(query=search_query)) |
+            Q(MultiMatch(query=search_query, fuzziness='AUTO')) |
             Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))
         ).scan()
         result_opp = [opp.meta.id for opp in result_opp]
@@ -47,9 +49,14 @@ def opportunity_search(request):
 @login_required
 @restrict_to_http_methods('GET', 'POST')
 def search_no_result(request, query="", num_results=0):
+    # keywords = [keyword.meta.id for keyword in KeywordDocument.search().query(MultiMatch(query=query)).scan()]
+    count = Keyword.objects.count()
+    random_ints = [randint(0, count - 1) for _ in range(10)]
+    keywords = Keyword.objects.filter(id__in=random_ints)[:5]
     context = {
         'query': query,
         'num_results': num_results,
+        'keywords': keywords,
     }
     response = render(request, 'search_no_result.html', context)
     response['HX-Trigger-After-Settle'] = json.dumps({"noResult": ""})

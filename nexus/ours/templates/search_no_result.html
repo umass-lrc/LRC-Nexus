@@ -19,6 +19,18 @@
         something else!
       </p>
     </div>
-    Try using our tried and tested keywords for search:
+    <div>
+      Try using our tried and tested keywords for search:
+      <ul>
+        {% for keyword in keywords %}
+        <li>
+          <a href="javascript:search_keyword('{{keyword.keyword}}');"
+            >{{keyword.keyword}}</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+      See list of all recommended keywords
+    </div>
   </div>
 </div>
