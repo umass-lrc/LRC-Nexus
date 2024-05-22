@@ -179,3 +179,24 @@ class loadOURSOpportunitiesForm(forms.Form):
                 css_class='text-center',
             ),
         )
+
+class loadMajorsForm(forms.Form):
+    file = forms.FileField()
+
+    def __init__(self, *args, **kwargs):
+        super(loadMajorsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.attrs = {
+            'hx-post': reverse('load_majors'),
+            'hx-swap': 'multi:#load-majors-message:innerHTML,#load-majors-logs:innerHTML',
+        }
+        self.helper.layout = Layout(
+            Fieldset(
+                '',
+                FloatingField('file'),
+            ),
+            Div(
+                Submit('submit', 'Load Majors', css_class='btn btn-primary'),
+                css_class='text-center',
+            ),
+        )
