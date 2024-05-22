@@ -188,15 +188,15 @@ class Opportunity(models.Model):
     )
     
     show_on_website_start_date = models.DateField(
-        blank=True,
-        null=True,
-        default=datetime.date.today
+        blank=False,
+        null=False,
+        default=datetime.date.today,
     )
     
     show_on_website_end_date = models.DateField(
-        blank=True,
-        null=True,
-        default=datetime.date(2099, 12, 31)
+        blank=False,
+        null=False,
+        default=datetime.date(2099, 12, 31),
     )
     
     def __str__(self):
