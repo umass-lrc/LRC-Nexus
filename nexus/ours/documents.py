@@ -113,6 +113,10 @@ class OpportunityDocument(Document):
             "title",
             "location",
             "deadline",
+            "active",
+            "show_on_website",
+            "show_on_website_start_date",
+            "show_on_website_end_date",
         ]
         related_models = [Keyword, Majors, Tracks, CitizenshipStatus]
     

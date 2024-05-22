@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from urllib.parse import parse_qs
 
-from elasticsearch_dsl.query import MultiMatch
+from elasticsearch_dsl.query import MultiMatch, Match
 from elasticsearch_dsl import Q
 
 import json
@@ -34,8 +34,9 @@ def opportunity_search(request):
         body = parse_qs(body_unicode, strict_parsing=True)
         search_query = body['search_query'][0] if 'search_query' in body else ""
         result_opp = OpportunityDocument.search().query(
-            Q(MultiMatch(query=search_query)) |
-            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))
+            (Q(MultiMatch(query=search_query)) |
+            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))) &
+            Q(Match(active=True)) & (Q(Match(show_on_website=True)) & Q('range', show_on_website_start_date={'lte': 'now/d'}) & Q('range', show_on_website_end_date={'gte': 'now/d'}))
         ).scan()
         result_opp = [opp.meta.id for opp in result_opp]
         num_results = len(result_opp)

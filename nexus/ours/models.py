@@ -182,7 +182,7 @@ class Opportunity(models.Model):
     )
     
     show_on_website = models.BooleanField(
-        default=False
+        default=True
     )
     
     show_on_website_start_date = models.DateField(

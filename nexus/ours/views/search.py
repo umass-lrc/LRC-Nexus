@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from elasticsearch_dsl.query import MultiMatch
+from elasticsearch_dsl.query import MultiMatch, Match
 from elasticsearch_dsl import Q
 
 import json
@@ -31,8 +31,9 @@ def opportunity_search(request):
         # result_opp = Opportunity.objects.filter(title__icontains=search_query).values_list('id', flat=True)
         # result_opp = OpportunityDocument.search().query(MultiMatch(query=search_query))
         result_opp = OpportunityDocument.search().query(
-            Q(MultiMatch(query=search_query, fuzziness='AUTO')) |
-            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))
+            (Q(MultiMatch(query=search_query, fuzziness='AUTO')) |
+            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))) &
+            Q(Match(active=True))
         ).scan()
         result_opp = [opp.meta.id for opp in result_opp]
         num_results = len(result_opp)
