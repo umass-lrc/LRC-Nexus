@@ -59,3 +59,8 @@ class OpportunityAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     ordering = ('title',)
 
+@admin.register(StudyLevel)
+class StudyLevelAdmin(admin.ModelAdmin):
+    list_display = ('study_level',)
+    search_fields = ('study_level',)
+    ordering = ('study_level',)
