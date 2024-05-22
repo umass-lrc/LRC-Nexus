@@ -80,7 +80,7 @@ def update_opportunity(request, opp_id):
                 MinGPARestriction.objects.filter(opportunity=opp).delete()
             
             if restricted_majors:
-                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})
+                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})[0]
                 mr.majors.set(restricted_majors)
                 mr.save()
             else:
