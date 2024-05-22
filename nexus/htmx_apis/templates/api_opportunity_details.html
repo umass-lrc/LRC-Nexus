@@ -10,11 +10,11 @@
     {%endif%}
     <div class="h6 text-center">
       {% if opportunity.is_paid %}
-      <span class="badge text-bg-success">Paid</span>
+      <span class="badge text-bg-success badge-green">Paid</span>
       {% endif %}{% if opportunity.on_campus %}
-      <span class="badge text-bg-primary">On Campus</span>
+      <span class="badge text-bg-primary badge-blue">On Campus</span>
       {% endif %}{% if opportunity.is_for_credit %}
-      <span class="badge text-bg-danger">For Credit</span>
+      <span class="badge text-bg-danger badge-red">For Credit</span>
       {% endif %}
     </div>
     {% if keywords|length != 0 %}
