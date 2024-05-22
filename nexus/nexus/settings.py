@@ -27,9 +27,9 @@ SECRET_KEY = os.environ.get("NEXUS_SECRET_KEY", "django-insecure-881r(ved7o)qr@@
 
 ALLOWED_HOSTS = os.environ.get("NEXUS_ALLOWED_HOSTS", ".localhost,127.0.0.1,[::1]").split(",")
 
-CSRF_TRUSTED_ORIGINS = ["http://3.137.183.137:80"]
+CSRF_TRUSTED_ORIGINS = ["http://3.137.183.137:80", "https://www.umass.edu"]
 
-CORS_ORIGIN_WHITELIST = ["http://3.137.183.137:80"]
+CORS_ORIGIN_WHITELIST = ["http://3.137.183.137:80", "https://www.umass.edu"]
 
 CORS_ALLOWED_ORIGINS = ["https://www.umass.edu"]
 

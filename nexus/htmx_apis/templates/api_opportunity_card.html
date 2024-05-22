@@ -1,0 +1,41 @@
+<div class="card w-100">
+  <div class="card-body">
+    <h5 class="card-title">{{opportunity.title}}</h5>
+    <div class="h6" style="--bs-bg-opacity: 1">
+      {% if opportunity.is_paid %}
+      <span
+        class="badge"
+        style="
+          color: #fff !important;
+          background-color: var(--green) !important;
+        "
+        >Paid</span
+      >
+      {% endif %}{% if opportunity.on_campus %}
+      <span
+        class="badge"
+        style="color: #fff !important; background-color: var(--blue) !important"
+        >On Campus</span
+      >
+      {% endif %}{% if opportunity.is_for_credit %}
+      <span
+        class="badge"
+        style="color: #fff !important; background-color: var(--red) !important"
+        >For Credit</span
+      >
+      {% endif %}
+    </div>
+    <p class="card-text" style="font-size: 1rem; line-height: revert">
+      {{opportunity.short_description|striptags|truncatewords:40}}
+    </p>
+    <button
+      hx-get="https://lrcstaff.umass.edu{% url 'api_opportunity_details' opportunity.id %}"
+      hx-trigger="click"
+      hx-swap="multi:#opportunity-div:innerHTML"
+      class="btn"
+      style="background-color: #730f1e; color: white"
+    >
+      Learn More
+    </button>
+  </div>
+</div>
