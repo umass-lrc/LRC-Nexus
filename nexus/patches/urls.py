@@ -20,6 +20,8 @@ from .views import (
     load_faculty_position_from_line,
     load_ours_opportunities,
     load_ours_opportunity_from_line,
+    load_majors,
+    load_major_from_line,
 )
 
 urlpatterns = [
@@ -42,4 +44,6 @@ urlpatterns = [
     path('load_faculty_positions/load_faculty_position_from_line/<int:line_number>/', load_faculty_position_from_line, name='load_faculty_position_from_line'),
     path('load_ours_opportunities/', load_ours_opportunities, name='load_ours_opportunities'),
     path('load_ours_opportunities/load_ours_opportunity_from_line/<int:line_number>/', load_ours_opportunity_from_line, name='load_ours_opportunity_from_line'),
+    path('load_majors/', load_majors, name='load_majors'),
+    path('load_majors/load_major_from_line/<int:line_number>/', load_major_from_line, name='load_major_from_line'),
 ]
