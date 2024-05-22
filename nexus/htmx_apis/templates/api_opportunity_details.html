@@ -45,17 +45,23 @@
       >
       {% endfor %}
     </div>
-    {% endif %} {% if not opportunity.on_campus %}
+    {% endif %}
+    <hr />
+    {% if not opportunity.on_campus %}
     <div class="fs-5">
       <span class="h5">Location:</span> {{ opportunity.location }}
     </div>
+    <hr />
     {% endif %} {% if opportunity.deadline %}
     <div class="fs-5">
       <span class="h5">Deadline:</span> {{ opportunity.deadline }}
     </div>
+    <hr />
     {% endif %}
     <h5>Description:</h5>
-    {{ opportunity.description|safe }} {% if restrictions|length != 0 %}
+    {{ opportunity.description|safe }}
+    <hr />
+    {% if restrictions|length != 0 %}
     <h5>Restrictions:</h5>
     <table class="table">
       <tbody>
@@ -82,8 +88,11 @@
         {% endif %}
       </tbody>
     </table>
+    <hr />
     {% endif %} {% if opportunity.additional_info %}
     <h5>Additional Informtion:</h5>
-    {{ opportunity.additional_info|safe }} {% endif %}
+    {{ opportunity.additional_info|safe }}
+    <hr />
+    {% endif %}
   </div>
 </div>
