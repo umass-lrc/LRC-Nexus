@@ -28,6 +28,16 @@ from .views.search import (
     opportunity_card,
 )
 
+from .views.check_opportunities import (
+    check_opp_main,
+    check_opp_row,
+    check_opp_update_opportunity,
+    check_opp_update_opportunity_form,
+    check_opportunity_link,
+    update_web_data,
+)
+
+
 
 FACULTY_URLS = [
     path('faculty/', faculty_list, name='faculty_list'),
@@ -50,6 +60,15 @@ OPPORTUNITY_URLS = [
     path('page_not_found/', page_not_found, name='opp_page_not_found'),
 ]
 
+CHECK_OPP_URLS = [
+    path('check_opp_main/', check_opp_main, name='check_opp_main'),
+    path('check_opp_row/<int:opp_id>/', check_opp_row, name='check_opp_row'),
+    path('check_opp_update_opportunity/<int:opp_id>/', check_opp_update_opportunity, name='check_opp_update_opportunity'),
+    path('check_opp_update_opportunity_form/<int:opp_id>/', check_opp_update_opportunity_form, name='check_opp_update_opportunity_form'),
+    path('check_opportunity_link/<int:opp_id>/', check_opportunity_link, name='check_opportunity_link'),
+    path('update_web_data/<int:opp_id>/', update_web_data, name='update_web_data'),
+]
+
 SEARCH_URLS = [
     path('opportunity_search/', opportunity_search, name='opportunity_search'),
     path('search_no_result/', search_no_result, name='search_no_result'),
@@ -59,5 +78,6 @@ SEARCH_URLS = [
 urlpatterns = (
     FACULTY_URLS +
     OPPORTUNITY_URLS +
+    CHECK_OPP_URLS +
     SEARCH_URLS
 )

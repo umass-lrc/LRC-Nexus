@@ -51,7 +51,7 @@ def get_opportunity_row(request, opp_id):
 @login_required
 @restrict_to_http_methods('GET', 'POST')
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
-def update_opportunity(request, opp_id):
+def update_opportunity(request, opp_id, check_opportunity=False):
     opportunity = Opportunity.objects.get(id=opp_id)
     if request.method == 'POST':
         updated_post = request.POST.copy()
@@ -102,20 +102,20 @@ def update_opportunity(request, opp_id):
             
             messages.success(request, 'Opportunity updated successfully.')
         context = {'success': True, 'opportunity': opportunity}
-        response = render(request, 'update_opportunity.html', context)
+        response = render(request, 'update_opportunity.html' if not check_opportunity else 'check_opp_update.html', context)
         response['HX-Trigger-After-Settle'] = json.dumps({"formScroll": "#update-opportunity-message"})
         return response
     context = {'success':False, 'opportunity': opportunity}
-    response = render(request, 'update_opportunity.html', context)
+    response = render(request, 'update_opportunity.html' if not check_opportunity else 'check_opp_update.html', context)
     response["HX-Trigger-After-Settle"] = json.dumps({"updateClicked": f"ot-{opportunity.id}"})
     return response
 
 @login_required
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
-def update_opportunity_form(request, opp_id):
+def update_opportunity_form(request, opp_id, check_opportunity=False):
     opportunity = Opportunity.objects.get(id=opp_id)
-    form = CreateOpportunityForm(instance=opportunity)
+    form = CreateOpportunityForm(instance=opportunity, check_opportunity=check_opportunity)
     context = {'form': form}
     return render(request, 'just_form.html', context)
 

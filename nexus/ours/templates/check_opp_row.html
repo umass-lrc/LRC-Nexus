@@ -1,0 +1,48 @@
+<tr id="ot-{{opportunity.id}}">
+  <td>
+    <a
+      href=""
+      hx-get="{% url 'view_opportunity' opportunity.id %}"
+      hx-trigger="click"
+      hx-target="#view-opportunity"
+      >{{opportunity.title}}</a
+    >
+  </td>
+  <!-- prettier-ignore -->
+  <td class="text-center align-middle text-{{short_desc}}"> {% if short_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif short_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <!-- prettier-ignore -->
+  <td class="text-center align-middle text-{{long_desc}}"> {% if long_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif long_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <!-- prettier-ignore -->
+  <td class="text-center align-middle text-{{link}}"> {% if link == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif link == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <!-- prettier-ignore -->
+  <td class="text-center align-middle text-{{location}}">{% if location == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif location == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <td class="text-center align-middle">
+    <a
+      href=""
+      hx-get="{% url 'check_opportunity_link' opportunity.id %}"
+      hx-trigger="click"
+      hx-swap="multi:#ot-{{opportunity.id}}:outerHTML"
+      placeholder="Checking..."
+      ><i class="bi bi-cloud-check-fill"></i
+    ></a>
+  </td>
+  <td class="text-center align-middle">
+    <a
+      href=""
+      hx-get="{% url 'update_web_data' opportunity.id %}"
+      hx-trigger="click"
+      hx-swap="multi:#ot-{{opportunity.id}}:outerHTML"
+      placeholder="Updating..."
+      ><i class="bi bi-arrow-repeat"></i
+    ></a>
+  </td>
+  <td class="text-center align-middle">
+    <a
+      href=""
+      hx-get="{% url 'check_opp_update_opportunity' opportunity.id %}"
+      hx-trigger="click"
+      hx-swap="multi:#ot-{{opportunity.id}}:outerHTML,#update-opportunity-form:outerHTML"
+      ><i class="bi bi-pencil-square"></i
+    ></a>
+  </td>
+</tr>
