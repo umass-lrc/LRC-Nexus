@@ -1,5 +1,7 @@
 from django.urls import path, re_path
 
+from .views import page_not_found
+
 from .views.faculty import (
     faculty_list,
     get_faculty_row,
@@ -45,6 +47,7 @@ OPPORTUNITY_URLS = [
     path('create_opportunity_form/', create_opportunity_form, name='create_opportunity_form'),
     path('view_opportunity_full_page/<int:opp_id>/', view_opportunity_full_page, name='view_opportunity_full_page'),
     re_path(r'^opportunity/autocomplete/$', OpportunityAutocomplete.as_view(), name='autocomplete-opportunity'),
+    path('page_not_found/', page_not_found, name='opp_page_not_found'),
 ]
 
 SEARCH_URLS = [

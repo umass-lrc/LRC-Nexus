@@ -1,0 +1,30 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %} {% load static %}
+
+<!--Content of the page-->
+{% block content %}
+<div
+  class="center-div d-flex align-items-center justify-content-center"
+  id="center-if-possible"
+>
+  <div class="align-items-center justify-content-center">
+    <img
+      class="img-fluid mx-auto d-block"
+      src="{% static 'img/page_not_found.webp' %}"
+      alt="Page Not Found"
+    />
+    <br />
+    <p class="fs-5 container text-center">
+      We apologize for the inconvenience. It appears that the link for this
+      opportunity is either broken or was never set up. Our system has recorded
+      this issue, and we will update the link as soon as the original
+      opportunity posts a new one. If you believe this is an error and there
+      should be a working link, please contact the OURS office at
+      <a href="mailto:ours@umass.edu">ours@umass.edu</a>, and we will address it
+      promptly.
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,6 +1,12 @@
 from django.db import models
+from django.db.models import Q
+from django.urls import reverse
+from django.db.models import CharField, Value
+from django.db.models.functions import Concat
 
 import datetime
+import requests
+from urllib.parse import urlparse
 
 from core.models import (
     Faculty,
@@ -24,6 +30,24 @@ class FacultyPosition(models.Model):
     
     def __str__(self):
         return self.position
+
+class FacultyDetailsManager(models.Manager):
+    def basic_search(self, search_query):
+        return self.all().annotate(
+            last_name_first_name=Concat('faculty__last_name', Value(' '), 'faculty__first_name', output_field=CharField()),
+            first_name_last_name=Concat('faculty__first_name', Value(' '), 'faculty__last_name', output_field=CharField()),
+        ).filter(
+            Q(last_name_first_name__icontains=search_query) |
+            Q(first_name_last_name__icontains=search_query) |
+            Q(faculty__email__icontains=search_query) |
+            Q(positions__position__icontains=search_query) |
+            Q(subjects__short_name__icontains=search_query) |
+            Q(subjects__description__icontains=search_query) |
+            Q(keywords__keyword__icontains=search_query) |
+            Q(lab_name__icontains=search_query) |
+            Q(research_outline__icontains=search_query) |
+            Q(miscellaneous__icontains=search_query)
+        ).distinct()
 
 class FacultyDetails(models.Model):
     faculty = models.OneToOneField(
@@ -77,6 +101,8 @@ class FacultyDetails(models.Model):
         default=False
     )
     
+    objects = FacultyDetailsManager()
+    
     def __str__(self):
         return str(self.faculty)
     
@@ -113,6 +139,22 @@ class CitizenshipStatus(models.Model):
     def opportunity_set(self):
         opp_ids = CitizenshipRestriction.objects.filter(citizenship_status__in=[self]).values_list('opportunity__id', flat=True)
         return Opportunity.objects.filter(id__in=opp_ids)
+
+class OpportunityManager(models.Manager):
+    def basic_search(self, search_query):
+        return self.filter(
+            Q(title__icontains=search_query) |
+            Q(short_description__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(keywords__keyword__icontains=search_query) |
+            Q(related_to_major__major__icontains=search_query) |
+            Q(related_to_track__track__icontains=search_query) |
+            Q(location__icontains=search_query) |
+            Q(additional_info__icontains=search_query)
+        ).distinct()
+
+def url_for_page_not_found():
+    return f"https://lrcstaff.umass.edu{reverse('opp_page_not_found')}"
 
 class Opportunity(models.Model):
     title = models.CharField(
@@ -157,8 +199,9 @@ class Opportunity(models.Model):
     )
     
     link = models.URLField(
-        blank=True,
-        null=True
+        blank=False,
+        null=False,
+        default=url_for_page_not_found 
     )
     
     deadline = models.DateField(
@@ -199,8 +242,46 @@ class Opportunity(models.Model):
         default=datetime.date(2099, 12, 31),
     )
     
+    link_not_working = models.BooleanField(
+        default=False
+    )
+    
+    website_data = models.TextField(
+        default="",
+        blank=True,
+        null=True
+    )
+    
     def __str__(self):
         return self.title
+    
+    def get_link(self):
+        if self.link_not_working:
+            return reverse('opp_page_not_found')
+        if requests.get(self.link).status_code != 200:
+            self.link_not_working = True
+            self.save()
+            return reverse('opp_page_not_found')
+        return self.link
+    
+    def check_link(self):
+        netloc = urlparse(self.link).netloc
+        status = netloc not in ['lrcstaff.umass.edu', 'localhost:8000', '127.0.0.1:8000']
+        req = requests.get(self.link) if status else None
+        status = status and req.status_code == 200
+        if status and (self.link_not_working or self.website_data == ""):
+            self.link_not_working = False
+            self.website_data = '\n'.join([line for line in req.text.split('\n') if line.strip() != ''])
+            self.save()
+        if not status:
+            self.link_not_working = True
+            self.save()
+    
+    def check_and_get_link(self):
+        self.check_link()
+        return self.get_link()
+    
+    objects = OpportunityManager()
 
 class MinGPARestriction(models.Model):
     opportunity = models.OneToOneField(

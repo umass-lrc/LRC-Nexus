@@ -28,7 +28,7 @@ def opportunities_list(request):
         if len(search) == 0:
             opportunities = Opportunity.objects.all()
         else:
-            opportunities = Opportunity.objects.filter(Q(title__icontains=search))
+            opportunities = Opportunity.objects.basic_search(search)
         context = {
             'opportunities': opportunities.values_list('id', flat=True),
         }
@@ -211,5 +211,5 @@ class OpportunityAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Opportunity.objects.all()
         if self.q:
-            qs = qs.filter(Q(title__icontains=self.q)).all()
+            qs = Opportunity.objects.basic_search(self.q)
         return qs
