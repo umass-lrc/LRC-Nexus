@@ -89,6 +89,8 @@ class OpportunityDocument(Document):
     
     description = fields.TextField(attr="description", analyzer=html_strip)
     
+    website_data = fields.TextField(attr="website_data", analyzer=html_strip)
+    
     keywords = fields.NestedField(properties={
         "keyword": fields.TextField(),
     })

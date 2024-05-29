@@ -7,6 +7,8 @@ from elasticsearch_dsl import Q
 
 import json
 from random import randint
+import requests
+from bs4 import BeautifulSoup
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -39,7 +41,8 @@ def opportunity_search(request):
         ).execute()
         result_opp = [(opp.meta.id, opp.meta.score) for opp in result_opp]
         sorted_result_opp = sorted(result_opp, key=lambda x: x[1], reverse=True)
-        result_opp = [opp[0] for opp in sorted_result_opp]
+        print(sorted_result_opp[0][1], sorted_result_opp[-1][1])
+        result_opp = [opp[0] for opp in sorted_result_opp if opp[1] > 0]
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)
@@ -71,5 +74,6 @@ def search_no_result(request, query="", num_results=0):
 @restrict_to_http_methods('GET')
 def opportunity_card(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
+    opportunity.check_link()
     context = {'opportunity': opportunity}
     return render(request, 'opportunity_card.html', context)
