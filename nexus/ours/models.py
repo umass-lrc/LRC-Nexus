@@ -265,15 +265,19 @@ class Opportunity(models.Model):
         return self.link
     
     def check_link(self):
-        netloc = urlparse(self.link).netloc
-        status = netloc not in ['lrcstaff.umass.edu', 'localhost:8000', '127.0.0.1:8000']
-        req = requests.get(self.link) if status else None
-        status = status and req.status_code == 200
-        if status and (self.link_not_working or self.website_data == ""):
-            self.link_not_working = False
-            self.website_data = '\n'.join([line for line in req.text.split('\n') if line.strip() != ''])
-            self.save()
-        if not status:
+        try:
+            netloc = urlparse(self.link).netloc
+            status = netloc not in ['lrcstaff.umass.edu', 'localhost:8000', '127.0.0.1:8000']
+            req = requests.get(self.link, timeout=10) if status else None
+            status = status and req.status_code == 200
+            if status and (self.link_not_working or self.website_data == ""):
+                self.link_not_working = False
+                self.website_data = '\n'.join([line for line in req.text.split('\n') if line.strip() != ''])
+                self.save()
+            if not status:
+                self.link_not_working = True
+                self.save()
+        except:
             self.link_not_working = True
             self.save()
     

@@ -9,6 +9,22 @@
 <hr />
 {% crispy form %}
 <hr />
+<div class="row">
+  <div class="col-md-6 text-center justify-content-center">
+    <form
+      hx-get="{% url 'check_all_opportunity_links' %}"
+      placeholder="Checking..."
+    >
+      <input type="submit" value="Run Check For All" class="btn btn-primary" />
+    </form>
+  </div>
+  <div class="col-md-6 text-center justify-content-center">
+    <button class="btn btn-primary" type="button">
+      Update Web Data For All
+    </button>
+  </div>
+</div>
+<hr />
 <div class="table-responsive">
   <table class="table" id="roles">
     <thead>

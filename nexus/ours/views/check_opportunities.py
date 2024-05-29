@@ -82,6 +82,15 @@ def check_opportunity_link(request, opp_id):
 @login_required
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
+def check_all_opportunity_links(request):
+    opportunities = Opportunity.objects.all()
+    for i, opportunity in enumerate(opportunities):
+        opportunity.check_link()
+    return redirect('check_opp_main')
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def update_web_data(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
     netloc = urlparse(opportunity.link).netloc

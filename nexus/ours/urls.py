@@ -35,6 +35,7 @@ from .views.check_opportunities import (
     check_opp_update_opportunity_form,
     check_opportunity_link,
     update_web_data,
+    check_all_opportunity_links,
 )
 
 
@@ -67,6 +68,7 @@ CHECK_OPP_URLS = [
     path('check_opp_update_opportunity_form/<int:opp_id>/', check_opp_update_opportunity_form, name='check_opp_update_opportunity_form'),
     path('check_opportunity_link/<int:opp_id>/', check_opportunity_link, name='check_opportunity_link'),
     path('update_web_data/<int:opp_id>/', update_web_data, name='update_web_data'),
+    path('check_all_opportunity_links/', check_all_opportunity_links, name='check_all_opportunity_links'),
 ]
 
 SEARCH_URLS = [
