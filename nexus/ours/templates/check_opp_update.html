@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %} {% if success %}
 
 <tr
-  id="ot-{{opp}}"
+  id="ot-{{opportunity.id}}"
   hx-get="{% url 'check_opp_row' opportunity.id %}"
   hx-trigger="intersect once"
   hx-target="this"
@@ -10,9 +10,13 @@
 ></tr>
 
 <div id="update-opportunity-message">{% include 'alerts.html' %}</div>
+{% elif opportunity is None %}
+<tr id="ot-{{opportunity.id}}"></tr>
+<div id="update-opportunity-message">{% include 'alerts.html' %}</div>
+<div id="update-opportunity-form"></div>
 {% else %}
 <tr
-  id="ot-{{opp}}"
+  id="ot-{{opportunity.id}}"
   hx-get="{% url 'check_opp_row' opportunity.id %}"
   hx-trigger="intersect once"
   hx-target="this"

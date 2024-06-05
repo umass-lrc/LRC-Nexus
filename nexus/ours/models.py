@@ -19,6 +19,9 @@ class Keyword(models.Model):
         unique=True
     )
     
+    class Meta:
+        ordering = ['keyword']
+    
     def __str__(self):
         return self.keyword
 
@@ -201,7 +204,8 @@ class Opportunity(models.Model):
     link = models.URLField(
         blank=False,
         null=False,
-        default=url_for_page_not_found 
+        default=url_for_page_not_found,
+        unique=True
     )
     
     deadline = models.DateField(
