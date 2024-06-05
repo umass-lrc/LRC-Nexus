@@ -66,7 +66,7 @@ class CreateOpportunityForm(forms.ModelForm):
         widgets = {
             'related_to_track': autocomplete.ModelSelect2Multiple(),
             'related_to_major': autocomplete.ModelSelect2Multiple(),
-            'keywords': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
+            'keywords': autocomplete.ModelSelect2Multiple(url='autocomplete-keyword',attrs={'data-tags': 'true'}),
             'link': forms.URLInput(),
             'short_description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
             'description': TinyMCE(attrs={'cols': 80, 'rows': 30}),

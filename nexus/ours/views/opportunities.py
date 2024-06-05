@@ -59,7 +59,7 @@ def update_opportunity(request, opp_id, check_opportunity=False):
         for i, keyword in enumerate(keywords):
             if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
                 continue
-            key = Keyword.objects.create(keyword=keyword)
+            key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
         form = CreateOpportunityForm(updated_post, instance=opportunity)
@@ -166,7 +166,7 @@ def create_opportunity_form(request):
         for i, keyword in enumerate(keywords):
             if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
                 continue
-            key = Keyword.objects.create(keyword=keyword)
+            key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
         form = CreateOpportunityForm(updated_post)
@@ -212,4 +212,11 @@ class OpportunityAutocomplete(autocomplete.Select2QuerySetView):
         qs = Opportunity.objects.all()
         if self.q:
             qs = Opportunity.objects.basic_search(self.q)
+        return qs
+
+class KeywordAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Keyword.objects.all()
+        if self.q:
+            qs = Keyword.objects.filter(keyword__icontains=self.q)
         return qs
