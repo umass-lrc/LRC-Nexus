@@ -167,7 +167,7 @@ class SimpleSearchForm(forms.Form):
         self.helper.form_method = 'POST'
         self.helper.layout = Layout(
             Fieldset(
-                'Basic Search',
+                'Expensive Search (Please use sparingly)',
                 Div(
                     Div(
                         FloatingField('search'),

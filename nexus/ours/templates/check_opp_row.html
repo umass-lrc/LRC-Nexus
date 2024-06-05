@@ -13,7 +13,13 @@
   <!-- prettier-ignore -->
   <td class="text-center align-middle text-{{long_desc}}"> {% if long_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif long_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
   <!-- prettier-ignore -->
-  <td class="text-center align-middle text-{{link}}"> {% if link == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif link == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <td class="text-center align-middle text-{{link}}"> 
+    <a class="text-{{link}}" hx-get="{% url 'change_link_override' opportunity.id %}" hx-target="#ot-{{opportunity.id}}" hx-trigger="click" hx-swap="outerHTML">
+      {% if link == 'success' %}<i class="bi bi-check-circle-fill"></i> 
+      {% elif link == 'warning' %}<i class="bi bi-dash-square-fill"></i> 
+      {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}
+    </a>
+  </td>
   <!-- prettier-ignore -->
   <td class="text-center align-middle text-{{location}}">{% if location == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif location == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
   <td class="text-center align-middle">

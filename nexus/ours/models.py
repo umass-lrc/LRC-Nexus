@@ -36,21 +36,58 @@ class FacultyPosition(models.Model):
 
 class FacultyDetailsManager(models.Manager):
     def basic_search(self, search_query):
-        return self.all().annotate(
-            last_name_first_name=Concat('faculty__last_name', Value(' '), 'faculty__first_name', output_field=CharField()),
-            first_name_last_name=Concat('faculty__first_name', Value(' '), 'faculty__last_name', output_field=CharField()),
-        ).filter(
-            Q(last_name_first_name__icontains=search_query) |
-            Q(first_name_last_name__icontains=search_query) |
-            Q(faculty__email__icontains=search_query) |
-            Q(positions__position__icontains=search_query) |
-            Q(subjects__short_name__icontains=search_query) |
-            Q(subjects__description__icontains=search_query) |
-            Q(keywords__keyword__icontains=search_query) |
-            Q(lab_name__icontains=search_query) |
-            Q(research_outline__icontains=search_query) |
-            Q(miscellaneous__icontains=search_query)
-        ).distinct()
+        search_query = search_query.strip()
+        search_query_list = []
+        i = 0
+        while i < len(search_query):
+            if search_query[i] == '"':
+                start = i
+                i += 1
+                while i < len(search_query) and search_query[i] != '"':
+                    i += 1
+                search_query_list.append(search_query[start + 1:i])
+                i += 1
+            elif search_query[i] == ' ':
+                i += 1
+            else:
+                start = i
+                while i < len(search_query) and search_query[i] != ' ':
+                    i += 1
+                search_query_list.append(search_query[start:i])
+        
+        search_query_list = [query for query in search_query_list if query != '']
+        
+        filter_query = [
+            (Q(faculty__last_name__icontains=query) |
+            Q(faculty__first_name__icontains=query) |
+            Q(faculty__email__icontains=query) |
+            Q(positions__position__icontains=query) |
+            Q(subjects__short_name__icontains=query) |
+            Q(subjects__description__icontains=query) |
+            Q(keywords__keyword__icontains=query) |
+            Q(lab_name__icontains=query) |
+            Q(research_outline__icontains=query) |
+            Q(miscellaneous__icontains=query)) if search_query_list not in ['AND', 'OR'] else query 
+            for query in search_query_list 
+        ]
+        
+        final_query = None
+        i = 0    
+        while i < len(filter_query):
+            if final_query is None:
+                if filter_query[i] not in ['AND', 'OR']:
+                    final_query = filter_query[i]
+            elif filter_query[i] in ['AND', 'OR']:
+                j = i + 1
+                while j < len(filter_query) and filter_query[j] in ['AND', 'OR']:
+                    j += 1
+                if j < len(filter_query):
+                    final_query = final_query & filter_query[j] if filter_query[i] == 'AND' else final_query | filter_query[j]
+                i = j
+            else:
+                final_query = final_query & filter_query[i]
+            i += 1
+        return self.all().filter(final_query).distinct()
 
 class FacultyDetails(models.Model):
     faculty = models.OneToOneField(
@@ -145,17 +182,61 @@ class CitizenshipStatus(models.Model):
 
 class OpportunityManager(models.Manager):
     def basic_search(self, search_query):
-        return self.filter(
-            Q(title__icontains=search_query) |
-            Q(short_description__icontains=search_query) |
-            Q(description__icontains=search_query) |
-            Q(keywords__keyword__icontains=search_query) |
-            Q(related_to_major__major__icontains=search_query) |
-            Q(related_to_track__track__icontains=search_query) |
-            Q(location__icontains=search_query) |
-            Q(additional_info__icontains=search_query)
-        ).distinct()
+        search_query = search_query.strip()
+        search_query_list = []
+        i = 0
+        while i < len(search_query):
+            if search_query[i] == '"':
+                start = i
+                i += 1
+                while i < len(search_query) and search_query[i] != '"':
+                    i += 1
+                search_query_list.append(search_query[start + 1:i])
+                i += 1
+            elif search_query[i] == ' ':
+                i += 1
+            else:
+                start = i
+                while i < len(search_query) and search_query[i] != ' ':
+                    i += 1
+                search_query_list.append(search_query[start:i])
+        
+        search_query_list = [query for query in search_query_list if query != '']
+        
+        filter_query = [
+            (Q(title__icontains=query) |
+            Q(short_description__icontains=query) |
+            Q(description__icontains=query) |
+            Q(keywords__keyword__icontains=query) |
+            Q(related_to_major__major__icontains=query) |
+            Q(related_to_track__track__icontains=query) |
+            Q(location__icontains=query) |
+            Q(additional_info__icontains=query)) if query not in ['AND', 'OR'] else query 
+            for query in search_query_list 
+        ]
+        
+        print(filter_query)
+        
+        final_query = None
+        i = 0    
+        while i < len(filter_query):
+            if final_query is None:
+                if filter_query[i] not in ['AND', 'OR']:
+                    final_query = filter_query[i]
+            elif filter_query[i] in ['AND', 'OR']:
+                j = i + 1
+                while j < len(filter_query) and filter_query[j] in ['AND', 'OR']:
+                    j += 1
+                if j < len(filter_query):
+                    final_query = final_query & filter_query[j] if filter_query[i] == 'AND' else final_query | filter_query[j]
+                i = j
+            else:
+                final_query = final_query & filter_query[i]
+            i += 1
+        print(final_query)
+        return self.all().filter(final_query).distinct()
 
+# Do not delete this function or else migrations will break
 def url_for_page_not_found():
     return f"https://lrcstaff.umass.edu{reverse('opp_page_not_found')}"
 
@@ -204,7 +285,6 @@ class Opportunity(models.Model):
     link = models.URLField(
         blank=False,
         null=False,
-        default=url_for_page_not_found,
         unique=True
     )
     
@@ -250,21 +330,24 @@ class Opportunity(models.Model):
         default=False
     )
     
+    link_not_working_override = models.BooleanField(
+        default=False
+    )
+    
     website_data = models.TextField(
         default="",
         blank=True,
         null=True
     )
     
+    class Meta:
+        ordering = ['title']
+    
     def __str__(self):
         return self.title
     
     def get_link(self):
-        if self.link_not_working:
-            return reverse('opp_page_not_found')
-        if requests.get(self.link).status_code != 200:
-            self.link_not_working = True
-            self.save()
+        if self.link_not_working and not self.link_not_working_override:
             return reverse('opp_page_not_found')
         return self.link
     
@@ -297,11 +380,9 @@ class Opportunity(models.Model):
                 self.website_data = '\n'.join([line for line in req.text.split('\n') if line.strip() != ''])
                 self.save()
             if not status:
-                print(f"Link not working: {self.link} \n Response: {req}")
                 self.link_not_working = True
                 self.save()
         except:
-            print(f"Error: Link not working: {self.link}")
             self.link_not_working = True
             self.save()
     
