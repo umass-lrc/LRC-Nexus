@@ -37,7 +37,7 @@ class UpdateFacultyDetailsForm(forms.ModelForm):
         widgets = {
             'positions': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
             'subjects': autocomplete.ModelSelect2Multiple(),
-            'keywords': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
+            'keywords': autocomplete.ModelSelect2Multiple(url='autocomplete-keyword', attrs={'data-tags': 'true'}),
             'personal_website': forms.URLInput(),
             'lab_website': forms.URLInput(),
             'research_outline': TinyMCE(attrs={'cols': 80, 'rows': 30}),

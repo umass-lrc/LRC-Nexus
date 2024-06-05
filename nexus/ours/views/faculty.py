@@ -65,13 +65,13 @@ def update_faculty_details(request, faculty_id):
         for i, position in enumerate(positions):
             if position.isnumeric() and FacultyPosition.objects.filter(id=int(position)).exists():
                 continue
-            pos = FacultyPosition.objects.create(position=position)
+            pos = FacultyPosition.objects.get_or_create(position=position)
             positions[i] = str(pos.id)
         updated_post.setlist('positions', positions)
         for i, keyword in enumerate(keywords):
             if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
                 continue
-            key = Keyword.objects.create(keyword=keyword)
+            key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
         form = UpdateFacultyDetailsForm(updated_post, instance=faculty)
