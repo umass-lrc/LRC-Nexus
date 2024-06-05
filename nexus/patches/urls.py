@@ -22,6 +22,7 @@ from .views import (
     load_ours_opportunity_from_line,
     load_majors,
     load_major_from_line,
+    list_all_duplicate_opportunities,
 )
 
 urlpatterns = [
@@ -46,4 +47,5 @@ urlpatterns = [
     path('load_ours_opportunities/load_ours_opportunity_from_line/<int:line_number>/', load_ours_opportunity_from_line, name='load_ours_opportunity_from_line'),
     path('load_majors/', load_majors, name='load_majors'),
     path('load_majors/load_major_from_line/<int:line_number>/', load_major_from_line, name='load_major_from_line'),
+    path('list_all_duplicate_opportunities/', list_all_duplicate_opportunities, name='list_all_duplicate_opportunities'),
 ]

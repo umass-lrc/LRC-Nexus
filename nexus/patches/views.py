@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
+from django.db.models import Count
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -719,3 +720,13 @@ def load_major_from_line(request, line_number):
             content += f"<b>==Error Occoured On Line {line_number}, Major Not Added: {e}==</b>"
         content += f"<br/>Line {line_number} Content: {to_read} <br/>"
         return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
+def list_all_duplicate_opportunities(request):
+    opps = Opportunity.objects.all()
+    opps = opps.values('link').annotate(count=Count('id')).filter(count__gt=1)
+    context = {'opps': []}
+    for opp in opps:
+        context['opps'].append(Opportunity.objects.filter(link=opp['link']).all())
+    return render(request, 'list_all_duplicate_opportunities.html', context)
