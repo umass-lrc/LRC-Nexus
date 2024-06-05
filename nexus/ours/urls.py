@@ -41,6 +41,7 @@ from .views.check_opportunities import (
     check_opportunity_link_with_progress_bar,
     update_all_web_data,
     update_web_data_with_progress_bar,
+    change_link_override,
 )
 
 
@@ -79,6 +80,7 @@ CHECK_OPP_URLS = [
     path('check_opportunity_link_with_progress_bar/<int:opp_id>/<int:max_id>/', check_opportunity_link_with_progress_bar, name='check_opportunity_link_with_progress_bar'),
     path('update_all_web_data/', update_all_web_data, name='update_all_web_data'),
     path('update_web_data_with_progress_bar/<int:opp_id>/<int:max_id>/', update_web_data_with_progress_bar, name='update_web_data_with_progress_bar'),
+    path('change_link_override/<int:opp_id>/', change_link_override, name='change_link_override'),
 ]
 
 SEARCH_URLS = [

@@ -48,13 +48,14 @@ def check_opp_row(request, opp_id):
     long_desc_check = len(opportunity.description.strip()) > 0
     long_desc_warning = len(opportunity.description.strip()) <= len(opportunity.short_description.strip())
     link_check = not opportunity.link_not_working
+    link_override = opportunity.link_not_working_override
     location_check = opportunity.on_campus or (opportunity.location is not None and len(opportunity.location.strip()) > 0)
     
     context = {
         'opportunity': opportunity,
         'short_desc': 'success' if short_desc_check else 'danger',
         'long_desc': ('success' if not long_desc_warning else 'warning') if long_desc_check else 'danger',
-        'link': 'success' if link_check else 'danger',
+        'link': 'warning' if link_override else 'success' if link_check else 'danger',
         'location': 'success' if location_check else 'danger',
     }
     return render(request, 'check_opp_row.html', context)
@@ -146,3 +147,12 @@ def update_web_data_with_progress_bar(request, opp_id, max_id):
 def update_all_web_data(request):
     max_id = Opportunity.objects.latest('id').id
     return redirect('update_web_data_with_progress_bar', opp_id=0, max_id=max_id)
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
+def change_link_override(request, opp_id):
+    opportunity = Opportunity.objects.get(id=opp_id)
+    opportunity.link_not_working_override = not opportunity.link_not_working_override
+    opportunity.save()
+    return redirect('check_opp_row', opp_id=opp_id)
