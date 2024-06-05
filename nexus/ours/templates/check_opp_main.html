@@ -9,51 +9,50 @@
 <hr />
 {% crispy form %}
 <hr />
-<div class="row">
+<div class="row my-2">
   <div class="col-md-6 text-center justify-content-center">
     <div id="check_all_zone">
       {% include 'check_opp_check_link_form.html' %}
     </div>
   </div>
   <div class="col-md-6 text-center justify-content-center">
-    <button class="btn btn-primary" type="button">
-      Update Web Data For All
-    </button>
+    <div id="update_all_zone">
+      {% include 'check_opp_update_web_data_form.html' %}
+    </div>
   </div>
 </div>
-  <hr />
-  <div class="table-responsive">
-    <table class="table" id="roles">
-      <thead>
-        <tr>
-          <th class="text-center" scope="col">Title</th>
-          <th class="text-center" scope="col">Short Description</th>
-          <th class="text-center" scope="col">Description</th>
-          <th class="text-center" scope="col">Link</th>
-          <th class="text-center" scope="col">Location</th>
-          <th class="text-center" scope="col">Check</th>
-          <th class="text-center" scope="col">Update Web Data</th>
-          <th class="text-center" scope="col">Edit</th>
-        </tr>
-      </thead>
-      <tbody id="roles_body">
-        {% for opp in opportunities %}
-        <tr
-          id="ot-{{opp}}"
-          hx-get="{% url 'check_opp_row' opp %}"
-          hx-trigger="intersect once"
-          hx-target="this"
-          hx-swap="outerHTML"
-          style="height: 100px"
-        ></tr>
-        {% empty %}
-        <tr>
-          <th scope="row" colspan="8" class="text-center">None.</th>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<hr />
+<div class="table-responsive">
+  <table class="table" id="roles">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Title</th>
+        <th class="text-center" scope="col">Short Description</th>
+        <th class="text-center" scope="col">Description</th>
+        <th class="text-center" scope="col">Link</th>
+        <th class="text-center" scope="col">Location</th>
+        <th class="text-center" scope="col">Check</th>
+        <th class="text-center" scope="col">Update Web Data</th>
+        <th class="text-center" scope="col">Edit</th>
+      </tr>
+    </thead>
+    <tbody id="roles_body">
+      {% for opp in opportunities %}
+      <tr
+        id="ot-{{opp}}"
+        hx-get="{% url 'check_opp_row' opp %}"
+        hx-trigger="intersect once"
+        hx-target="this"
+        hx-swap="outerHTML"
+        style="height: 100px"
+      ></tr>
+      {% empty %}
+      <tr>
+        <th scope="row" colspan="8" class="text-center">None.</th>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   {% endblock %} {% block bottom %}
   <div class="accordion-item">
     <h2 class="accordion-header" id="flush-headingOne">
