@@ -1,0 +1,18 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">List of Duplicate Opportunities</h1>
+<hr />
+{% for opp in opps %}
+<hr />
+<ul>
+  {% for o in opp %}
+  <li>{{o.title}}</li>
+  {% endfor %}
+</ul>
+<hr />
+{% endfor %} {% endblock %}
