@@ -82,11 +82,29 @@ def check_opportunity_link(request, opp_id):
 @login_required
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
-def check_all_opportunity_links(request):
-    opportunities = Opportunity.objects.all()
-    for i, opportunity in enumerate(opportunities):
+def check_opportunity_link_with_progress_bar(request, opp_id, max_id):
+    try:
+        opportunity = Opportunity.objects.get(id=opp_id)
         opportunity.check_link()
-    return redirect('check_opp_main')
+    except:
+        pass
+    if opp_id == max_id:
+        return render(request, 'check_opp_check_link_form.html')
+    context = {
+        'label': f'Checking Opportunity: {opp_id+1}/{max_id+1}',
+        'percentage': round((opp_id / max_id) * 100),
+        'next_url': 'check_opportunity_link_with_progress_bar',
+        'next_index': opp_id + 1,
+        'max_id': max_id,
+    }
+    return render(request, 'check_opp_progress_bar.html', context)
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
+def check_all_opportunity_links(request):
+    max_id = Opportunity.objects.latest('id').id
+    return redirect('check_opportunity_link_with_progress_bar', opp_id=0, max_id=max_id)
 
 @login_required
 @restrict_to_http_methods('GET')

@@ -268,16 +268,36 @@ class Opportunity(models.Model):
         try:
             netloc = urlparse(self.link).netloc
             status = netloc not in ['lrcstaff.umass.edu', 'localhost:8000', '127.0.0.1:8000']
-            req = requests.get(self.link, timeout=10) if status else None
-            status = status and req.status_code == 200
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                'upgrade-insecure-requests': '1',
+                'dnt': '1',
+                'sec-ch-ua': '"Google Chrome";v="93", " Not;A Brand";v="99", "Chromium";v="93"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+                'sec-fetch-site': 'cross-site',
+                'sec-fetch-mode': 'navigate',
+                'sec-fetch-user': '?1',
+                'sec-fetch-dest': 'document',
+                'Accept-Encoding': 'gzip, deflate, br, zstd',
+                'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
+                'priority': 'u=0, i',
+                'x-forwarded-proto': 'https',
+                'x-https': 'on',
+            }
+            req = requests.get(self.link, headers=headers, timeout=10) if status else None
+            status = status and req.status_code >= 200 and req.status_code < 300
             if status and (self.link_not_working or self.website_data == ""):
                 self.link_not_working = False
                 self.website_data = '\n'.join([line for line in req.text.split('\n') if line.strip() != ''])
                 self.save()
             if not status:
+                print(f"Link not working: {self.link} \n Response: {req}")
                 self.link_not_working = True
                 self.save()
         except:
+            print(f"Error: Link not working: {self.link}")
             self.link_not_working = True
             self.save()
     
