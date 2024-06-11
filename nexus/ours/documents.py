@@ -89,6 +89,8 @@ class OpportunityDocument(Document):
     
     description = fields.TextField(attr="description", analyzer=html_strip)
     
+    website_data = fields.TextField(attr="website_data", analyzer=html_strip)
+    
     keywords = fields.NestedField(properties={
         "keyword": fields.TextField(),
     })
@@ -113,6 +115,10 @@ class OpportunityDocument(Document):
             "title",
             "location",
             "deadline",
+            "active",
+            "show_on_website",
+            "show_on_website_start_date",
+            "show_on_website_end_date",
         ]
         related_models = [Keyword, Majors, Tracks, CitizenshipStatus]
     
@@ -124,5 +130,5 @@ class OpportunityDocument(Document):
         elif isinstance(related_instance, Tracks):
             return related_instance.opportunity_set.all()
         elif isinstance(related_instance, CitizenshipStatus):
-            return related_instance.opportunity_set.all()
+            return related_instance.opportunity_set().all()
         return related_instance

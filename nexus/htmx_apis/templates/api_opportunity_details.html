@@ -10,17 +10,19 @@
     {%endif%}
     <div class="h6 text-center">
       {% if opportunity.is_paid %}
-      <span class="badge text-bg-success">Paid</span>
+      <span class="badge text-bg-success badge-green">Paid</span>
       {% endif %}{% if opportunity.on_campus %}
-      <span class="badge text-bg-primary">On Campus</span>
+      <span class="badge text-bg-primary badge-blue">On Campus</span>
       {% endif %}{% if opportunity.is_for_credit %}
-      <span class="badge text-bg-danger">For Credit</span>
+      <span class="badge text-bg-danger badge-red">For Credit</span>
       {% endif %}
     </div>
     {% if keywords|length != 0 %}
     <div class="text-center">
       keywords: {% for keyword in keywords %}
-      <span class="badge rounded-pill text-bg-info">{{keyword}}</span>
+      <span class="badge rounded-pill text-bg-info badge-gray"
+        >{{keyword}}</span
+      >
       {% endfor %}
     </div>
     {% endif %}
@@ -28,7 +30,9 @@
     {% if rtm|length != 0 %}
     <div class="text-center">
       majors: {% for major in rtm %}
-      <span class="badge rounded-pill text-bg-warning">{{major}}</span>
+      <span class="badge rounded-pill text-bg-warning badge-warning"
+        >{{major}}</span
+      >
       {% endfor %}
     </div>
     {% endif %}
@@ -36,20 +40,28 @@
     {% if rtt|length != 0 %}
     <div class="text-center">
       tracks: {% for track in rtt %}
-      <span class="badge rounded-pill text-bg-primary">{{track}}</span>
+      <span class="badge rounded-pill text-bg-primary badge-info"
+        >{{track}}</span
+      >
       {% endfor %}
     </div>
-    {% endif %} {% if not opportunity.on_campus %}
+    {% endif %}
+    <hr />
+    {% if not opportunity.on_campus %}
     <div class="fs-5">
       <span class="h5">Location:</span> {{ opportunity.location }}
     </div>
+    <hr />
     {% endif %} {% if opportunity.deadline %}
     <div class="fs-5">
       <span class="h5">Deadline:</span> {{ opportunity.deadline }}
     </div>
+    <hr />
     {% endif %}
     <h5>Description:</h5>
-    {{ opportunity.description|safe }} {% if restrictions|length != 0 %}
+    {{ opportunity.description|safe }}
+    <hr />
+    {% if restrictions|length != 0 %}
     <h5>Restrictions:</h5>
     <table class="table">
       <tbody>
@@ -76,8 +88,11 @@
         {% endif %}
       </tbody>
     </table>
+    <hr />
     {% endif %} {% if opportunity.additional_info %}
     <h5>Additional Informtion:</h5>
-    {{ opportunity.additional_info|safe }} {% endif %}
+    {{ opportunity.additional_info|safe }}
+    <hr />
+    {% endif %}
   </div>
 </div>

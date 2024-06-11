@@ -5,10 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 from urllib.parse import parse_qs
 
-from elasticsearch_dsl.query import MultiMatch
+from elasticsearch_dsl.query import MultiMatch, Match
 from elasticsearch_dsl import Q
 
 import json
+from random import randint
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -18,6 +19,7 @@ from ours.models import (
     MajorRestriction,
     CitizenshipRestriction,
     StudyLevelRestriction,
+    Keyword,
 )
 
 from ours.documents import OpportunityDocument
@@ -31,11 +33,14 @@ def opportunity_search(request):
             return search_no_result(request, search_query, 0)
         body = parse_qs(body_unicode, strict_parsing=True)
         search_query = body['search_query'][0] if 'search_query' in body else ""
-        result_opp = OpportunityDocument.search().query(
-            Q(MultiMatch(query=search_query)) |
-            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))
-        ).scan()
-        result_opp = [opp.meta.id for opp in result_opp]
+        result_opp = OpportunityDocument.search().extra(size=1000).query(
+            (Q(MultiMatch(query=search_query)) |
+            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))) &
+            Q(Match(active=True)) & (Q(Match(show_on_website=True)) & Q('range', show_on_website_start_date={'lte': 'now/d'}) & Q('range', show_on_website_end_date={'gte': 'now/d'}))
+        ).execute()
+        result_opp = [(opp.meta.id, opp.meta.score) for opp in result_opp]
+        sorted_result_opp = sorted(result_opp, key=lambda x: x[1], reverse=True)
+        result_opp = [opp[0] for opp in sorted_result_opp]
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)
@@ -50,7 +55,11 @@ def opportunity_search(request):
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')
 def search_no_result(request, query="", num_results=0):
+    count = Keyword.objects.count()
+    random_ints = [randint(0, count - 1) for _ in range(10)]
+    keywords = Keyword.objects.filter(id__in=random_ints)[:5]
     context = {
+        'keywords': keywords,
         'query': query,
         'num_results': num_results,
     }

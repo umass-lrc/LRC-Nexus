@@ -28,7 +28,7 @@ def opportunities_list(request):
         if len(search) == 0:
             opportunities = Opportunity.objects.all()
         else:
-            opportunities = Opportunity.objects.filter(Q(title__icontains=search))
+            opportunities = Opportunity.objects.basic_search(search)
         context = {
             'opportunities': opportunities.values_list('id', flat=True),
         }
@@ -51,15 +51,22 @@ def get_opportunity_row(request, opp_id):
 @login_required
 @restrict_to_http_methods('GET', 'POST')
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
-def update_opportunity(request, opp_id):
-    opportunity = Opportunity.objects.get(id=opp_id)
+def update_opportunity(request, opp_id, check_opportunity=False):
+    try:
+        opportunity = Opportunity.objects.get(id=opp_id)
+    except Opportunity.DoesNotExist:
+        messages.error(request, 'Opportunity not found.')
+        context = {'success': False, 'opportunity': None}
+        response = render(request, 'update_opportunity.html' if not check_opportunity else 'check_opp_update.html', context)
+        response['HX-Trigger-After-Settle'] = json.dumps({"formScroll": "#update-opportunity-message"})
+        return response
     if request.method == 'POST':
         updated_post = request.POST.copy()
         keywords = request.POST.getlist('keywords')
         for i, keyword in enumerate(keywords):
             if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
                 continue
-            key = Keyword.objects.create(keyword=keyword)
+            key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
         form = CreateOpportunityForm(updated_post, instance=opportunity)
@@ -80,7 +87,7 @@ def update_opportunity(request, opp_id):
                 MinGPARestriction.objects.filter(opportunity=opp).delete()
             
             if restricted_majors:
-                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})
+                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})[0]
                 mr.majors.set(restricted_majors)
                 mr.save()
             else:
@@ -102,20 +109,20 @@ def update_opportunity(request, opp_id):
             
             messages.success(request, 'Opportunity updated successfully.')
         context = {'success': True, 'opportunity': opportunity}
-        response = render(request, 'update_opportunity.html', context)
+        response = render(request, 'update_opportunity.html' if not check_opportunity else 'check_opp_update.html', context)
         response['HX-Trigger-After-Settle'] = json.dumps({"formScroll": "#update-opportunity-message"})
         return response
     context = {'success':False, 'opportunity': opportunity}
-    response = render(request, 'update_opportunity.html', context)
+    response = render(request, 'update_opportunity.html' if not check_opportunity else 'check_opp_update.html', context)
     response["HX-Trigger-After-Settle"] = json.dumps({"updateClicked": f"ot-{opportunity.id}"})
     return response
 
 @login_required
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
-def update_opportunity_form(request, opp_id):
+def update_opportunity_form(request, opp_id, check_opportunity=False):
     opportunity = Opportunity.objects.get(id=opp_id)
-    form = CreateOpportunityForm(instance=opportunity)
+    form = CreateOpportunityForm(instance=opportunity, check_opportunity=check_opportunity)
     context = {'form': form}
     return render(request, 'just_form.html', context)
 
@@ -166,7 +173,7 @@ def create_opportunity_form(request):
         for i, keyword in enumerate(keywords):
             if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
                 continue
-            key = Keyword.objects.create(keyword=keyword)
+            key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
         form = CreateOpportunityForm(updated_post)
@@ -207,9 +214,24 @@ def create_opportunity_form(request):
     context = {'form': form}
     return render(request, 'just_form.html', context)
 
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
+def delete_opportunity(request, opp_id):
+    opportunity = Opportunity.objects.get(id=opp_id)
+    opportunity.delete()
+    return HttpResponse('')
+
 class OpportunityAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Opportunity.objects.all()
         if self.q:
-            qs = qs.filter(Q(title__icontains=self.q)).all()
+            qs = Opportunity.objects.basic_search(self.q)
+        return qs
+
+class KeywordAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Keyword.objects.all()
+        if self.q:
+            qs = Keyword.objects.filter(keyword__icontains=self.q)
         return qs

@@ -3,6 +3,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
+from django.db.models import CharField, Value
+from django.db.models.functions import Concat
+
 import json
 from dal import autocomplete
 
@@ -22,17 +25,11 @@ from ..forms.faculty import UpdateFacultyDetailsForm, SimpleSearchForm
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def faculty_list(request):
     if request.method == 'POST':
-        search = [f.strip() for f in request.POST.get('search').split(' ') if len(f.strip()) != 0]
+        search = request.POST.get('search').strip()
         if len(search) == 0:
             faculties = FacultyDetails.objects.all()
         else:
-            query = []
-            for s in search:
-                query.append(Q(faculty__first_name__icontains=s) | Q(faculty__last_name__icontains=s))
-            q = query.pop()
-            for query_part in query:
-                q |= query_part
-            faculties = FacultyDetails.objects.filter(q)
+            faculties = FacultyDetails.objects.basic_search(search)
         context = {
             'faculties': faculties.values_list('faculty_id', flat=True),
         }
@@ -68,13 +65,13 @@ def update_faculty_details(request, faculty_id):
         for i, position in enumerate(positions):
             if position.isnumeric() and FacultyPosition.objects.filter(id=int(position)).exists():
                 continue
-            pos = FacultyPosition.objects.create(position=position)
+            pos = FacultyPosition.objects.get_or_create(position=position)
             positions[i] = str(pos.id)
         updated_post.setlist('positions', positions)
         for i, keyword in enumerate(keywords):
             if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
                 continue
-            key = Keyword.objects.create(keyword=keyword)
+            key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
         form = UpdateFacultyDetailsForm(updated_post, instance=faculty)
@@ -121,5 +118,5 @@ class FacultyAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = FacultyDetails.objects.all()
         if self.q:
-            qs = qs.filter(Q(faculty__first_name__icontains=self.q) | Q(faculty__last_name__icontains=self.q)).all()
+            qs = FacultyDetails.objects.basic_search(self.q)
         return qs

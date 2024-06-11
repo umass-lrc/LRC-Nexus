@@ -66,7 +66,7 @@ class CreateOpportunityForm(forms.ModelForm):
         widgets = {
             'related_to_track': autocomplete.ModelSelect2Multiple(),
             'related_to_major': autocomplete.ModelSelect2Multiple(),
-            'keywords': autocomplete.ModelSelect2Multiple(attrs={'data-tags': 'true'}),
+            'keywords': autocomplete.ModelSelect2Multiple(url='autocomplete-keyword',attrs={'data-tags': 'true'}),
             'link': forms.URLInput(),
             'short_description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
             'description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
@@ -76,13 +76,13 @@ class CreateOpportunityForm(forms.ModelForm):
             'show_on_website_end_date': forms.DateInput(attrs={'type': 'date'}),
         }
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, check_opportunity=False, **kwargs):
         super(CreateOpportunityForm, self).__init__(*args, **kwargs)
         
         self.helper = FormHelper(self)
         if self.instance.id is not None:
             self.helper.attrs = {
-                'hx-post': reverse('update_opportunity', kwargs={'opp_id': self.instance.id}),
+                'hx-post': reverse('update_opportunity' if not check_opportunity else 'check_opp_update_opportunity', kwargs={'opp_id': self.instance.id}),
                 'hx-swap': f'multi:#ot-{self.instance.id}:outerHTML,#update-opportunity-message',
                 'onsubmit': 'tinyMCE.triggerSave()',
             }
@@ -167,7 +167,7 @@ class SimpleSearchForm(forms.Form):
         self.helper.form_method = 'POST'
         self.helper.layout = Layout(
             Fieldset(
-                'Basic Search',
+                'Expensive Search (Please use sparingly)',
                 Div(
                     Div(
                         FloatingField('search'),

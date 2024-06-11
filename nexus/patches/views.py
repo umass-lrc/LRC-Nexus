@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
+from django.db.models import Count
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -38,6 +39,7 @@ from ours.models import (
     FacultyPosition,
     Opportunity,
     Keyword,
+    Majors,
 )
 
 from .forms import (
@@ -49,6 +51,7 @@ from .forms import (
     loadTutorRoleForm,
     loadFacultyPositionsForm,
     loadOURSOpportunitiesForm,
+    loadMajorsForm,
 )
 
 from tutors.models import (
@@ -665,3 +668,65 @@ def delete_error_drop_req(request):
     dr = DropRequest.objects.get(id=1)
     dr.delete()
     return HttpResponse("DONE!")
+
+
+@login_required
+@restrict_to_groups('Tech')
+def load_majors(request):
+    if request.method == 'POST':
+        form = loadMajorsForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_majors_response.html', context={'success': False})
+        with open("temp/majors.csv", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        return render(request, 'load_majors_response.html', context={'success': True})
+    form = loadMajorsForm()
+    context = {'form': form}
+    return render(request, 'load_majors.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_major_from_line(request, line_number):
+    with open("temp/majors.csv", "r") as f:
+        to_read = None
+        for i, line in enumerate(f):
+            if i == line_number-1:
+                to_read = line
+                break
+        if to_read is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = f"""
+            <div
+                hx-post="{reverse('load_major_from_line', kwargs={'line_number': line_number+1})}"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="outerHTML"
+            >
+            </div>
+        """
+        if to_read[-1] == '\n':
+            to_read = to_read[:-1]
+        values = to_read
+        try:
+            major = values
+            Majors.objects.create(
+                major=major,
+            )
+            content += f"<b>==Major Added Successfully==</b>"
+        except Exception as e:
+            content += f"<b>==Error Occoured On Line {line_number}, Major Not Added: {e}==</b>"
+        content += f"<br/>Line {line_number} Content: {to_read} <br/>"
+        return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
+def list_all_duplicate_opportunities(request):
+    opps = Opportunity.objects.all()
+    opps = opps.values('link').annotate(count=Count('id')).filter(count__gt=1)
+    context = {'opps': []}
+    for opp in opps:
+        context['opps'].append(Opportunity.objects.filter(link=opp['link']).all())
+    return render(request, 'list_all_duplicate_opportunities.html', context)

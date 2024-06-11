@@ -1,5 +1,7 @@
 from django.urls import path, re_path
 
+from .views import page_not_found
+
 from .views.faculty import (
     faculty_list,
     get_faculty_row,
@@ -17,7 +19,9 @@ from .views.opportunities import (
     view_opportunity,
     create_opportunity_form,
     view_opportunity_full_page,
+    delete_opportunity,
     OpportunityAutocomplete,
+    KeywordAutocomplete,
 )
 
 from .views.search import (
@@ -25,6 +29,21 @@ from .views.search import (
     search_no_result,
     opportunity_card,
 )
+
+from .views.check_opportunities import (
+    check_opp_main,
+    check_opp_row,
+    check_opp_update_opportunity,
+    check_opp_update_opportunity_form,
+    check_opportunity_link,
+    update_web_data,
+    check_all_opportunity_links,
+    check_opportunity_link_with_progress_bar,
+    update_all_web_data,
+    update_web_data_with_progress_bar,
+    change_link_override,
+)
+
 
 
 FACULTY_URLS = [
@@ -45,6 +64,23 @@ OPPORTUNITY_URLS = [
     path('create_opportunity_form/', create_opportunity_form, name='create_opportunity_form'),
     path('view_opportunity_full_page/<int:opp_id>/', view_opportunity_full_page, name='view_opportunity_full_page'),
     re_path(r'^opportunity/autocomplete/$', OpportunityAutocomplete.as_view(), name='autocomplete-opportunity'),
+    re_path(r'^keyword/autocomplete/$', KeywordAutocomplete.as_view(), name='autocomplete-keyword'),
+    path('page_not_found/', page_not_found, name='opp_page_not_found'),
+    path('delete_opportunity/<int:opp_id>/', delete_opportunity, name='delete_opportunity'),
+]
+
+CHECK_OPP_URLS = [
+    path('check_opp_main/', check_opp_main, name='check_opp_main'),
+    path('check_opp_row/<int:opp_id>/', check_opp_row, name='check_opp_row'),
+    path('check_opp_update_opportunity/<int:opp_id>/', check_opp_update_opportunity, name='check_opp_update_opportunity'),
+    path('check_opp_update_opportunity_form/<int:opp_id>/', check_opp_update_opportunity_form, name='check_opp_update_opportunity_form'),
+    path('check_opportunity_link/<int:opp_id>/', check_opportunity_link, name='check_opportunity_link'),
+    path('update_web_data/<int:opp_id>/', update_web_data, name='update_web_data'),
+    path('check_all_opportunity_links/', check_all_opportunity_links, name='check_all_opportunity_links'),
+    path('check_opportunity_link_with_progress_bar/<int:opp_id>/<int:max_id>/', check_opportunity_link_with_progress_bar, name='check_opportunity_link_with_progress_bar'),
+    path('update_all_web_data/', update_all_web_data, name='update_all_web_data'),
+    path('update_web_data_with_progress_bar/<int:opp_id>/<int:max_id>/', update_web_data_with_progress_bar, name='update_web_data_with_progress_bar'),
+    path('change_link_override/<int:opp_id>/', change_link_override, name='change_link_override'),
 ]
 
 SEARCH_URLS = [
@@ -56,5 +92,6 @@ SEARCH_URLS = [
 urlpatterns = (
     FACULTY_URLS +
     OPPORTUNITY_URLS +
+    CHECK_OPP_URLS +
     SEARCH_URLS
 )

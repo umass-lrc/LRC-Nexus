@@ -194,7 +194,14 @@
               <a
                 class="nav-link nav-menu-item"
                 href="{% url 'opportunities_list' %}"
-                >Opportunities</a
+                >Manage Opportunities</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'check_opp_main' %}"
+                >Check Opportunities Quality</a
               >
             </li>
             <li>
@@ -365,6 +372,18 @@
                 >Load Opportunities</a
               >
             </li>
+            <li>
+              <a class="nav-link nav-menu-item" href="{% url 'load_majors' %}"
+                >Load Majors</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'list_all_duplicate_opportunities' %}"
+                >List Duplicate Opportunity</a
+              >
+            </li>
           </ul>
         </li>
         {% else %}
@@ -398,7 +417,7 @@
               <a
                 class="nav-link nav-menu-item"
                 href="{% url 'opportunities_list' %}"
-                >Opportunities</a
+                >Manage Opportunities</a
               >
             </li>
             <li>
