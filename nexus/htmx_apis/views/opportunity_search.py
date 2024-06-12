@@ -34,10 +34,10 @@ def opportunity_search(request):
         body = parse_qs(body_unicode, strict_parsing=True)
         search_query = body['search_query'][0] if 'search_query' in body else ""
         result_opp = OpportunityDocument.search().extra(size=1000).query(
-            (Q(MultiMatch(query=search_query)) |
+            (Q(MultiMatch(query=search_query, type="phrase", fields=['title^5','short_description^3','description^2','website_data','additional_information','location^5'])) |
             Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))) &
-            Q(Match(active=True)) & (Q(Match(show_on_website=True)) & Q('range', show_on_website_start_date={'lte': 'now/d'}) & Q('range', show_on_website_end_date={'gte': 'now/d'}))
-        ).execute()
+            Q(Match(active=True))
+        ).execute().hits
         result_opp = [(opp.meta.id, opp.meta.score) for opp in result_opp]
         sorted_result_opp = sorted(result_opp, key=lambda x: x[1], reverse=True)
         result_opp = [opp[0] for opp in sorted_result_opp]
