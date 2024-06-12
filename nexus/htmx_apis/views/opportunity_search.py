@@ -50,7 +50,9 @@ def opportunity_search(request):
             'result_opp': result_opp,
         }
         return render(request, 'api_search_results.html', context)
-    return render(request, 'api_search_base.html')
+    opportunity = Opportunity.objects.get(id=1)
+    context = {'featured_opp': [1,3,4]}
+    return render(request, 'api_search_base.html', context)
 
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')
@@ -64,6 +66,12 @@ def search_no_result(request, query="", num_results=0):
         'num_results': num_results,
     }
     return render(request, 'search_no_result.html', context)
+
+@restrict_to_http_methods('GET')
+def featured_opportunities(request):
+    featured_opp = [1,3,4]
+    context = {'featured_opp': featured_opp}
+    return render(request, 'api_opportunity_featured.html', context)
 
 @restrict_to_http_methods('GET')
 def opportunity_card(request, opp_id):
