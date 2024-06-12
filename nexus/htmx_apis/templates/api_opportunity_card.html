@@ -1,6 +1,5 @@
 <div class="card w-100">
-  <div class="card-body d-flex flex-column">
-    <h5 class="card-title">{{opportunity.title}}</h5>
+  <div class="card-header">
     <div class="h6" style="--bs-bg-opacity: 1">
       {% if opportunity.is_paid %}
       <span class="badge badge-green">Paid</span>
@@ -10,7 +9,10 @@
       <span class="badge badge-red">For Credit</span>
       {% endif %}
     </div>
-    <p class="card-text my-auto" style="font-size: 1rem; line-height: revert">
+  </div>
+  <div class="card-body d-flex flex-column">
+    <h5 class="card-title">{{opportunity.title}}</h5>
+    <p class="card-text" style="font-size: 1rem; line-height: revert">
       {{opportunity.short_description|striptags|truncatewords:40}}
     </p>
     <button
