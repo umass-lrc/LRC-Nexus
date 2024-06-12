@@ -8,6 +8,10 @@
       >{{opportunity.title}}</a
     >
   </td>
+  <td class="text-center align-middle">
+    <!-- prettier-ignore -->
+    <input class="form-check-input" type="checkbox" value="" hx-get="{% url 'change_featured' opportunity.id %}" hx-target="#ot-{{opportunity.id}}" hx-swap="outerHTML" hx-trigger="click" {% if featured %} checked {% endif %}/>
+  </td>
   <!-- prettier-ignore -->
   <td class="text-center align-middle text-{{short_desc}}"> {% if short_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif short_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
   <!-- prettier-ignore -->

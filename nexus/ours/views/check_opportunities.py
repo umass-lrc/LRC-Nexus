@@ -53,6 +53,7 @@ def check_opp_row(request, opp_id):
     
     context = {
         'opportunity': opportunity,
+        'featured': opportunity.featured,
         'short_desc': 'success' if short_desc_check else 'danger',
         'long_desc': ('success' if not long_desc_warning else 'warning') if long_desc_check else 'danger',
         'link': 'warning' if link_override else 'success' if link_check else 'danger',
@@ -154,5 +155,14 @@ def update_all_web_data(request):
 def change_link_override(request, opp_id):
     opportunity = Opportunity.objects.get(id=opp_id)
     opportunity.link_not_working_override = not opportunity.link_not_working_override
+    opportunity.save()
+    return redirect('check_opp_row', opp_id=opp_id)
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
+def change_featured(request, opp_id):
+    opportunity = Opportunity.objects.get(id=opp_id)
+    opportunity.featured = not opportunity.featured
     opportunity.save()
     return redirect('check_opp_row', opp_id=opp_id)

@@ -340,6 +340,10 @@ class Opportunity(models.Model):
         null=True
     )
     
+    featured = models.BooleanField(
+        default=False
+    )
+    
     class Meta:
         ordering = ['title']
     
