@@ -195,6 +195,13 @@
     }
   });
 
+  function makeSearchVisible() {
+    pupils = document.querySelectorAll(".eye .pupil");
+    document.getElementById("results-div").classList.remove("d-none");
+    document.getElementById("below-search").classList.remove("d-none");
+    document.getElementById("opportunity-div").classList.add("d-none");
+  }
+
   window.addEventListener("mousemove", (e) => {
     if (pupils.length == 0) {
       pupils = document.querySelectorAll(".eye .pupil");
