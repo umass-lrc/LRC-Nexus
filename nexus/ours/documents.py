@@ -119,6 +119,7 @@ class OpportunityDocument(Document):
             "show_on_website",
             "show_on_website_start_date",
             "show_on_website_end_date",
+            "featured",
         ]
         related_models = [Keyword, Majors, Tracks, CitizenshipStatus]
     

@@ -32,16 +32,13 @@ def opportunity_search(request):
         search_query = request.POST.get('search_query', '')
         if len(search_query) == 0:
             return redirect('search_no_result')
-        # result_opp = Opportunity.objects.filter(title__icontains=search_query).values_list('id', flat=True)
-        # result_opp = OpportunityDocument.search().query(MultiMatch(query=search_query))
         result_opp = OpportunityDocument.search().extra(size=1000).query(
-            (Q(MultiMatch(query=search_query, fuzziness='AUTO')) |
+            (Q(MultiMatch(query=search_query, type="phrase", fields=['title^5','short_description^3','description^2','website_data','additional_information','location^5'])) |
             Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))) &
             Q(Match(active=True))
-        ).execute()
+        ).execute().hits
         result_opp = [(opp.meta.id, opp.meta.score) for opp in result_opp]
         sorted_result_opp = sorted(result_opp, key=lambda x: x[1], reverse=True)
-        print(sorted_result_opp[0][1], sorted_result_opp[-1][1])
         result_opp = [opp[0] for opp in sorted_result_opp if opp[1] > 0]
         num_results = len(result_opp)
         if num_results == 0:
