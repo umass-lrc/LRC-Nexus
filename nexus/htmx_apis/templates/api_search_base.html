@@ -106,6 +106,10 @@
     color: #212529 !important;
     background-color: var(--info) !important;
   }
+
+  .background-grey {
+    background-color: #f7f8f8 !important;
+  }
 </style>
 
 <!--Content of the page-->
@@ -139,7 +143,23 @@
       </form>
     </div>
   </div>
-  <hr />
+  <br />
+  <div id="below-search">
+    <div class="background-grey py-3">
+      <div class="container">
+        <div
+          hx-get="https://lrcstaff.umass.edu{% url 'api_opportunity_featured'%}"
+          hx-trigger="load"
+          hx-target="this"
+          hx-swap="outerHTML"
+        >
+          <h2>Featured Opportunities</h2>
+          <p>Loading...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
   <div id="results-div">
     <p id="result_stats">
       Showing results for: "<b></b>", Found <b>0</b> opportunities.
@@ -154,6 +174,7 @@
   </div>
   <div id="opportunity-div" class="d-none"></div>
 </div>
+<br />
 
 <script>
   // get both pupils
@@ -162,13 +183,16 @@
   document.body.addEventListener("htmx:afterSettle", function (e) {
     let path = e.detail.requestConfig.path.split("/");
     path.pop();
-    if (path.pop() == "search") {
+    path = path.pop();
+    if (path == "search") {
       pupils = document.querySelectorAll(".eye .pupil");
       document.getElementById("results-div").classList.remove("d-none");
+      document.getElementById("below-search").classList.remove("d-none");
       document.getElementById("opportunity-div").classList.add("d-none");
-    } else if (path.pop() == "opportunity_details") {
-      document.getElementById("opportunity-div").classList.remove("d-none");
+    } else if (path == "opportunity_details") {
       document.getElementById("results-div").classList.add("d-none");
+      document.getElementById("below-search").classList.add("d-none");
+      document.getElementById("opportunity-div").classList.remove("d-none");
     }
   });
 
@@ -188,5 +212,9 @@
   function search_keyword(keyword) {
     document.querySelector("input[name='search_query']").value = keyword;
     document.querySelector("input[name='submit']").click();
+  }
+
+  function horizontalScroll(id, value) {
+    document.getElementById(id).scrollLeft += value;
   }
 </script>

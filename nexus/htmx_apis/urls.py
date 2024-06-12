@@ -10,6 +10,7 @@ from .views.opportunity_search import (
     search_no_result,
     opportunity_card,
     opportunity_details,
+    featured_opportunities,
 )
 
 SCHEDULE_URLS = [
@@ -22,6 +23,7 @@ OPP_SEARCH_URLS = [
     path("search_no_result/", search_no_result, name="api_search_no_result"),
     path("opportunity_card/<int:opp_id>/", opportunity_card, name="api_opportunity_card"),
     path("opportunity_details/<int:opp_id>/", opportunity_details, name="api_opportunity_details"),
+    path("featured_opportunities/", featured_opportunities, name="api_opportunity_featured"),
 ]
 
 urlpatterns = (
