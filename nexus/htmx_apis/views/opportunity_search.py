@@ -69,7 +69,7 @@ def search_no_result(request, query="", num_results=0):
 
 @restrict_to_http_methods('GET')
 def featured_opportunities(request):
-    featured_opp = [1,3,4]
+    featured_opp = Opportunity.objects.filter(featured=True).values_list('id', flat=True)
     context = {'featured_opp': featured_opp}
     return render(request, 'api_opportunity_featured.html', context)
 

@@ -183,18 +183,24 @@
   document.body.addEventListener("htmx:afterSettle", function (e) {
     let path = e.detail.requestConfig.path.split("/");
     path.pop();
-    path = path.pop();
-    if (path == "search") {
+    if (path.pop() == "search") {
       pupils = document.querySelectorAll(".eye .pupil");
       document.getElementById("results-div").classList.remove("d-none");
       document.getElementById("below-search").classList.remove("d-none");
       document.getElementById("opportunity-div").classList.add("d-none");
-    } else if (path == "opportunity_details") {
+    } else if (path.pop() == "opportunity_details") {
       document.getElementById("results-div").classList.add("d-none");
       document.getElementById("below-search").classList.add("d-none");
       document.getElementById("opportunity-div").classList.remove("d-none");
     }
   });
+
+  function makeSearchVisible() {
+    pupils = document.querySelectorAll(".eye .pupil");
+    document.getElementById("results-div").classList.remove("d-none");
+    document.getElementById("below-search").classList.remove("d-none");
+    document.getElementById("opportunity-div").classList.add("d-none");
+  }
 
   window.addEventListener("mousemove", (e) => {
     if (pupils.length == 0) {
@@ -214,7 +220,13 @@
     document.querySelector("input[name='submit']").click();
   }
 
-  function horizontalScroll(id, value) {
+  function horizontalScroll(id, left_scroll) {
+    let value = document.querySelector(
+      "#featured-opportunities > div:nth-child(2)"
+    ).offsetWidth;
+    if (left_scroll) {
+      value = -value;
+    }
     document.getElementById(id).scrollLeft += value;
   }
 </script>

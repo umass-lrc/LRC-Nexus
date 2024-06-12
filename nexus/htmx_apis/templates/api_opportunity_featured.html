@@ -4,13 +4,13 @@
     <div>
       <button
         class="btn"
-        onclick="horizontalScroll('featured-opportunities', -300)"
+        onclick="horizontalScroll('featured-opportunities', true)"
       >
         &larr;
       </button>
       <button
         class="btn"
-        onclick="horizontalScroll('featured-opportunities', 300)"
+        onclick="horizontalScroll('featured-opportunities', false)"
       >
         &rarr;
       </button>
@@ -46,6 +46,22 @@
           <button class="btn" style="background-color: #730f1e; color: white">
             Learn More
           </button>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div
+      class="col-sm-10 col-md-8 mb-3 d-flex align-items-stretch"
+      style="scroll-snap-align: center"
+    >
+      <div class="card w-100">
+        <div class="card-body">
+          <h5 class="card-title">No Featured Opportunities</h5>
+          <p class="card-text">
+            Looks like there is no featured opportunities at the movement. OURS
+            team is working hard to bring you the best opportunities. Please
+            check back later.
+          </p>
         </div>
       </div>
     </div>
