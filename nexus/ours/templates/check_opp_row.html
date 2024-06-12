@@ -13,9 +13,9 @@
     <input class="form-check-input" type="checkbox" value="" hx-get="{% url 'change_featured' opportunity.id %}" hx-target="#ot-{{opportunity.id}}" hx-swap="outerHTML" hx-trigger="click" {% if featured %} checked {% endif %}/>
   </td>
   <!-- prettier-ignore -->
-  <td class="text-center align-middle text-{{short_desc}}"> {% if short_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif short_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <td class="text-center align-middle text-{{short_desc}}"> {% if short_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif short_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %} {{short_desc_len}}</td>
   <!-- prettier-ignore -->
-  <td class="text-center align-middle text-{{long_desc}}"> {% if long_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif long_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <td class="text-center align-middle text-{{long_desc}}"> {% if long_desc == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif long_desc == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %} {{long_desc_len}}</td>
   <!-- prettier-ignore -->
   <td class="text-center align-middle text-{{link}}"> 
     <a class="text-{{link}}" hx-get="{% url 'change_link_override' opportunity.id %}" hx-target="#ot-{{opportunity.id}}" hx-trigger="click" hx-swap="outerHTML">
@@ -26,6 +26,8 @@
   </td>
   <!-- prettier-ignore -->
   <td class="text-center align-middle text-{{location}}">{% if location == 'success' %}<i class="bi bi-check-circle-fill"></i> {% elif location == 'warning' %}<i class="bi bi-dash-square-fill"></i> {% else %}<i class="bi bi-exclamation-diamond-fill"></i>{% endif %}</td>
+  <td class="text-center align-middle text-{{keywords}}">{{keywords_count}}</td>
+  <td class="text-center align-middle text-{{majors}}">{{majors_count}}</td>
   <td class="text-center align-middle">
     <a
       href=""

@@ -55,9 +55,15 @@ def check_opp_row(request, opp_id):
         'opportunity': opportunity,
         'featured': opportunity.featured,
         'short_desc': 'success' if short_desc_check else 'danger',
+        'short_desc_len': len(opportunity.short_description.strip().split()),
         'long_desc': ('success' if not long_desc_warning else 'warning') if long_desc_check else 'danger',
+        'long_desc_len': len(opportunity.description.strip().split()),
         'link': 'warning' if link_override else 'success' if link_check else 'danger',
         'location': 'success' if location_check else 'danger',
+        'keywords': 'success' if opportunity.keywords.count() > 0 else 'danger',
+        'keywords_count': opportunity.keywords.count(),
+        'majors': 'success' if opportunity.related_to_major.count() > 0 else 'danger',
+        'majors_count': opportunity.related_to_major.count(),
     }
     return render(request, 'check_opp_row.html', context)
 
