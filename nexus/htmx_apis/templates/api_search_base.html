@@ -220,7 +220,13 @@
     document.querySelector("input[name='submit']").click();
   }
 
-  function horizontalScroll(id, value) {
+  function horizontalScroll(id, left_scroll) {
+    let value = document.querySelector(
+      "#featured-opportunities > div:nth-child(2)"
+    ).offsetWidth;
+    if (left_scroll) {
+      value = -value;
+    }
     document.getElementById(id).scrollLeft += value;
   }
 </script>
