@@ -22,6 +22,8 @@ from ours.models import (
     Keyword,
 )
 
+from ours.views.search import es_opportunity_search
+
 from ours.documents import OpportunityDocument
 
 @csrf_exempt
@@ -33,14 +35,7 @@ def opportunity_search(request):
             return search_no_result(request, search_query, 0)
         body = parse_qs(body_unicode, strict_parsing=True)
         search_query = body['search_query'][0] if 'search_query' in body else ""
-        result_opp = OpportunityDocument.search().extra(size=1000).query(
-            (Q(MultiMatch(query=search_query, type="phrase", fields=['title^5','short_description^3','description^2','website_data','additional_information','location^5'])) |
-            Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))) &
-            Q(Match(active=True))
-        ).execute().hits
-        result_opp = [(opp.meta.id, opp.meta.score) for opp in result_opp]
-        sorted_result_opp = sorted(result_opp, key=lambda x: x[1], reverse=True)
-        result_opp = [opp[0] for opp in sorted_result_opp]
+        result_opp = es_opportunity_search(search_query)
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)
