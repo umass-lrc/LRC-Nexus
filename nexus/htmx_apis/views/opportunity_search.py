@@ -24,8 +24,6 @@ from ours.models import (
 
 from ours.views.search import es_opportunity_search
 
-from ours.documents import OpportunityDocument
-
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')
 def opportunity_search(request):
@@ -35,7 +33,7 @@ def opportunity_search(request):
             return search_no_result(request, search_query, 0)
         body = parse_qs(body_unicode, strict_parsing=True)
         search_query = body['search_query'][0] if 'search_query' in body else ""
-        result_opp = es_opportunity_search(search_query)
+        result_opp = es_opportunity_search(search_query, ours_website=True)
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)

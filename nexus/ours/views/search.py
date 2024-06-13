@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from elasticsearch_dsl.query import MultiMatch, Match
+from elasticsearch_dsl.query import MultiMatch, Match, MatchPhrase
 from elasticsearch_dsl import Q
 
 import json
@@ -25,15 +25,175 @@ import datetime
 
 from ..documents import OpportunityDocument, KeywordDocument
 
-def es_opportunity_search(search_query):
-    result_opp = OpportunityDocument.search().extra(size=1000).query(
-        (Q(MultiMatch(query=search_query, type="phrase", fields=['title^5','short_description^3','description^2','website_data','additional_information','location^5'])) |
-        Q('nested', path='keywords', query=MultiMatch(query=search_query, fields=['keywords.keyword'], fuzziness='AUTO'))) &
-        Q(Match(active=True))
-    ).execute().hits
-    result_opp = [(opp.meta.id, opp.meta.score) for opp in result_opp]
-    sorted_result_opp = sorted(result_opp, key=lambda x: x[1], reverse=True)
-    result_opp = [opp[0] for opp in sorted_result_opp if opp[1] > 0]
+def divide_query(search_query):
+    search_query = search_query.strip()
+    search_query_list = []
+    i = 0
+    while i < len(search_query):
+        if search_query[i] == '"':
+            start = i
+            i += 1
+            while i < len(search_query) and search_query[i] != '"':
+                i += 1
+            query = search_query[start + 1:i].strip()
+            if len(query) > 0:
+                search_query_list.append((2, search_query[start + 1:i]))
+            i += 1
+        elif search_query[i] == ' ':
+            i += 1
+        else:
+            start = i
+            while i < len(search_query) and search_query[i] != ' ':
+                i += 1
+            query = search_query[start:i]
+            search_query_list.append((1 if query in ["AND", "OR"] else 0, query))
+    
+    return search_query_list
+
+def interval_query_per_field(query_list, field_name):
+    return Q('intervals', **{field_name: {'all_of': {'ordered': 'true', 'intervals': [{'fuzzy': {'term': query}} for query in query_list]}}})
+
+def make_query_from_list(search_query_list):
+    es_query = None
+    new_query = None
+    opp = 'AND'
+    i = 0
+    while i < len(search_query_list):
+        print(i)
+        type, query = search_query_list[i]
+        if type == 0:
+            query_list = [query]
+            i += 1
+            while i < len(search_query_list) and search_query_list[i][0] == 0:
+                query_list.append(search_query_list[i][1])
+                i += 1
+            new_query = None
+            if len(query_list) == 1:
+                new_query = Q('bool', should = [Q(MultiMatch(
+                    query=query_list[0],
+                    type="most_fields", 
+                    fields=[
+                        'title^5',
+                        'short_description^3',
+                        'description^2',
+                        'website_data',
+                        'additional_information',
+                        'location^5'
+                    ],
+                    fuzziness='AUTO'
+                    )), Q(
+                        'nested',
+                        path='keywords',
+                        query=Match(keyword=query_list[0])
+                    )],
+                    minimum_should_match=1,
+                    boost=50
+                )
+            else:
+                # 1st priority: If the exact phrase is found
+                query_for_phrase = " ".join(query_list)
+                phrase_query = Q('bool', should = [Q(MultiMatch(
+                    query=query_for_phrase, 
+                    type="phrase", 
+                    fields=[
+                        'title^5',
+                        'short_description^3',
+                        'description^2',
+                        'website_data',
+                        'additional_information',
+                        'location^5'
+                    ]
+                    )), Q(
+                        'nested',
+                        path='keywords',
+                        query=MatchPhrase(keyword=query_for_phrase)
+                    )],
+                    minimum_should_match=1,
+                    boost=100
+                )
+                
+                # 2nd priority: If the words are found in same order with gap between them
+                interval_query = Q('bool', should =[
+                        interval_query_per_field(query_list, 'title'),
+                        interval_query_per_field(query_list, 'short_description'),
+                        interval_query_per_field(query_list, 'description'),
+                        interval_query_per_field(query_list, 'website_data'),
+                        interval_query_per_field(query_list, 'additional_information'),
+                        interval_query_per_field(query_list, 'location')
+                    ],
+                    minimum_should_match=1,
+                    boost=50
+                )
+                
+                # 3rd priority: If the words are found in any order
+                words_query = Q('bool', must=[
+                        MultiMatch(
+                            query=_query,
+                            type="most_fields",
+                            fields=[
+                                'title^5',
+                                'short_description^3',
+                                'description^2',
+                                'website_data',
+                                'additional_information',
+                                'location^5'
+                            ],
+                            fuzziness='AUTO'
+                        ) for _query in query_list
+                    ],
+                )
+                
+                new_query = Q('bool', should=[phrase_query, interval_query, words_query], minimum_should_match=1)
+            i -= 1
+        elif type == 1:
+            opp = query
+            i += 1
+            continue
+        elif type == 2:
+            new_query = Q('bool', should=[MultiMatch(
+                    query=query, 
+                    type="phrase", 
+                    fields=[
+                        'title^5',
+                        'short_description^3',
+                        'description^2',
+                        'website_data',
+                        'additional_information',
+                        'location^5'
+                    ]
+                ), Q(
+                    'nested', 
+                    path='keywords', 
+                    query=MatchPhrase(keyword=query)
+                )], 
+                minimum_should_match=1, 
+                boost=100
+            )
+        
+        if es_query is None:
+            es_query = new_query
+        else:
+            es_query = es_query & new_query if opp == 'AND' else es_query | new_query
+        
+        i += 1
+    return es_query
+
+def es_opportunity_search(search_query, ours_website=False):
+    search_query_list = divide_query(search_query)
+    if len(search_query_list) == 0:
+        return []
+    
+    filter_query = Q(Match(active=True))
+    if ours_website:
+        filter_query = filter_query & \
+            Q(Match(show_on_website=True)) & \
+            Q('range', show_on_website_start_date={'lte': datetime.datetime.now()}) & \
+            Q('range', show_on_website_end_date={'gte': datetime.datetime.now()})
+    
+    query = make_query_from_list(search_query_list)
+    result_opp = OpportunityDocument.search().extra(size=1000).filter(filter_query).query(query).execute()
+    
+    result_opp = [opp.meta.id for opp in result_opp]
     return result_opp
 
 @login_required
