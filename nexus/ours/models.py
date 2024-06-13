@@ -215,8 +215,6 @@ class OpportunityManager(models.Manager):
             for query in search_query_list 
         ]
         
-        print(filter_query)
-        
         final_query = None
         i = 0    
         while i < len(filter_query):
