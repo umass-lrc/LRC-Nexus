@@ -87,7 +87,7 @@ def make_query_from_list(search_query_list):
                         query=Match(keyword=query_list[0])
                     )],
                     minimum_should_match=1,
-                    boost=50
+                    boost=100
                 )
             else:
                 # 1st priority: If the exact phrase is found
