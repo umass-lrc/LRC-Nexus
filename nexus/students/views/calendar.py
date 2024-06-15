@@ -30,6 +30,7 @@ from shifts.models import (
     State,
     ChangeRequest,
     DropRequest,
+    ShiftKind,
 )
 
 from ..forms.calendar import (
@@ -65,8 +66,9 @@ def get_student_shifts(request):
     events_data = []
     
     shifts = Shift.objects.filter(position__user=user, start__gte=start, start__lte=end).all()
-    change_shifts = ChangeRequest.objects.filter(Q(shift__position__user=user) & ((Q(start__gte=start) & Q(start__lte=end)) | (Q(shift__start__gte=start) & Q(shift__start__lte=end)))).all()
-    drop_shifts = DropRequest.objects.filter(shift__position__user=user, shift__start__gte=start, shift__start__lte=end).all()
+    change_shifts = ChangeRequest.objects.filter(Q(shift__isnull=False) & Q(shift__position__user=user) & Q(state__in=[State.IN_PROGRESS, State.NOT_VIEWED]) & ((Q(start__gte=start) & Q(start__lte=end)) | (Q(shift__start__gte=start) & Q(shift__start__lte=end)))).all()
+    add_req = ChangeRequest.objects.filter(shift__isnull=True, position__user=user, start__gte=start, start__lte=end, state__in=[State.IN_PROGRESS, State.NOT_VIEWED]).all()
+    drop_shifts = DropRequest.objects.filter(shift__position__user=user, shift__start__gte=start, shift__start__lte=end, state__in=[State.IN_PROGRESS, State.NOT_VIEWED]).all()
     for shift in shifts:
         if change_shifts.filter(shift=shift).exists() or drop_shifts.filter(shift=shift).exists():
             continue
@@ -168,7 +170,6 @@ def get_student_shifts(request):
             }
         })
     
-    add_req = ChangeRequest.objects.filter(shift__isnull=True, position__user=user, start__gte=start, start__lte=end).all()
     for req in add_req:
         description = f"""
             <b>Add Request: {req.kind} - {req.position}</b>
@@ -206,6 +207,9 @@ def add_shift_request(request):
             messages.error(request, f"Form Error: {form.errors}")
             return render(request, "add_shift_req_response.html", {"success": False})
         data = form.cleaned_data
+        if (data["kind"] == ShiftKind.SI_SESSION or data["kind"] == ShiftKind.CLASS) and data["start"] - timezone.now() < timedelta(days=7):
+            messages.error(request, f"Add Request for SI Session or Class must be made 7 days before the shift.")
+            return render(request, "add_shift_req_response.html", {"si_lock": True})
         req = ChangeRequest.objects.create(
             position=data["position"],
             start=data["start"],
@@ -343,6 +347,8 @@ def change_shift_request(request, shift_id):
             }),
         })
         return response
+    if (shift.kind == ShiftKind.SI_SESSION or shift.kind == ShiftKind.CLASS) and shift.start - timezone.now() < timedelta(days=7):
+        return render(request, "si_directions_7_days.html")
     form = ChangeShiftRequestForm(shift)
     return render(request, "just_form.html", {"form": form})
 
@@ -388,5 +394,7 @@ def drop_shift_request(request, shift_id):
             }),
         })
         return response
+    if (shift.kind == ShiftKind.SI_SESSION or shift.kind == ShiftKind.CLASS) and shift.start - timezone.now() < timedelta(days=7):
+        return render(request, "si_directions_7_days.html")
     form = DropShiftRequestForm(shift)
     return render(request, "just_form.html", {"form": form})

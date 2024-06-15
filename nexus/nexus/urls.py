@@ -28,13 +28,14 @@ def index(request):
 def work_in_progress(request):
     return render(request, "work_in_progress_full_page.html")
 
-# handler404 = 'core.views.handler404'
+handler404 = 'core.views.handler404'
 
 urlpatterns = [
     path('', index, name='index'),
     path('work_in_progress/', work_in_progress, name='work_in_progress'),
     path('admin/', admin.site.urls),
     path('explorer/', include('explorer.urls')),
+    path('tinymce/', include('tinymce.urls')),
     path('core/', include('core.urls')),
     path('users/', include('users.urls')),
     path('patches/', include('patches.urls')),
@@ -42,4 +43,7 @@ urlpatterns = [
     path('SIs/', include('SIs.urls')),
     path('students/', include('students.urls')),
     path('payrolls/', include('payrolls.urls')),
+    path('tutors/', include('tutors.urls')),
+    path('htmx_apis/', include('htmx_apis.urls')),
+    path('ours/', include('ours.urls')),
 ]

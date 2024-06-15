@@ -1,0 +1,47 @@
+<div class="table-responsive">
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th class="text-center" colspan="2" scope="col">Drop Request</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" class="text-center">Reason</th>
+        <td class="text-center">{{drop_request.reason}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">State</th>
+        <td class="text-center">{{drop_request.state}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Last Changed By</th>
+        <td class="text-center">{{drop_request.last_change_by}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Last Changed On</th>
+        <td class="text-center">{{drop_request.last_changed_on}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Start</th>
+        <td class="text-center">{{drop_request.shift.start}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Duration</th>
+        <td class="text-center">{{drop_request.shift.duration}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Building</th>
+        <td class="text-center">{{drop_request.shift.building}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Room</th>
+        <td class="text-center">{{drop_request.shift.room}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="text-center">Kind</th>
+        <td class="text-center">{{drop_request.shift.kind}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,18 @@
+<div class="row">
+  <button
+    hx-delete="{% url 'drop_shift' shift_id %}"
+    hx-trigger="click"
+    hx-swap="multi:#edit-shift-message:innerHTML,#edit-shift-form:innerHTML"
+    class="btn btn-danger d-block mx-auto col-4"
+  >
+    Drop Shift
+  </button>
+  <button
+    hx-get="{% url 'edit_shift'  shift_id %}"
+    hx-trigger="click"
+    hx-swap="multi:#edit-shift-message:innerHTML,#edit-shift-form:innerHTML"
+    class="btn btn-primary d-block mx-auto col-4"
+  >
+    Edit Shift
+  </button>
+</div>

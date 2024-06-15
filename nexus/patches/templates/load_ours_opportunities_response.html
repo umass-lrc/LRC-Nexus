@@ -1,0 +1,12 @@
+<div id="load-ours-opportunities-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="load-ours-opportunities-logs">
+  <div
+    hx-post="{% url 'load_ours_opportunity_from_line' 1 %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}

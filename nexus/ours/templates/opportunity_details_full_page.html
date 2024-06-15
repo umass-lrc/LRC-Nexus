@@ -1,0 +1,17 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}" />
+{% endblock %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Search Result Page</h1>
+<div class="text-center h4">
+  <a href="{% url 'opportunity_search' %}" class="text-center"
+    >Go back to Search Page</a
+  >
+</div>
+<hr />
+{% include 'opportunity_details.html' %} {% endblock %}
