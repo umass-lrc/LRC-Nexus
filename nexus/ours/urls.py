@@ -45,6 +45,16 @@ from .views.check_opportunities import (
     change_featured,
 )
 
+from .views.shift_request import (
+    shift_requests,
+    change_request,
+    drop_request,
+    add_request,
+    add_request_form,
+    change_request_form,
+    drop_request_form,
+)
+
 
 
 FACULTY_URLS = [
@@ -91,9 +101,20 @@ SEARCH_URLS = [
     path('opportunity_card/<int:opp_id>/', opportunity_card, name='opportunity_card'),
 ]
 
+SHIFT_REQUEST = [
+    path('shift_requests/', shift_requests, name='ours_shift_requests'),
+    path('add_request/<str:request_state>/', add_request, name='ours_add_request'),
+    path('change_request/<str:request_state>/', change_request, name='ours_change_request'),
+    path('drop_request/<str:request_state>/', drop_request, name='ours_drop_request'),
+    path('add_request_form/<int:req_id>/', add_request_form, name='ours_add_request_form'),
+    path('change_request_form/<int:req_id>/', change_request_form, name='ours_change_request_form'),
+    path('drop_request_form/<int:req_id>/', drop_request_form, name='ours_drop_request_form'),
+]
+
 urlpatterns = (
     FACULTY_URLS +
     OPPORTUNITY_URLS +
     CHECK_OPP_URLS +
-    SEARCH_URLS
+    SEARCH_URLS +
+    SHIFT_REQUEST
 )
