@@ -77,7 +77,6 @@ def get_user_payroll_page(request):
 @login_required
 @restrict_to_http_methods('GET','POST')
 def punch_in_out_position(request, position_id):
-    user = request.user
     position = Positions.objects.get(id=position_id)
     att_info = AttendanceInfo.objects.filter(shift__position=position, shift__require_punch_in_out=False, punch_in_time__isnull=False, punch_out_time__isnull=True, attended=False)
     punched_in = att_info.exists()

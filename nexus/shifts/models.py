@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Any
 from django.utils import timezone
 
 from django.db import models
@@ -144,7 +143,7 @@ class RecurringShift(models.Model):
         update = self.id is not None
         recurring_shift = super(RecurringShift, self).save(*args, **kwargs)
         
-        todays_date = datetime.now().date()
+        todays_date = timezone.localdate(datetime.now())
         start_date = self.start_date if self.start_date > todays_date else todays_date
         
         if update:
@@ -198,7 +197,7 @@ class RecurringShift(models.Model):
         return recurring_shift
     
     def delete(self):
-        todays_date = datetime.now().date()
+        todays_date = timezone.localdate(datetime.now()).date()
         for shift in Shift.objects.filter(recurring_shift=self, start__date__gte=todays_date).all():
             shift.delete()
         super(RecurringShift, self).delete()
@@ -298,8 +297,8 @@ class Shift(models.Model):
             old_shift = Shift.objects.get(id=self.id)
             if AttendanceInfo.objects.get(shift=old_shift).signed:
                 raise Exception("Cannot edit a signed shift.")
-            not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=old_shift.position, payroll__week_end=get_weekend(old_shift.start.date()))
-            start_weekday = old_shift.start.weekday()
+            not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=old_shift.position, payroll__week_end=get_weekend(timezone.localdate(old_shift.start)))
+            start_weekday = timezone.localdate(old_shift.start).weekday()
             not_signed_payroll.total_hours -= old_shift.duration
             if start_weekday == 6:
                 not_signed_payroll.sunday_hours -= old_shift.duration
@@ -323,15 +322,15 @@ class Shift(models.Model):
                 shift=self,
             )
             
-        if not Payroll.objects.filter(position=self.position, week_end=get_weekend(self.start.date())).exists():
+        if not Payroll.objects.filter(position=self.position, week_end=get_weekend(timezone.localdate(self.start))).exists():
             Payroll.objects.create(
                 position=self.position,
-                week_end=get_weekend(self.start.date()),
+                week_end=get_weekend(timezone.localdate(self.start)),
                 status=PayrollStatus.NOT_IN_HR,
             )
         
-        not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
-        start_weekday = self.start.weekday()
+        not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(timezone.localdate(self.start)))
+        start_weekday = timezone.localdate(self.start).weekday()
         not_signed_payroll.total_hours += self.duration
         if start_weekday == 6:
             not_signed_payroll.sunday_hours += self.duration
@@ -356,8 +355,8 @@ class Shift(models.Model):
         if attendance.signed:
             raise Exception("Cannot delete a signed shift.")
         attendance.delete()
-        not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
-        start_weekday = self.start.weekday()
+        not_signed_payroll = PayrollNotSigned.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(timezone.localdate(self.start)))
+        start_weekday = timezone.localdate(self.start).weekday()
         not_signed_payroll.total_hours -= self.duration
         if start_weekday == 6:
             not_signed_payroll.sunday_hours -= self.duration
@@ -379,8 +378,8 @@ class Shift(models.Model):
         self.save()
     
     def force_delete_from_not_in_hr(self):
-        not_in_hr_payroll = PayrollNotInHR.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(self.start.date()))
-        start_weekday = self.start.weekday()
+        not_in_hr_payroll = PayrollNotInHR.objects.get(payroll__position=self.position, payroll__week_end=get_weekend(timezone.localdate(self.start)))
+        start_weekday = timezone.localdate(self.start).weekday()
         not_in_hr_payroll.total_hours -= self.duration
         if start_weekday == 6:
             not_in_hr_payroll.sunday_hours -= self.duration
@@ -456,9 +455,9 @@ class AttendanceInfo(models.Model):
     )
     
     def did_attend(self):
-        pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
-        nihr = PayrollNotInHR.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
-        start_weekday = self.shift.start.weekday()
+        pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(timezone.localdate(self.shift.start)))
+        nihr = PayrollNotInHR.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(timezone.localdate(self.shift.start)))
+        start_weekday = timezone.localdate(self.shift.start).weekday()
         pns.total_hours -= self.shift.duration
         nihr.total_hours += self.shift.duration
         if start_weekday == 6:
@@ -486,8 +485,8 @@ class AttendanceInfo(models.Model):
         nihr.save()
     
     def did_not_attend(self):
-        pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(self.shift.start.date()))
-        start_weekday = self.shift.start.weekday()
+        pns = PayrollNotSigned.objects.get(payroll__position=self.shift.position, payroll__week_end=get_weekend(timezone.localdate(self.shift.start)))
+        start_weekday = timezone.localdate(self.shift.start).weekday()
         pns.total_hours -= self.shift.duration
         if start_weekday == 6:
             pns.sunday_hours -= self.shift.duration
