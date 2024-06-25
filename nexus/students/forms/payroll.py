@@ -17,15 +17,77 @@ from shifts.models import (
 
 from users.models import (
     Positions,
+    PositionChoices,
 )
+
+shift_type_choices = {
+    PositionChoices.TUTOR: [
+        ShiftKind.TUTOR_DROP_IN,
+        ShiftKind.TUTOR_APPOINTMENT,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.TUTOR_PM: [
+        ShiftKind.OBSERVATION,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.OURS_MENTOR: [
+        ShiftKind.OURS_MENTOR_HOURS,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING, 
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.OURS_MENTOR_PM: [
+        ShiftKind.OBSERVATION,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.OFFICE_ASSISTANT: [
+        ShiftKind.OA_HOURS,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.OFFICE_ASSISTANT_PM: [
+        ShiftKind.OBSERVATION,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.TECH: [
+        ShiftKind.MEETING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.SI: [
+        ShiftKind.CLASS,
+        ShiftKind.SI_SESSION,
+        ShiftKind.PREPARATION,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.SI_PM: [
+        ShiftKind.OBSERVATION,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+}
 
 class PunchInForm(forms.Form):
     building = forms.ModelChoiceField(queryset=Buildings.objects.all(), required=True, initial=Buildings.objects.get(short_name='LIBR'))
-    room = forms.CharField(max_length=10, required=True)
+    room = forms.CharField(initial=1020, max_length=10, required=True)
     kind = forms.ChoiceField(choices=ShiftKind.choices, required=True)
     
     def __init__(self, position, *args, **kwargs):
         super(PunchInForm, self).__init__(*args, **kwargs)
+        
+        self.fields['kind'].choices = [(sk.value, sk.label) for sk in shift_type_choices[position.position]]
+        
         self.helper = FormHelper(self)
         self.helper.attrs = {
             'hx-post': reverse('punch_in_out_position', kwargs={'position_id': position.id}),
