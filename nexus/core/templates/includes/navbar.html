@@ -186,6 +186,13 @@
           >
           <ul class="submenu collapse">
             <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'ours_shift_requests' %}"
+                >Shift Requests</a
+              >
+            </li>
+            <li>
               <a class="nav-link nav-menu-item" href="{% url 'faculty_list' %}"
                 >Faculties</a
               >
@@ -276,6 +283,41 @@
               <a
                 class="nav-link nav-menu-item"
                 href="{% url 'tutor_shift_requests' %}"
+                >Shift Request</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Observation</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Student Report</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-submenu">
+          <a class="nav-link nav-menu-item" href="#"
+            ><i class="bi bi-person-hearts me-3"></i>Office Assistant</a
+          >
+          <ul class="submenu collapse">
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'work_in_progress' %}"
+                >Schedule</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'oa_shift_requests' %}"
                 >Shift Request</a
               >
             </li>

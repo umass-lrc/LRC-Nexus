@@ -26,60 +26,60 @@ from ..forms.shift_request import (
 
 @login_required
 @restrict_to_http_methods("GET")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "OURS Supervisor")
 def shift_requests(request):
     context = {
-        'position': 'SIs',
+        'position': 'OURSs',
         'state': State,
-        'change_url_name': 'si_change_request',
-        'drop_url_name': 'si_drop_request',
-        'add_url_name': 'si_add_request',
+        'change_url_name': 'ours_change_request',
+        'drop_url_name': 'ours_drop_request',
+        'add_url_name': 'ours_add_request',
     }
     return render(request, "shift_request_main.html", context)
 
 @login_required
 @restrict_to_http_methods("GET")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "OURS Supervisor")
 def add_request(request, request_state):
     requests = ChangeRequest.objects.filter(
-        Q(state = request_state) & (Q(position__position = PositionChoices.SI) | Q(position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
+        Q(state = request_state) & (Q(position__position = PositionChoices.OURS_MENTOR) | Q(position__position = PositionChoices.OURS_MENTOR_PM)),
     ).order_by('start')
     context = {
         'a_requests': requests,
-        'url_name': 'si_add_request_form',
+        'url_name': 'ours_add_request_form',
     }
     return render(request, "shift_request_add_table.html", context)
 
 @login_required
 @restrict_to_http_methods("GET")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "OURS Supervisor")
 def change_request(request, request_state):
     requests = ChangeRequest.objects.filter(
-        Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
+        Q(state = request_state) & (Q(position__position = PositionChoices.OURS_MENTOR) | Q(position__position = PositionChoices.OURS_MENTOR_PM)),
     ).order_by('start')
     context = {
         'c_requests': requests,
-        'url_name': 'si_change_request_form',
+        'url_name': 'ours_change_request_form',
     }
     return render(request, "shift_request_change_table.html", context)
 
 
 @login_required
 @restrict_to_http_methods("GET")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "OURS Supervisor")
 def drop_request(request, request_state):
     requests = DropRequest.objects.filter(
-        Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
+        Q(state = request_state) & (Q(shift__position__position = PositionChoices.OURS_MENTOR) | Q(shift__position__position = PositionChoices.OURS_MENTOR_PM)),
     ).order_by('shift__start')
     context = {
         'd_requests': requests,
-        'url_name': 'si_drop_request_form',
+        'url_name': 'ours_drop_request_form',
     }
     return render(request, "shift_request_drop_table.html", context)
 
 @login_required
 @restrict_to_http_methods("GET", "POST")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "OURS Supervisor")
 def add_request_form(request, req_id):
     arequest = ChangeRequest.objects.get(id=req_id)
     state = arequest.state
@@ -107,7 +107,7 @@ def add_request_form(request, req_id):
             return response
         context = {
             'req_id': req_id,
-            'url_name': 'si_add_request_form',
+            'url_name': 'ours_add_request_form',
             'add_request': arequest,  
         }
         response = render(request, "add_request_not_viewed.html", context)
@@ -125,7 +125,7 @@ def add_request_form(request, req_id):
                 messages.error(request, f"Form Errors: {form.errors}")
                 context = {
                     "add_request": arequest,
-                    "url_name": "si_add_request_form",
+                    "url_name": "ours_add_request_form",
                 }
                 return render(request, "add_request_update_response.html", context)
             else:
@@ -149,7 +149,7 @@ def add_request_form(request, req_id):
                     messages.success(request, "Request Updated")
                     context = {
                         "add_request": arequest,
-                        "url_name": "si_add_request_form",
+                        "url_name": "ours_add_request_form",
                     }
                     return render(request, "add_request_update_response.html", context)
             response['HX-Trigger-After-Settle'] = json.dumps({"stateChanged": f"art-{req_id}"})
@@ -164,7 +164,7 @@ def add_request_form(request, req_id):
 
 @login_required
 @restrict_to_http_methods("GET", "POST")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "OURS Supervisor")
 def change_request_form(request, req_id):
     crequest = ChangeRequest.objects.get(id=req_id)
     state = crequest.state
@@ -192,7 +192,7 @@ def change_request_form(request, req_id):
             return response
         context = {
             'req_id': req_id,
-            'url_name': 'si_change_request_form',
+            'url_name': 'ours_change_request_form',
             'change_request': crequest,  
         }
         response = render(request, "change_request_not_viewed.html", context)
@@ -210,7 +210,7 @@ def change_request_form(request, req_id):
                 messages.error(request, f"Form Errors: {form.errors}")
                 context = {
                     "add_request": crequest,
-                    "url_name": "si_change_request_form",
+                    "url_name": "ours_change_request_form",
                 }
                 return render(request, "change_request_update_response.html", context)
             else:
@@ -234,7 +234,7 @@ def change_request_form(request, req_id):
                     messages.success(request, "Request Updated")
                     context = {
                         "change_request": crequest,
-                        "url_name": "si_change_request_form",
+                        "url_name": "ours_change_request_form",
                     }
                     return render(request, "change_request_update_response.html", context)
             response['HX-Trigger-After-Settle'] = json.dumps({"stateChanged": f"crt-{req_id}"})
@@ -249,7 +249,7 @@ def change_request_form(request, req_id):
 
 @login_required
 @restrict_to_http_methods("GET", "POST")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "OURS Supervisor")
 def drop_request_form(request, req_id):
     drequest = DropRequest.objects.get(id=req_id)
     state = drequest.state
@@ -271,7 +271,7 @@ def drop_request_form(request, req_id):
             return response
         context = {
             'req_id': req_id,
-            'url_name': 'si_drop_request_form',
+            'url_name': 'ours_drop_request_form',
             'drop_request': drequest,  
         }
         response = render(request, "drop_request_not_viewed.html", context)
