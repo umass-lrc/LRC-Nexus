@@ -113,7 +113,10 @@ def punch_in_out_position(request, position_id):
             att_info.shift.duration = duration
             att_info.shift.save()
             att_info.punch_out_time = punch_out_time.time()
+            att_info.attendance_info.signed = True
+            att_info.attendance_info.sign_datetime = timezone.now()
             att_info.save()
+            att_info.did_attend()
             messages.success(request, 'Punched out successfully.')
         context = {
             'position': position,
@@ -162,7 +165,10 @@ def shift_punch_in_out(request, shift_id):
             att_info.shift.duration = punch_out_time - start
             att_info.shift.save()
             att_info.punch_out_time = punch_out_time.time()
+            att_info.attendance_info.signed = True
+            att_info.attendance_info.sign_datetime = timezone.now()
             att_info.save()
+            att_info.did_attend()
             messages.success(request, 'Punched out successfully.')
         context = {
             'shift': shift,
