@@ -24,7 +24,7 @@
 <div
   id="attendance-shift-main"
   hx-get="{% url 'get_attendance_for_shifts' %}"
-  hx-trigger="intersect once"
+  hx-trigger="intersect once, every 600s"
   hx-target="this"
   hx-swap="innerHTML"
 >
@@ -38,7 +38,7 @@
 <div
   id="approve-weeks-main"
   hx-get="{% url 'get_approve_entire_weeks' %}"
-  hx-trigger="intersect once"
+  hx-trigger="intersect once, every 600s"
   hx-target="this"
   hx-swap="innerHTML"
 >
@@ -81,7 +81,7 @@
     <tbody
       hx-get="{% url 'get_user_payslips' %}"
       hx-target="this"
-      hx-trigger="intersect once"
+      hx-trigger="intersect once, every 600s"
       hx-swap="innerHTML"
     ></tbody>
   </table>

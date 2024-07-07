@@ -44,6 +44,7 @@ from ..forms.payroll import (
     SignShiftForm,
     ShiftPunchInForm,
     ShiftPunchOutForm,
+    WeekPayrollApproveForm,
 )
 
 @login_required
@@ -320,12 +321,50 @@ def attendance_for_shift(request, shift_id):
 @login_required
 @restrict_to_http_methods('GET')
 def get_approve_entire_weeks(request):
-    pass
+    user = request.user
+    active_sem = Semester.objects.get_active_semester()
+    positions = Positions.objects.filter(user=user, semester=active_sem).all()
+    payrolls = Payroll.objects.filter(position__in=positions, week_end__lte=get_weekend(timezone.now().date())).all().order_by('-week_end')
+    payrolls_id = []
+    
+    for payroll in payrolls:
+        if not payroll.not_in_hr.approved_by_user:
+            payrolls_id.append(payroll.id)
+    
+    context = {
+        'payrolls_id': payrolls_id,
+    }
+    return render(request, 'user_approve_entire_weeks.html', context)
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
-def approve_entire_week(request, week_end):
-    pass
+def approve_entire_week(request, payroll_id):
+    payroll = Payroll.objects.get(id=payroll_id)
+    if request.method == 'POST':
+        now = timezone.localtime(timezone.now())
+        error = False
+        if now.date() + timedelta(days=1) < payroll.week_end:
+            error = True
+            messages.error(request, 'You can sign for the week before end of the week.')
+        elif payroll.not_signed.total_hours > timedelta(hours=0):
+            error = True
+            messages.error(request, 'Records indicate you have un-signed shift. Please sign those first.')
+        if error:
+            return render(request, 'approve_entire_week_response.html', context={'success': False})
+        form = WeekPayrollApproveForm(payroll, request.POST)
+        if not form.is_valid():
+            messages.error(request, f'Form Errors: {form.errors}')
+            return render(request, 'approve_entire_week_response.html', context={'success': False})
+        payroll.not_in_hr.approved_by_user = True
+        payroll.not_in_hr.save()
+        messages.success(request, 'Payroll approved successfully.')
+        return render(request, 'approve_entire_week_response.html', context={'success': True, 'payroll_id': payroll.id})
+    form = WeekPayrollApproveForm(payroll)
+    context = {
+        'form': form,
+        'payroll': payroll,
+    }
+    return render(request, 'just_form.html', context=context)
 
 @login_required
 @restrict_to_http_methods('GET')

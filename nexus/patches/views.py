@@ -499,10 +499,7 @@ def delete_class_shifts(request):
         print("Starting....")
         shifts = Shift.objects.filter(position__semester=Semester.objects.get_active_semester(), kind=ShiftKind.CLASS).all()
         for shift in shifts:
-            try:
-                shift.delete()
-            except:
-                shift.force_delete_from_not_in_hr()
+            shift.delete()
         print("done.")
         return HttpResponse("DONE!")
     return render(request, 'delete_class_shift.html')

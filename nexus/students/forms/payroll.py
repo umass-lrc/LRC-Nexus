@@ -1,7 +1,7 @@
 from django import forms
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, Div
+from crispy_forms.layout import Submit, Layout, Fieldset, Div, HTML
 from crispy_forms.bootstrap import AccordionGroup
 
 from crispy_bootstrap5.bootstrap5 import BS5Accordion, FloatingField
@@ -239,6 +239,65 @@ class SignShiftForm(forms.Form):
                     Div(
                         Submit('did_attend', 'Attended', css_class='btn btn-primary') if not requires_punch_in_out else Div(),
                         Submit('did_not_attend', "Didn't Attend", css_class='btn btn-danger'),
+                        css_class='text-center',
+                    ),
+                    active=False,
+                ),
+            ),
+        )
+        
+class WeekPayrollApproveForm(forms.Form):
+    extra_context = {}
+    
+    def __init__(self, payroll, *args, **kwargs):
+        super(WeekPayrollApproveForm, self).__init__(*args, **kwargs)
+        
+        self.extra_context = {'payroll': payroll}
+        self.helper = FormHelper(self)
+        self.helper.attrs = {
+            'hx-post': reverse('approve_entire_week', kwargs={'payroll_id': payroll.id}),
+            'hx-swap': f'multi:#approve-week-{payroll.id}:outerHTML,#approve-weeks-message:innerHTML',
+        }
+        self.helper.layout = Layout(
+            BS5Accordion(
+                AccordionGroup(
+                    f"{payroll.position.get_position_display()} - {str(payroll.week_end)}",
+                    Div(
+                        HTML("""
+                            {% load hours %}
+                            <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th class="text-center" scope="col">Sunday</th>
+                                <th class="text-center" scope="col">Monday</th>
+                                <th class="text-center" scope="col">Tuesday</th>
+                                <th class="text-center" scope="col">Wednesday</th>
+                                <th class="text-center" scope="col">Thursday</th>
+                                <th class="text-center" scope="col">Friday</th>
+                                <th class="text-center" scope="col">Saturday</th>
+                                <th class="text-center" scope="col">Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <td class="text-end">{{payroll.not_in_hr.sunday_hours|hours}}</td>
+                                <td class="text-end">{{payroll.not_in_hr.monday_hours|hours}}</td>
+                                <td class="text-end">{{payroll.not_in_hr.tuesday_hours|hours}}</td>
+                                <td class="text-end">{{payroll.not_in_hr.wednesday_hours|hours}}</td>
+                                <td class="text-end">{{payroll.not_in_hr.thursday_hours|hours}}</td>
+                                <td class="text-end">{{payroll.not_in_hr.friday_hours|hours}}</td>
+                                <td class="text-end">{{payroll.not_in_hr.saturday_hours|hours}}</td>
+                                <th class="text-end" scope="row">{{payroll.not_in_hr.total_hours|hours}}</th>
+                            </tbody>
+                            </table>
+                        """),
+                        css_class='table-responsive',
+                    ),
+                    Div(
+                        HTML("<p><b>Please refrain from approving if you find any discrepancies in the hours.</b> Instead, kindly reach out to office staff to correct your hours using the form before proceeding with approval.</p>"),
+                        css_class='text-center text-danger',
+                    ),
+                    Div(
+                        Submit('submit', 'Approve', css_class='btn btn-primary'),
                         css_class='text-center',
                     ),
                     active=False,
