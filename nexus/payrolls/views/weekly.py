@@ -146,7 +146,9 @@ def single_weekly_payroll(request, payroll_id):
                 payroll = Payroll.objects.get(id=payroll_id)
                 messages.error(request, f"Payroll Status Not Updated! Can't update status to Not In HR!")
     if payroll.not_signed.total_hours > timedelta(hours=0):
-        messages.warning(request, f"User has not signed [few/all] of their payroll for the week!")
+        messages.error(request, f"User has not signed [few/all] of their shift for the week!")
+    if not payroll.not_in_hr.approved_by_user:
+        messages.warning(request, f"User has not approved the weekly payroll for this week!")
     form = StatusForm(instance=payroll)
     color = "tbody-red" if payroll.status == PayrollStatus.NOT_IN_HR else "tbody-green" if payroll.status == PayrollStatus.IN_HR_ON_TIME else "tbody-yellow"
     context = {
