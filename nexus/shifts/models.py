@@ -306,6 +306,7 @@ class Shift(models.Model):
                 self.recurring_shift = None
                 self.require_punch_in_out = False
                 change_payroll = payroll.not_in_hr
+                change_payroll.approved_by_user = False
             change_payroll.total_hours -= old_shift.duration
             if start_weekday == 6:
                 change_payroll.sunday_hours -= old_shift.duration
@@ -377,6 +378,7 @@ class Shift(models.Model):
                 not_in_hr_payroll.friday_hours -= self.duration
             elif start_weekday == 5:
                 not_in_hr_payroll.saturday_hours -= self.duration
+            not_in_hr_payroll.approved_by_user = False
             not_in_hr_payroll.save()
             self.attendance_info.delete()
             self.recurring_shift = None
