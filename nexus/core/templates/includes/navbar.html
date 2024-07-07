@@ -65,7 +65,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div style="overflow-y: scroll;">
       <ul class="sidebar nav flex-column" id="nav_accordion">
         {% if user.is_staff %}
         <li class="nav-item has-submenu">
@@ -277,6 +277,13 @@
                 class="nav-link nav-menu-item"
                 href="{% url 'tutor_schedule_for_all_course' %}"
                 >Schedule</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
+                href="{% url 'tutor_live_punch_in_out' %}"
+                >Live Punch In/Out</a
               >
             </li>
             <li>
