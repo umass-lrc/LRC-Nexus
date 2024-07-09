@@ -33,6 +33,10 @@ from ..forms.weekly import (
 from ..models import (
     Payroll,
     PayrollStatus,
+    PayrollInHR,
+    PayrollInHRViaLatePay,
+    PayrollNotInHR,
+    PayrollNotSigned,
 )
 
 @login_required
@@ -78,6 +82,10 @@ def all_weekly_payroll(request):
             )
         else:
             payroll = payroll[0]
+        PayrollNotSigned.objects.get_or_create(payroll=payroll)
+        PayrollNotInHR.objects.get_or_create(payroll=payroll)
+        PayrollInHRViaLatePay.objects.get_or_create(payroll=payroll)
+        PayrollInHR.objects.get_or_create(payroll=payroll)
         payrolls.append(payroll)
     
     return render(request, "weekly_all.html", {"payrolls": payrolls, "week": week})
