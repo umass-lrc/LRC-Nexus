@@ -19,6 +19,12 @@ from users.models import (
     PositionChoices
 )
 
+def convert_timedelta(duration):
+    days, seconds = duration.days, duration.seconds
+    hours = days * 24 + seconds // 3600
+    minutes = (seconds % 3600) // 60
+    return hours, minutes
+
 @login_required
 @restrict_to_groups("Staff Admin", "Tutor Supervisor")
 @restrict_to_http_methods("GET")
@@ -40,10 +46,12 @@ def live_punch_in_out(request):
 @restrict_to_http_methods("GET")
 def get_punched_in(request, id):
     att_info = AttendanceInfo.objects.get(id=id)
+    hours, minutes = convert_timedelta(timezone.now() - att_info.shift.start)
     context = {
+        'id': att_info.id,
         'name': str(att_info.shift.position.user),
         'position': att_info.shift.position.get_position_display(),
         'kind': att_info.shift.kind,
-        'start': att_info.punch_in_time,
+        'duration': f"{hours:02d}:{minutes:02d}",
     }
     return render(request, "punched_in_row.html", context=context)

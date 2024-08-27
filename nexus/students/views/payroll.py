@@ -176,6 +176,9 @@ def shift_punch_in_out(request, shift_id):
     
     if request.method == 'POST':
         form = None
+        if not is_punched_in_this_shift and not is_punched_in:
+            messages.error(request, 'You are already punched out for this shift.')
+            return render(request, 'punch_in_out_response.html', context={'success': False})
         if not is_punched_in_this_shift:
             form = ShiftPunchInForm(shift, position, is_punched_in_this_shift, request.POST)
         else:
@@ -231,6 +234,21 @@ def shift_punch_in_out(request, shift_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'Tutor Supervisor')
+def force_punch_out(request, id):
+    attendance_info = AttendanceInfo.objects.get(id=id)
+    shift = attendance_info.shift
+    position = shift.position
+    is_punched_in = AttendanceInfo.objects.filter(shift__position=position, punch_in_time__isnull=False, punch_out_time__isnull=True).exists()
+    is_punched_in_this_shift = shift.attendance_info.punch_in_time is not None and shift.attendance_info.punch_out_time is None
+    
+    if not is_punched_in_this_shift and not is_punched_in:
+        messages.error(request, 'This shift is already punched out.')
+        # TODO: Replace this
+        return HttpResponse('<div></div>')
+
+@login_required
+@restrict_to_http_methods('GET')
 def get_attendance_for_shifts(request):
     user = request.user
     not_signed_shifts_id = Shift.objects.filter(
@@ -271,6 +289,9 @@ def attendance_for_shift(request, shift_id):
         data = form.cleaned_data
         if 'did_attend' in request.POST:
             att = AttendanceInfo.objects.get(shift=shift)
+            if att.signed:
+                messages.error(request, 'Shift is already signed.')
+                return render(request, 'sign_shift_response.html', context={'success': False})
             att.attended = True
             att.signed = True
             att.sign_datetime = timezone.now()
