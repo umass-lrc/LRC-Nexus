@@ -1,0 +1,31 @@
+<h5>Faculty Info:</h5>
+<!--prettier-ignore-->
+{{ faculty.faculty.first_name }} {{ faculty.faculty.last_name }} &lt;{{faculty.faculty.email }}&gt;
+<hr />
+<h5>Positions:</h5>
+{{ positions }}
+<hr />
+<h5>Subjects:</h5>
+{{ subjects }}
+<hr />
+<h5>Keywords:</h5>
+{{ keywords }}
+<hr />
+<h5>Personal Website:</h5>
+{% if faculty.personal_website %}
+<!--prettier-ignore-->
+<<a href="{{ faculty.personal_website }}">Personal Website</a>> {% else %}
+<-None-> {% endif %}
+<hr />
+<h5>Lab Info:</h5>
+<!--prettier-ignore-->
+{{ faculty.lab_name }} <{%if faculty.lab_website %}<a
+  href="{{faculty.lab_website}}"
+  >Lab Website</a
+>{% else %}-None-{%endif%}>
+<hr />
+<h5>Research Outline:</h5>
+{{ faculty.research_outline|safe }}
+<hr />
+<h5>Miscellaneous:</h5>
+{{ faculty.miscellaneous|safe }}

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
+from django.db.models import Count
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -31,6 +32,14 @@ from shifts.models import (
     get_weekend,
     Shift,
     ShiftKind,
+    DropRequest,
+)
+
+from ours.models import (
+    FacultyPosition,
+    Opportunity,
+    Keyword,
+    Majors,
 )
 
 from .forms import (
@@ -40,6 +49,9 @@ from .forms import (
     loadFacultiesForm,
     loadClassesForm,
     loadTutorRoleForm,
+    loadFacultyPositionsForm,
+    loadOURSOpportunitiesForm,
+    loadMajorsForm,
 )
 
 from tutors.models import (
@@ -353,6 +365,60 @@ def load_class_from_line(request, line_number):
 
 @login_required
 @restrict_to_groups('Tech')
+def load_faculty_positions(request):
+    if request.method == 'POST':
+        form = loadFacultyPositionsForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_faculty_positions_response.html', context={'success': False})
+        with open("temp/faculty_positions.csv", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        return render(request, 'load_faculty_positions_response.html', context={'success': True})
+    form = loadFacultyPositionsForm()
+    context = {'form': form}
+    return render(request, 'load_faculty_positions.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_faculty_position_from_line(request, line_number):
+    with open("temp/faculty_positions.csv", "r") as f:
+        to_read = None
+        for i, line in enumerate(f):
+            if i == line_number-1:
+                to_read = line
+                break
+        if to_read is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = f"""
+            <div
+                hx-post="{reverse('load_faculty_position_from_line', kwargs={'line_number': line_number+1})}"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="outerHTML"
+            >
+            </div>
+        """
+        if to_read[-1] == '\n':
+            to_read = to_read[:-1]
+        values = to_read.split(',')
+        if len(values) != 1:
+            content += f"<b>==Invalid Format On Line {line_number}==</b>"
+        else:
+            try:
+                position = values[0]
+                FacultyPosition.objects.create(
+                    position=position,
+                )
+                content += f"<b>==Position Added Successfully==</b>"
+            except Exception as e:
+                content += f"<b>==Error Occoured On Line {line_number}, Position Not Added: {e}==</b>"
+        content += f"<br/>Line {line_number} Content: {to_read} <br/>"
+        return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
 @restrict_to_http_methods('GET', 'POST')
 def fix_payroll(request):
     if request.method == 'POST':
@@ -433,10 +499,7 @@ def delete_class_shifts(request):
         print("Starting....")
         shifts = Shift.objects.filter(position__semester=Semester.objects.get_active_semester(), kind=ShiftKind.CLASS).all()
         for shift in shifts:
-            try:
-                shift.delete()
-            except:
-                shift.force_delete_from_not_in_hr()
+            shift.delete()
         print("done.")
         return HttpResponse("DONE!")
     return render(request, 'delete_class_shift.html')
@@ -513,3 +576,154 @@ def load_tutor_role_from_line(request, line_number):
             content += f"<b>==Error Occoured On Line {line_number}, Tutor Role Not Added: {e}=={err_course}</b>"
         content += f"<br/>Line {line_number} Content: {to_read} <br/>"
         return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
+@restrict_to_http_methods('GET', 'POST')
+def load_ours_opportunities(request):
+    if request.method == 'POST':
+        form = loadOURSOpportunitiesForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_ours_opportunities.html', context={'success': False})
+        with open("temp/opp.txt", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        return render(request, 'load_ours_opportunities_response.html', context={'success': True})
+    form = loadOURSOpportunitiesForm()
+    context = {'form': form}
+    return render(request, 'load_ours_opportunities.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_ours_opportunity_from_line(request, line_number):
+    line_number = int(line_number) - 1
+    with open("temp/opp.txt", "r") as f:
+        opp_data = None
+        for i, line in enumerate(f):
+            if i == line_number*6:
+                opp_data = line
+            elif i < (line_number+1)*6 and i > line_number*6:
+                opp_data += line
+        if opp_data is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = [f"Line {line_number*6+1}:<br/>"]
+        opp_data = opp_data.split('\n')
+        if len(opp_data) != 7:
+            content += [f"<b>==Invalid Format: len(opp_data) = {len(opp_data)}==</b>"]
+        elif opp_data[-3] != '' or opp_data[-2] != '' or opp_data[-1] != '':
+            content += [f"<b>==Invalid Format: Found data on last 2 lines==</b>"]
+        else:
+            title = opp_data[0].strip()
+            short_description = opp_data[1].strip()
+            url = opp_data[2].strip()
+            keywords = opp_data[3].split(',')
+            keywords = [keyword.strip().title() for keyword in keywords if keyword.strip() != '']
+            
+            if len(keywords) == 1 and keywords[0] == 'None':
+                keywords = []
+            
+            for i, keyword in enumerate(keywords):
+                keyword = Keyword.objects.get_or_create(keyword=keyword)
+                keywords[i] = keyword[0].id
+            
+            opp = Opportunity.objects.create(
+                title=title,
+                short_description=short_description,
+                description=short_description,
+                link=url,
+            )
+            
+            opp.keywords.set(keywords)
+            
+            opp.save()
+            
+            content += [f"<b>Title:</b> {title}<br/>"]
+            content += [f"<b>Short Description:</b> {short_description}<br/>"]
+            content += [f"<b>URL:</b> {url}<br/>"]
+            content += [f"<b>Keywords:</b> {keywords}<br/>"]
+            
+            content += [f"<b>==Opportunity Added Successfully==</b><br/>"]
+            content += [f"""
+                <div
+                    hx-post="{reverse('load_ours_opportunity_from_line', kwargs={'line_number': line_number+2})}"
+                    hx-trigger="load"
+                    hx-target="this"
+                    hx-swap="outerHTML"
+                >
+                </div>
+            """]
+        content.reverse()
+        content = "".join(content)
+        return HttpResponse(content)
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Tech')
+def delete_error_drop_req(request):
+    dr = DropRequest.objects.get(id=1)
+    dr.delete()
+    return HttpResponse("DONE!")
+
+
+@login_required
+@restrict_to_groups('Tech')
+def load_majors(request):
+    if request.method == 'POST':
+        form = loadMajorsForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, f"Form error: {form.errors}")
+            return render(request, 'load_majors_response.html', context={'success': False})
+        with open("temp/majors.csv", "wb+") as f:
+            for chunk in request.FILES['file'].chunks():
+                f.write(chunk)
+        return render(request, 'load_majors_response.html', context={'success': True})
+    form = loadMajorsForm()
+    context = {'form': form}
+    return render(request, 'load_majors.html', context)
+
+@login_required
+@restrict_to_http_methods('POST')
+@restrict_to_groups('Tech')
+def load_major_from_line(request, line_number):
+    with open("temp/majors.csv", "r") as f:
+        to_read = None
+        for i, line in enumerate(f):
+            if i == line_number-1:
+                to_read = line
+                break
+        if to_read is None:
+            return HttpResponse("<b>==File End==</b><br/>")
+        content = f"""
+            <div
+                hx-post="{reverse('load_major_from_line', kwargs={'line_number': line_number+1})}"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="outerHTML"
+            >
+            </div>
+        """
+        if to_read[-1] == '\n':
+            to_read = to_read[:-1]
+        values = to_read
+        try:
+            major = values
+            Majors.objects.create(
+                major=major,
+            )
+            content += f"<b>==Major Added Successfully==</b>"
+        except Exception as e:
+            content += f"<b>==Error Occoured On Line {line_number}, Major Not Added: {e}==</b>"
+        content += f"<br/>Line {line_number} Content: {to_read} <br/>"
+        return HttpResponse(content)
+
+@login_required
+@restrict_to_groups('Tech')
+def list_all_duplicate_opportunities(request):
+    opps = Opportunity.objects.all()
+    opps = opps.values('link').annotate(count=Count('id')).filter(count__gt=1)
+    context = {'opps': []}
+    for opp in opps:
+        context['opps'].append(Opportunity.objects.filter(link=opp['link']).all())
+    return render(request, 'list_all_duplicate_opportunities.html', context)

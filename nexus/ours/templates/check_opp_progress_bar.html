@@ -1,0 +1,20 @@
+<div
+  hx-get="{% url next_url next_index max_id %}"
+  hx-target="this"
+  hx-trigger="revealed once"
+>
+  <h5 role="status" id="pblabel" tabindex="-1" autofocus>{{label}}</h5>
+
+  <div>
+    <div
+      class="progress"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      aria-labelledby="pblabel"
+    >
+      <div id="pb" class="progress-bar" style="width: {{percentage}}%"></div>
+    </div>
+  </div>
+</div>

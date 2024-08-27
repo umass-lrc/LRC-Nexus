@@ -116,6 +116,27 @@ class loadClassesForm(forms.Form):
                 css_class='text-center',
             ),
         )
+        
+class loadFacultyPositionsForm(forms.Form):
+    file = forms.FileField()
+
+    def __init__(self, *args, **kwargs):
+        super(loadFacultyPositionsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.attrs = {
+            'hx-post': reverse('load_faculty_positions'),
+            'hx-swap': 'multi:#load-faculty-positions-message:innerHTML,#load-faculty-positions-logs:innerHTML',
+        }
+        self.helper.layout = Layout(
+            Fieldset(
+                '',
+                FloatingField('file'),
+            ),
+            Div(
+                Submit('submit', 'Load Faculty Positions', css_class='btn btn-primary'),
+                css_class='text-center',
+            ),
+        )
 
 class loadTutorRoleForm(forms.Form):
     file = forms.FileField()
@@ -134,6 +155,48 @@ class loadTutorRoleForm(forms.Form):
             ),
             Div(
                 Submit('submit', 'Load Classes', css_class='btn btn-primary'),
+                css_class='text-center',
+            ),
+        )
+
+class loadOURSOpportunitiesForm(forms.Form):
+    file = forms.FileField()
+
+    def __init__(self, *args, **kwargs):
+        super(loadOURSOpportunitiesForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.attrs = {
+            'hx-post': reverse('load_ours_opportunities'),
+            'hx-swap': 'multi:#load-ours-opportunities-message:innerHTML,#load-ours-opportunities-logs:innerHTML',
+        }
+        self.helper.layout = Layout(
+            Fieldset(
+                '',
+                FloatingField('file'),
+            ),
+            Div(
+                Submit('submit', 'Load Opportunity', css_class='btn btn-primary'),
+                css_class='text-center',
+            ),
+        )
+
+class loadMajorsForm(forms.Form):
+    file = forms.FileField()
+
+    def __init__(self, *args, **kwargs):
+        super(loadMajorsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.attrs = {
+            'hx-post': reverse('load_majors'),
+            'hx-swap': 'multi:#load-majors-message:innerHTML,#load-majors-logs:innerHTML',
+        }
+        self.helper.layout = Layout(
+            Fieldset(
+                '',
+                FloatingField('file'),
+            ),
+            Div(
+                Submit('submit', 'Load Majors', css_class='btn btn-primary'),
                 css_class='text-center',
             ),
         )

@@ -7,67 +7,59 @@
 {% block content %}
 <h1 class="text-center">Manage Your Payroll</h1>
 <hr />
-<h3 class="text-center">Punch In/Out</h3>
-<div id="punch-in-out-main">
+<div
+  id="punch-in-out-main"
+  hx-get="{% url 'get_user_punch_in_out' %}"
+  hx-trigger="intersect once, every 600s"
+  hx-target="this"
+  hx-swap="innerHTML"
+>
+  <h3 class="text-center">Punch In/Out</h3>
   <div id="punch-in-out-message"></div>
-  {% for position in positions_punch_in_out %}
-  <div id="punch-in-out-form-{{position.id}}">
-    <div
-      hx-get="{% url 'punch_in_out_position' position.id %}"
-      hx-trigger="revealed once"
-      hx-swap="outerHTML"
-      hx-target="this"
-    ></div>
-  </div>
-  {% empty %}
   <p class="text-center">
     Looks like you don't have any position which requires punch in/out.
   </p>
-  {% endfor %}
+  <hr />
 </div>
-<hr />
-<h3 class="text-center">Shift with Punch In/Out</h3>
-<div id="shift-punch-in-out-main">
-  <div id="shift-punch-in-out-message"></div>
-  {% for shift in punch_in_out_shifts %}
-  <div id="shift-punch-in-out-form-{{shift.id}}">
-    <div
-      hx-get="{% url 'shift_punch_in_out' shift.id %}"
-      hx-trigger="revealed once"
-      hx-swap="outerHTML"
-      hx-target="this"
-    ></div>
-  </div>
-  {% empty %}
-  <p class="text-center">
-    Looks like you don't have any shift which starts within 30 minutes which
-    requires punch in/out.
-  </p>
-  {% endfor %}
-</div>
-<hr />
-<h3 class="text-center">Shifts to Sign</h3>
-<div id="sign-shift-main">
-  <div id="sign-shift-message"></div>
-  {% for shift in not_signed_shifts %}
-  <div id="sign-shift-form-{{shift.id}}">
-    <div
-      hx-get="{% url 'sign_shift' shift.id %}"
-      hx-trigger="revealed once"
-      hx-swap="outerHTML"
-      hx-target="this"
-    ></div>
-  </div>
-  {% empty %}
+<div
+  id="attendance-shift-main"
+  hx-get="{% url 'get_attendance_for_shifts' %}"
+  hx-trigger="intersect once, every 600s"
+  hx-target="this"
+  hx-swap="innerHTML"
+>
+  <h3 class="text-center">Attendance For Shifts</h3>
+  <div id="attendance-shift-message"></div>
   <p class="text-center">
     Looks like you don't have any shift which is left to aprove.
   </p>
-  {% endfor %}
+  <hr />
 </div>
-<hr />
+<div
+  id="approve-weeks-main"
+  hx-get="{% url 'get_approve_entire_weeks' %}"
+  hx-trigger="intersect once, every 600s"
+  hx-target="this"
+  hx-swap="innerHTML"
+>
+  <h3 class="text-center">Approve Entire Weeks</h3>
+  <div id="approve-weeks-message"></div>
+  <p class="text-center">
+    Looks like you don't have any weeks payroll to approve.
+  </p>
+  <hr />
+</div>
 <h3 class="text-center">Pays Till Now</h3>
 <p class="text-center">
-  <b>Please keep in mind the amount shown here are pre-tax.</b>
+  <b>
+    Please note that the amounts displayed are pre-tax and may not match your
+    final paycheck exactly.
+  </b>
+  Discrepancies can occur based on factors such as the timing of hour entries on
+  the HR website, delays due to late payroll submissions, or adjustments to
+  hours after payment. If you have any concerns about differences between your
+  paycheck and the information shown here, please contact the office staff for
+  clarification or to report the issue.
 </p>
 <div class="table-responsive">
   <table class="table table-bordered table-striped">
@@ -89,7 +81,8 @@
     <tbody
       hx-get="{% url 'get_user_payslips' %}"
       hx-target="this"
-      hx-trigger="load"
+      hx-trigger="intersect once, every 600s"
+      hx-swap="innerHTML"
     ></tbody>
   </table>
 </div>

@@ -21,7 +21,7 @@ from ..models import (
 class AssignRoleForm(forms.ModelForm):
     class Meta:
         model = SIRoleInfo
-        fields = ['position', 'assigned_class']
+        fields = ['position', 'assigned_class', 'all_sections']
         widgets = {
             'assigned_class': autocomplete.ModelSelect2(url='class-autocomplete'),
         }
@@ -30,6 +30,8 @@ class AssignRoleForm(forms.ModelForm):
         super(AssignRoleForm, self).__init__(*args, **kwargs)
         self.fields['position'].initial = SIRoleInfo.objects.get(id=role_id).position
         self.fields['position'].widget.attrs['disabled'] = 'True'
+        self.fields['assigned_class'].initial = SIRoleInfo.objects.get(id=role_id).assigned_class
+        self.fields['all_sections'].initial = SIRoleInfo.objects.get(id=role_id).all_sections
         self.helper = FormHelper(self)
         self.helper.attrs = {
             'hx-post': reverse('update_role', kwargs={'role_id': role_id}),
@@ -40,6 +42,7 @@ class AssignRoleForm(forms.ModelForm):
                 "",
                 FloatingField('position'),
                 FloatingField('assigned_class'),
+                'all_sections',
             ),
             Div(
                 Submit('submit', 'Update Role', css_class='btn btn-primary'),

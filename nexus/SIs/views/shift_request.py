@@ -42,7 +42,7 @@ def shift_requests(request):
 @restrict_to_groups("Staff Admin", "SI Supervisor")
 def add_request(request, request_state):
     requests = ChangeRequest.objects.filter(
-        Q(state = request_state) & (Q(position__position = PositionChoices.SI) | Q(position__position = PositionChoices.SI_PM)),
+        Q(state = request_state) & (Q(position__position = PositionChoices.SI) | Q(position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
     ).order_by('start')
     context = {
         'a_requests': requests,
@@ -55,7 +55,7 @@ def add_request(request, request_state):
 @restrict_to_groups("Staff Admin", "SI Supervisor")
 def change_request(request, request_state):
     requests = ChangeRequest.objects.filter(
-        Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM)),
+        Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
     ).order_by('start')
     context = {
         'c_requests': requests,
@@ -69,8 +69,7 @@ def change_request(request, request_state):
 @restrict_to_groups("Staff Admin", "SI Supervisor")
 def drop_request(request, request_state):
     requests = DropRequest.objects.filter(
-        state = request_state,
-        shift__position__position = PositionChoices.SI,
+        Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
     ).order_by('shift__start')
     context = {
         'd_requests': requests,

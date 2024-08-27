@@ -80,7 +80,7 @@ def schedule_for_all_course_for_start(request, start_date, shift_kind, remove_em
         
         Shifts = filtered_shift.filter(
             Q(position__in = si_positions) | Q(position__in = tutor_positions)
-        )
+        ).all()
 
         for shift in Shifts:
             index = (timezone.localtime(shift.start).date() - start_date).days
