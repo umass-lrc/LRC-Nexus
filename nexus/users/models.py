@@ -59,6 +59,9 @@ class NexusUser(AbstractUser):
     
     def is_ours_mentor(self):
         return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OURS_MENTOR).exists()
+    
+    def is_oa(self):
+        return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OFFICE_ASSISTANT).exists()
 
 class PositionChoices(models.IntegerChoices):
     TECH = 0, 'Tech'
