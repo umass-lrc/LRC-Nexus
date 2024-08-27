@@ -1,4 +1,9 @@
 {% if can_make_request %}
+<div class="alert alert-warning" role="alert">
+  Change/drop requests must be submitted at least 7 days prior to the desired
+  change. Any requests made after this deadline will not be accepted, except in
+  cases of emergency where you should contact your supervisor directly.
+</div>
 <div class="row">
   <button
     hx-get="{% url 'drop_shift_request' shift_id %}"

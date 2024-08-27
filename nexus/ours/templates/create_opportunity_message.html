@@ -1,0 +1,11 @@
+<div id="create-opportunity-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="create-opportunity-form">
+  <div
+    hx-get="{% url 'create_opportunity_form' %}"
+    hx-trigger="intersect once"
+    hx-target="this"
+  ></div>
+</div>
+{% endif %}

@@ -28,3 +28,6 @@ class TutorRoleInfo(models.Model):
     
     def str_assigned_courses(self):
         return f"[{', '.join([str(course) for course in self.assigned_courses.all()])}]"
+    
+    def __str__(self):
+        return f"{self.position.user.first_name} - {self.str_assigned_courses()}"
