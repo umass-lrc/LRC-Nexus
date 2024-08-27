@@ -1,0 +1,198 @@
+{% if can_make_request %}
+<div class="alert alert-warning" role="alert">
+  Change/drop requests must be submitted at least 7 days prior to the desired
+  change. Any requests made after this deadline will not be accepted, except in
+  cases of emergency where you should contact your supervisor directly.
+</div>
+<div class="row">
+  <button
+    hx-get="{% url 'drop_shift_request' shift_id %}"
+    hx-trigger="click"
+    hx-target="#shift-request"
+    class="btn btn-warning d-block mx-auto col-4"
+  >
+    Make A Drop Request
+  </button>
+  <button
+    hx-get="{% url 'change_shift_request'  shift_id %}"
+    hx-trigger="click"
+    hx-target="#shift-request"
+    class="btn btn-primary d-block mx-auto col-4"
+  >
+    Make A Change Request
+  </button>
+</div>
+{% else %}
+<div class="text-center">
+  {% if change_request %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th class="text-center" colspan="3" scope="col">Change Request</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row" class="text-center">Reason</th>
+          <td colspan="2" class="text-center">{{change_request.reason}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">State</th>
+          <td colspan="2" class="text-center">{{change_request.state}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Last Changed By</th>
+          <td colspan="2" class="text-center">
+            {{change_request.last_change_by}}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Last Changed On</th>
+          <td colspan="2" class="text-center">
+            {{change_request.last_change_on}}
+          </td>
+        </tr>
+        <tr>
+          <th class="text-center" scope="col">#</th>
+          <th class="text-center" scope="col">Old</th>
+          <th class="text-center" scope="col">New</th>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Start</th>
+          <td class="text-center">{{change_request.shift.start}}</td>
+          <td class="text-center">{{change_request.start}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Duration</th>
+          <td class="text-center">{{change_request.shift.duration}}</td>
+          <td class="text-center">{{change_request.duration}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Building</th>
+          <td class="text-center">{{change_request.shift.building}}</td>
+          <td class="text-center">{{change_request.building}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Room</th>
+          <td class="text-center">{{change_request.shift.room}}</td>
+          <td class="text-center">{{change_request.room}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Kind</th>
+          <td class="text-center">{{change_request.shift.kind}}</td>
+          <td class="text-center">{{change_request.kind}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {% elif drop_request %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th class="text-center" colspan="2" scope="col">Drop Request</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row" class="text-center">Reason</th>
+          <td class="text-center">{{drop_request.reason}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">State</th>
+          <td class="text-center">{{drop_request.state}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Last Changed By</th>
+          <td class="text-center">{{drop_request.last_change_by}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Last Changed On</th>
+          <td class="text-center">{{drop_request.last_change_on}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Start</th>
+          <td class="text-center">{{drop_request.shift.start}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Duration</th>
+          <td class="text-center">{{drop_request.shift.duration}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Building</th>
+          <td class="text-center">{{drop_request.shift.building}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Room</th>
+          <td class="text-center">{{drop_request.shift.room}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Kind</th>
+          <td class="text-center">{{drop_request.shift.kind}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {% elif add_request %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th class="text-center" colspan="2" scope="col">Add Request</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row" class="text-center">Reason</th>
+          <td class="text-center">{{add_request.reason}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">State</th>
+          <td class="text-center">{{add_request.state}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Last Changed By</th>
+          <td class="text-center">{{add_request.last_change_by}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Last Changed On</th>
+          <td class="text-center">{{add_request.last_change_on}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Position</th>
+          <td class="text-center">{{add_request.position}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Start</th>
+          <td class="text-center">{{add_request.start}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Duration</th>
+          <td class="text-center">{{add_request.duration}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Building</th>
+          <td class="text-center">{{add_request.building}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Room</th>
+          <td class="text-center">{{add_request.room}}</td>
+        </tr>
+        <tr>
+          <th scope="row" class="text-center">Kind</th>
+          <td class="text-center">{{add_request.kind}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  <p>
+    <b>
+      Looks like you already have an ongoing request for this shift. If you wish
+      to cancel the request or update something on the request, please reach out
+      to your supervisor.
+    </b>
+  </p>
+</div>
+{% endif %}

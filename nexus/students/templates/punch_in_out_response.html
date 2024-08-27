@@ -1,0 +1,10 @@
+<div id="punch-in-out-message">{% include 'alerts.html' %}</div>
+{% if success %}
+<div
+  id="punch-in-out-{{position_id}}"
+  hx-get="{% url 'individual_punch_in_out' position_id %}"
+  hx-trigger="intersect once, every 300s"
+  hx-target="this"
+  hx-swap="innerHTML"
+></div>
+{% endif %}

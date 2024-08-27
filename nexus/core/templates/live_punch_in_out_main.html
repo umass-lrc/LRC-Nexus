@@ -1,0 +1,34 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Tutors Live View</h1>
+<hr />
+<div class="table-responsive">
+  <table class="table" id="live_punch">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Name</th>
+        <th class="text-center" scope="col">Position</th>
+        <th class="text-center" scope="col">Shift Kind</th>
+        <th class="text-center" scope="col">Duration</th>
+        <th class="text-center" scope="col">Control</th>
+      </tr>
+    </thead>
+    <tbody id="live_punch_body">
+      {% for pid in punched_in %}
+      <tr 
+        id="rt-{{pid}}" 
+        style="height: 100px;" 
+        hx-get="{% url 'tutor_get_punched_in' pid %}" 
+        hx-target="this" 
+        hx-swap="outerHTML"
+        hx-trigger="intersect once"
+      >
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %} 

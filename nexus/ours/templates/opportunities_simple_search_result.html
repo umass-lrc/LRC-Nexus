@@ -1,0 +1,14 @@
+{% for opp in opportunities %}
+<tr
+  id="ot-{{opp}}"
+  hx-get="{% url 'get_opportunity_row' opp %}"
+  hx-trigger="intersect once"
+  hx-target="this"
+  hx-swap="outerHTML"
+  style="height: 100px"
+></tr>
+{% empty %}
+<tr>
+  <th scope="row" colspan="2" class="text-center">None.</th>
+</tr>
+{% endfor %}

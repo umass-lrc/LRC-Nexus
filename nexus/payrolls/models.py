@@ -41,23 +41,23 @@ class Payroll(models.Model):
         ]
     
     def save(self, *args, **kwargs):
-        print("\n\n###########WTF!!##############\n\n")
         update = self.id is not None
-        super(Payroll, self).save(*args, **kwargs)
+        payroll = super(Payroll, self).save(*args, **kwargs)
         if update:
-            return
+            return payroll
         PayrollInHR.objects.create(payroll=self)
         PayrollInHRViaLatePay.objects.create(payroll=self)
         PayrollNotInHR.objects.create(payroll=self)
         PayrollNotSigned.objects.create(payroll=self)
-        return
+        return payroll
 
 class PayrollInHR(models.Model):
     payroll = models.OneToOneField(
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="in_hr",
     )
     
     sunday_hours = models.DurationField(
@@ -121,7 +121,8 @@ class PayrollInHRViaLatePay(models.Model):
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="late_pay",
     )
     
     sunday_hours = models.DurationField(
@@ -185,7 +186,8 @@ class PayrollNotInHR(models.Model):
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="not_in_hr",
     )
     
     sunday_hours = models.DurationField(
@@ -243,13 +245,21 @@ class PayrollNotInHR(models.Model):
         default=timedelta(hours=0),
         help_text="The total number of hours worked for the week."
     )
+    
+    approved_by_user = models.BooleanField(
+        null=False,
+        blank=False,
+        default=False,
+        help_text="Whether the user has approved the hours."
+    )
 
 class PayrollNotSigned(models.Model):
     payroll = models.OneToOneField(
         to=Payroll,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="not_signed",
     )
     
     sunday_hours = models.DurationField(

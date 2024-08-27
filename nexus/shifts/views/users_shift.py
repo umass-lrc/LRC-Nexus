@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 
 from django.db.models import Q
 
@@ -77,6 +78,16 @@ def get_user_shifts(request):
     shifts = Shift.objects.filter(position__user=user, start__gte=start, start__lte=end).all()
     shifts_data = []
     for shift in shifts:
+        description = f"""
+            <b>{shift.kind}</b>
+            <hr/>
+            <b>Start:</b> {timezone.localtime(shift.start).strftime("%-I:%M %p")}<br/>
+            <b>End:</b> {timezone.localtime(shift.start + shift.duration).strftime("%-I:%M %p")}<br/>
+            <b>Location:</b> {shift.building.short_name}-{shift.room}
+            <hr/>
+            <b>Attended?</b> {shift.attendance_info.attended}<br/>
+            <b>Signed?</b> {shift.attendance_info.signed}
+        """
         shifts_data.append({
             "id": str(shift.id),
             "start": shift.start.isoformat(),
@@ -85,7 +96,8 @@ def get_user_shifts(request):
             "allDay": False,
             "color": color_coder(shift.kind),
             "extendedProps": {
-                "url": reverse("edit_shift", kwargs={"shift_id": shift.id}),
+                "url": reverse("edit_or_drop_shift", kwargs={"shift_id": shift.id}),
+                "description": description,
             }
         })
     return JsonResponse(shifts_data, safe=False)
@@ -117,6 +129,16 @@ def add_shift(request, user_id):
             "user_id": user_id,
         }
         response = render(request, "add_shift_response.html", context)
+        description = f"""
+            <b>{shift.kind}</b>
+            <hr/>
+            <b>Start:</b> {timezone.localtime(shift.start).strftime("%-I:%M %p")}<br/>
+            <b>End:</b> {timezone.localtime(shift.start + shift.duration).strftime("%-I:%M %p")}<br/>
+            <b>Location:</b> {shift.building.short_name}-{shift.room}
+            <hr/>
+            <b>Attended?</b> {shift.attendance_info.attended}<br/>
+            <b>Signed?</b> {shift.attendance_info.signed}
+        """
         response["HX-Trigger-After-Settle"] = json.dumps({
             "addEvent": json.dumps({
                 "id": str(shift.id),
@@ -126,7 +148,8 @@ def add_shift(request, user_id):
                 "allDay": False,
                 "color": color_coder(shift.kind),
                 "extendedProps": {
-                    "url": reverse("edit_shift", kwargs={"shift_id": shift.id}),
+                    "url": reverse("edit_or_drop_shift", kwargs={"shift_id": shift.id}),
+                    "description": description,
                 }
             })
         })
@@ -134,6 +157,35 @@ def add_shift(request, user_id):
     form = AddShiftForm(user_id, False)
     return render(request, "just_form.html", {'form': form})
 
+@login_required
+@restrict_to_http_methods("GET")
+@restrict_to_groups("Staff Admin", "SI Supervisor", "Tutor Supervisor", "OURS Supervisor", "Payroll Supervisor")
+def edit_or_drop_shift(request, shift_id):
+    context = {
+        "shift_id": shift_id,
+    }
+    return render(request, "edit_or_drop.html", context)
+
+@login_required
+@restrict_to_http_methods("DELETE")
+@restrict_to_groups("Staff Admin", "SI Supervisor", "Tutor Supervisor", "OURS Supervisor", "Payroll Supervisor")
+def drop_shift(request, shift_id):
+    shift = Shift.objects.get(id=shift_id)
+    if shift.attendance_info.attended:
+        messages.error(request, "Shift has already been signed. Cannot delete.")
+        context = { "success": False, "shift_id": shift_id }
+        return render(request, "delete_shift.html", context)
+    shift.delete()
+    messages.success(request, "Shift deleted successfully.")
+    context = {
+        "success": True,
+        "shift_id": shift_id,
+    }
+    response = render(request, "delete_shift.html", context)
+    response["HX-Trigger-After-Settle"] = json.dumps({
+        "dropEvent": str(shift.id),
+    })
+    return response
 
 @login_required
 @restrict_to_http_methods("GET", "POST")
@@ -163,6 +215,16 @@ def edit_shift(request, shift_id):
             "shift_id": shift.id,
         }
         response = render(request, "edit_shift_response.html", context)
+        description = f"""
+            <b>{shift.kind}</b>
+            <hr/>
+            <b>Start:</b> {timezone.localtime(shift.start).strftime("%-I:%M %p")}<br/>
+            <b>End:</b> {timezone.localtime(shift.start + shift.duration).strftime("%-I:%M %p")}<br/>
+            <b>Location:</b> {shift.building.short_name}-{shift.room}
+            <hr/>
+            <b>Attended?</b> {shift.attendance_info.attended}<br/>
+            <b>Signed?</b> {shift.attendance_info.signed}
+        """
         response["HX-Trigger-After-Settle"] = json.dumps({
             "editEvent": json.dumps({
                 "id": str(shift.id),
@@ -172,7 +234,8 @@ def edit_shift(request, shift_id):
                 "allDay": False,
                 "color": color_coder(shift.kind),
                 "extendedProps": {
-                    "url": reverse("edit_shift", kwargs={"shift_id": shift.id}),
+                    "url": reverse("edit_or_drop_shift", kwargs={"shift_id": shift.id}),
+                    "description": description,
                 }
             })
         })
@@ -180,8 +243,8 @@ def edit_shift(request, shift_id):
     form = AddShiftForm(shift.position.user.id, True, instance=shift)
     form.fields["hours"].initial = shift.duration.seconds // 3600
     form.fields["minutes"].initial = (shift.duration.seconds % 3600) // 60
-    context = { "form": form }
-    return render(request, "just_form.html", context)
+    context = { "form": form}
+    return render(request, "edit_shift_initial.html", context)
 
 @login_required
 @restrict_to_http_methods("GET")

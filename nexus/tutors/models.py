@@ -25,26 +25,9 @@ class TutorRoleInfo(models.Model):
         to=Course,
         help_text="Courses that this role is for."
     )
-
-class TutorShiftInfo(models.Model):
-    shift = models.OneToOneField(
-        to=Shift,
-        on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-        help_text="The shift that this shift info is for."
-    )
     
-    role = models.ForeignKey(
-        to=TutorRoleInfo,
-        on_delete=models.RESTRICT,
-        null=False,
-        blank=False,
-        help_text="The role that this shift info is for."
-    )
+    def str_assigned_courses(self):
+        return f"[{', '.join([str(course) for course in self.assigned_courses.all()])}]"
     
-    class Meta:
-        unique_together = [
-            "shift",
-            "role",
-        ]
+    def __str__(self):
+        return f"{self.position.user.first_name} - {self.str_assigned_courses()}"

@@ -1,0 +1,88 @@
+<!--Extends base template-->
+{% extends "base.html" %}
+<!--So forms look good-->
+{% load crispy_forms_tags %}
+
+<!--Content of the page-->
+{% block content %}
+<h1 class="text-center">Manage Tutor Roles</h1>
+<hr />
+<div class="table-responsive">
+  <table class="table" id="roles">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">Last Name</th>
+        <th class="text-center" scope="col">First Name</th>
+        <th class="text-center" scope="col">Tutor Courses</th>
+        <th class="text-center" scope="col">Edit</th>
+      </tr>
+    </thead>
+    <tbody id="roles_body">
+      {% for role in roles %}
+      <tr id="rt-{{role.id}}">
+        <td class="text-center">{{ role.position.user.last_name }}</td>
+        <td class="text-center">{{ role.position.user.first_name }}</td>
+        <td class="text-center">{{ role.str_assigned_courses }}</td>
+        <td class="text-center">
+          <a
+            href=""
+            hx-get="{% url 'tutor_update_role' role.id %}"
+            hx-trigger="click"
+            hx-target="#update-role-form"
+            ><i class="bi bi-pencil-square"></i
+          ></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %} {% block bottom %}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="flush-headingOne">
+    <button
+      class="accordion-button collapsed d-block text-center"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#flush-collapseOne"
+      aria-expanded="false"
+      aria-controls="flush-collapseOne"
+      id="flush-collapseOne-button"
+    >
+      <h3>Update Role</h3>
+    </button>
+  </h2>
+  <div
+    id="flush-collapseOne"
+    class="accordion-collapse collapse"
+    aria-labelledby="flush-headingOne"
+    data-bs-parent="#accordionFlushExample"
+  >
+    <div class="accordion-body">
+      <p class="text-center">
+        Please look up a user for whom you want to edit role.
+      </p>
+      <div id="update-role-message"></div>
+      <div id="update-role-form"></div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let last_updated_id = null;
+  document.body.addEventListener("updateClicked", function (e) {
+    if (last_updated_id) {
+      last_updated = document.getElementById(last_updated_id);
+      last_updated.classList.remove("curr-update");
+    }
+    last_updated_id = e.detail.value;
+    last_updated = document.getElementById(last_updated_id);
+    last_updated.classList.add("curr-update");
+    let accordion = document.getElementById("flush-collapseOne");
+    if (!accordion.classList.contains("show")) {
+      document.getElementById("flush-collapseOne-button").click();
+    }
+    document.getElementById("update_user_form_message").innerHTML = "";
+  });
+</script>
+{% endblock %}

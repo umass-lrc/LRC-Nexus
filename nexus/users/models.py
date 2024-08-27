@@ -56,16 +56,21 @@ class NexusUser(AbstractUser):
     
     class Meta(AbstractUser.Meta):
         ordering = ['last_name', 'first_name', 'email']
-        
+    
+    def is_ours_mentor(self):
+        return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OURS_MENTOR).exists()
+
 class PositionChoices(models.IntegerChoices):
     TECH = 0, 'Tech'
     SI = 1, 'SI'
-    Tutor = 2, 'Tutor'
+    TUTOR = 2, 'Tutor'
     SI_PM = 3, 'SI PM'
-    Tutor_PM = 4, 'Tutor PM'
+    TUTOR_PM = 4, 'Tutor PM'
     GROUP_TUTOR = 5, 'Group Tutor'
     OURS_MENTOR = 6, 'OURS Mentor'
     OFFICE_ASSISTANT = 7, 'Office Assistant'
+    OFFICE_ASSISTANT_PM = 8, 'Office Assistant PM'
+    OURS_MENTOR_PM = 9, 'OURS Mentor PM'
     
 
 class Positions(models.Model):

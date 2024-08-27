@@ -1,0 +1,14 @@
+<div id="add-shift-message">{% include 'alerts.html' %}</div>
+
+{% if success %}
+<div id="add-shift-form">
+  <div
+    hx-get="{% url 'add_shift_request' %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% elif si_lock %}
+<div id="add-shift-form">{% include 'si_directions_7_days.html' %}</div>
+{% endif%}
