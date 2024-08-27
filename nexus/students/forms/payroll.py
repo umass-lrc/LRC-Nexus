@@ -293,7 +293,7 @@ class WeekPayrollApproveForm(forms.Form):
                         css_class='table-responsive',
                     ),
                     Div(
-                        HTML("<p><b>Please refrain from approving if you find any discrepancies in the hours.</b> Instead, kindly reach out to office staff to correct your hours using the form before proceeding with approval.</p>"),
+                        HTML("<p><b>Please refrain from approving if you find any discrepancies in the hours.</b> Instead, please fill out the Payroll Correction form available at the supervisor desk in the LRC main office.</p>"),
                         css_class='text-center text-danger',
                     ),
                     Div(

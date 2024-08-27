@@ -345,7 +345,7 @@ def approve_entire_week(request, payroll_id):
         error = False
         if now.date() + timedelta(days=1) < payroll.week_end:
             error = True
-            messages.error(request, 'You can sign for the week before end of the week.')
+            messages.error(request, "You can't sign for the week before end of the week.")
         elif payroll.not_signed.total_hours > timedelta(hours=0):
             error = True
             messages.error(request, 'Records indicate you have un-signed shift. Please sign those first.')
