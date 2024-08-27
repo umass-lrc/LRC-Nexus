@@ -65,7 +65,7 @@ def get_user_punch_in_out(request):
                 (Q(position=position) & Q(require_punch_in_out=True)) & 
                 (
                     (Q(attendance_info__punch_in_time__isnull=False) & Q(attendance_info__punch_out_time__isnull=True)) | 
-                    (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=(timezone.now() + timedelta(minutes=30))) & Q(attendance_info__punch_in_time__isnull=True))
+                    (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=(timezone.now())) & Q(attendance_info__punch_in_time__isnull=True))
                 )
             ).exists()
             if not shift_with_punch_in_out_exists:
@@ -85,7 +85,7 @@ def individual_punch_in_out(request, position_id):
         (Q(position__id=position_id) & Q(require_punch_in_out=True)) & 
         (
             (Q(attendance_info__punch_in_time__isnull=False) & Q(attendance_info__punch_out_time__isnull=True)) | 
-            (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=(timezone.now() + timedelta(minutes=30))) & Q(attendance_info__punch_in_time__isnull=True))
+            (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=timezone.now()) & Q(attendance_info__punch_in_time__isnull=True))
         )
     ).values_list('id', flat=True)
     
