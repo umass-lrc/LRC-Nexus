@@ -245,6 +245,13 @@ class PayrollNotInHR(models.Model):
         default=timedelta(hours=0),
         help_text="The total number of hours worked for the week."
     )
+    
+    approved_by_user = models.BooleanField(
+        null=False,
+        blank=False,
+        default=False,
+        help_text="Whether the user has approved the hours."
+    )
 
 class PayrollNotSigned(models.Model):
     payroll = models.OneToOneField(

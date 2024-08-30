@@ -1,0 +1,71 @@
+<div>
+  <div class="d-flex flex-row justify-content-between align-items-center">
+    <h2>Featured Opportunities</h2>
+    <div>
+      <button
+        class="btn"
+        onclick="horizontalScroll('featured-opportunities', true)"
+      >
+        &larr;
+      </button>
+      <button
+        class="btn"
+        onclick="horizontalScroll('featured-opportunities', false)"
+      >
+        &rarr;
+      </button>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div
+    id="featured-opportunities"
+    class="row flex-row flex-nowrap"
+    style="
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    "
+  >
+    <div class="col-sm-6"></div>
+    {% for opp_id in featured_opp %}
+    <div
+      class="col-11 col-md-8 mb-3 d-flex align-items-stretch"
+      hx-get="https://lrcstaff.umass.edu{% url 'api_opportunity_card' opp_id %}"
+      hx-trigger="intersect once"
+      hx-swap="innerHTML"
+      style="scroll-snap-align: center"
+    >
+      <div class="card w-100">
+        <div class="card-body">
+          <h5 class="card-title">Loading</h5>
+          <p class="card-text">
+            Please wait while we load the opportunity details.
+          </p>
+          <button class="btn" style="background-color: #730f1e; color: white">
+            Learn More
+          </button>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div
+      class="col-sm-10 col-md-8 mb-3 d-flex align-items-stretch"
+      style="scroll-snap-align: center"
+    >
+      <div class="card w-100">
+        <div class="card-body">
+          <h5 class="card-title">No Featured Opportunities</h5>
+          <p class="card-text">
+            Looks like there is no featured opportunities at the movement. OURS
+            team is working hard to bring you the best opportunities. Please
+            check back later.
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <div class="col-sm-6"></div>
+  </div>
+</div>

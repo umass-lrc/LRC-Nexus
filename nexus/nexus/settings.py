@@ -27,9 +27,9 @@ SECRET_KEY = os.environ.get("NEXUS_SECRET_KEY", "django-insecure-881r(ved7o)qr@@
 
 ALLOWED_HOSTS = os.environ.get("NEXUS_ALLOWED_HOSTS", ".localhost,127.0.0.1,[::1]").split(",")
 
-CSRF_TRUSTED_ORIGINS = ["http://3.137.183.137:80"]
+CSRF_TRUSTED_ORIGINS = ["http://3.137.183.137:80", "https://www.umass.edu"]
 
-CORS_ORIGIN_WHITELIST = ["http://3.137.183.137:80"]
+CORS_ORIGIN_WHITELIST = ["http://3.137.183.137:80", "https://www.umass.edu"]
 
 CORS_ALLOWED_ORIGINS = ["https://www.umass.edu"]
 
@@ -55,6 +55,9 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "corsheaders",
     "explorer",
+    "tinymce",
+    "django_elasticsearch_dsl",
+    "hijack",
     # Local apps
     "core",
     "users",
@@ -65,6 +68,8 @@ INSTALLED_APPS = [
     "tutors",
     "students",
     "htmx_apis",
+    "ours",
+    "oa",
 ]
 
 MIDDLEWARE = [
@@ -78,6 +83,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Local middleware
+    "hijack.middleware.HijackUserMiddleware",
 ]
 
 ROOT_URLCONF = "nexus.urls"
@@ -95,6 +101,8 @@ TEMPLATES = [
             BASE_DIR.joinpath("payrolls", "templates"),
             BASE_DIR.joinpath("tutors", "templates"),
             BASE_DIR.joinpath("htmx_apis", "templates"),
+            BASE_DIR.joinpath("ours", "templates"),
+            BASE_DIR.joinpath("oa", "templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -197,4 +205,16 @@ MESSAGE_TAGS = {
     messages.SUCCESS: "success",
     messages.WARNING: "warning",
     messages.ERROR: "danger",
+}
+
+TINYMCE_JS_URL = "tinymce/tinymce.min.js"
+TINYMCE_JS_ROOT = "tinymce/"
+TINYMCE_SPELLCHECKER = False
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'https://localhost:9200', 
+        'http_auth': ('django', os.environ.get("ES_DJANGO_PASS", "ES4LRC!!")),
+        'ssl_assert_fingerprint': os.environ.get("ES_SSL", '91d3dcd44b40de733de0e099f71a0b5a74af7a0c4697cbdc5646bc01974f12c8'),
+    }
 }

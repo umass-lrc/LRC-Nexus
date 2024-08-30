@@ -71,8 +71,8 @@ def update_user(request, user_id):
             messages.error(request, f'Form Errors: {form.errors}')
             return render(request, 'alerts.html')
         data = form.cleaned_data
-        user.first_name = data['first_name'].title()
-        user.last_name = data['last_name'].title()
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
         user.save()
         messages.success(request, 'User updated successfully.')
         context = {'success': True, 'curr_user': user}

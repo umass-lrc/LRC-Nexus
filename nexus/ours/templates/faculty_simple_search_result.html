@@ -1,0 +1,10 @@
+{% for faculty_id in faculties %}
+<tr
+  id="ft-{{faculty_id}}"
+  hx-get="{% url 'get_faculty_row' faculty_id %}"
+  hx-trigger="intersect once"
+  hx-target="this"
+  hx-swap="outerHTML"
+  style="height: 100px"
+></tr>
+{% endfor %}

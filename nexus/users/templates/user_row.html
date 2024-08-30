@@ -17,6 +17,14 @@
     {% endif %}
   </td>
   <td class="text-center">
+    <form action="{% url 'hijack:acquire' %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="user_pk" value="{{ curr_user.id }}" />
+      <button type="submit"><i class="fa-solid fa-user-secret"></i></button>
+      <input type="hidden" name="next" value="/" />
+    </form>
+  </td>
+  <td class="text-center">
     <a
       href=""
       hx-get="{% url 'update_user' curr_user.id %}"

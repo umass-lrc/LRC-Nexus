@@ -63,6 +63,7 @@ class AddShiftRequestForm(forms.ModelForm):
                 FloatingField('building'),
                 FloatingField('room'),
                 FloatingField('kind'),
+                HTML("""<p><b>Important Info for SI Leader:</b> If you are requesting an exam review, make sure to include the exam date in your request.</p>"""),
                 FloatingField('reason'),
                 Div(
                     Submit('submit', 'Make Add Request', css_class='btn btn-primary'),
@@ -113,6 +114,7 @@ class ChangeShiftRequestForm(forms.ModelForm):
                 FloatingField('building'),
                 FloatingField('room'),
                 FloatingField('kind'),
+                HTML("""<p><b>Important Info for SI Leader:</b> If you are requesting an exam review, make sure to include the exam date in your request.</p>"""),
                 FloatingField('reason'),
                 Div(
                     Submit('submit', 'Make Change Request', css_class='btn btn-primary'),

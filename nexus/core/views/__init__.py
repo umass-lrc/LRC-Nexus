@@ -15,7 +15,14 @@ def restrict_to_groups(*groups):
         def inner(request, *args, **kwargs):
             if not request.user.is_authenticated:
                 return redirect('login')
-            if not request.user.groups.filter(name__in=groups).exists() and not request.user.is_superuser:
+            not_in_group = not request.user.groups.filter(name__in=groups).exists()
+            staff_group = [group for group in groups if group.startswith('Staff')]
+            not_in_staff_group = True
+            if "Staff-OURS-Mentor" in staff_group:
+                not_in_staff_group = not_in_staff_group and not request.user.is_ours_mentor()
+            elif "Staff-OA" in staff_group:
+                not_in_staff_group = not_in_staff_group and not request.user.is_oa()
+            if not_in_group and not_in_staff_group and not request.user.is_superuser:
                 response = render(request, '403.html')
                 response.status_code = 403
                 return response

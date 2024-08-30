@@ -20,6 +20,11 @@ from .views.shift_request import (
     drop_request_form,
 )
 
+from .views.live import (
+    live_punch_in_out,
+    get_punched_in,
+)
+
 ROLE_URLS = [
     path('assign-role/', assign_role, name='tutor_assign_role'),
     path('update-role/<int:role_id>/', update_role, name='tutor_update_role'),
@@ -40,8 +45,14 @@ SHIFT_REQUEST = [
     path('drop-request-form/<int:req_id>/', drop_request_form, name='tutor_drop_request_form'),
 ]
 
+LIVE_PUNCH_IN_OUT = [
+    path('live_punch_in_out', live_punch_in_out, name="tutor_live_punch_in_out"),
+    path('punched_in/<int:id>', get_punched_in, name="tutor_get_punched_in"),
+]
+
 urlpatterns = (
     ROLE_URLS +
     SCHEDULE_URLS +
-    SHIFT_REQUEST
+    SHIFT_REQUEST +
+    LIVE_PUNCH_IN_OUT
 )
