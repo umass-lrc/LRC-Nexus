@@ -52,8 +52,8 @@ class SIRoleInfo(models.Model):
             raise ValueError("This role is not for an SI position.")
         if self.id is not None:
             old_role = SIRoleInfo.objects.get(id=self.id)
-            if old_role.assigned_class == self.assigned_class:
-                return super(SIRoleInfo, self).save(*args, **kwargs)
+            # if old_role.assigned_class == self.assigned_class:
+            #     return super(SIRoleInfo, self).save(*args, **kwargs)
             SIReccuringShiftInfo.objects.filter(role=old_role).delete()
         ret = super(SIRoleInfo, self).save(*args, **kwargs)
         if self.assigned_class is None:
