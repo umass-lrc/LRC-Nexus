@@ -197,7 +197,7 @@ class RecurringShift(models.Model):
         return recurring_shift
     
     def delete(self):
-        todays_date = timezone.localdate(datetime.now()).date()
+        todays_date = timezone.localdate(timezone.now())
         for shift in Shift.objects.filter(recurring_shift=self, start__date__gte=todays_date).all():
             shift.delete()
         super(RecurringShift, self).delete()

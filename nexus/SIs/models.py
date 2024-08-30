@@ -52,9 +52,10 @@ class SIRoleInfo(models.Model):
             raise ValueError("This role is not for an SI position.")
         if self.id is not None:
             old_role = SIRoleInfo.objects.get(id=self.id)
-            # if old_role.assigned_class == self.assigned_class:
-            #     return super(SIRoleInfo, self).save(*args, **kwargs)
-            SIReccuringShiftInfo.objects.filter(role=old_role).delete()
+            if old_role.assigned_class == self.assigned_class:
+                return super(SIRoleInfo, self).save(*args, **kwargs)
+            for si_rec in SIReccuringShiftInfo.objects.filter(role__id=old_role.id).all():
+                si_rec.delete()
         ret = super(SIRoleInfo, self).save(*args, **kwargs)
         if self.assigned_class is None:
             return ret
@@ -82,7 +83,7 @@ class SIRoleInfo(models.Model):
 class SIReccuringShiftInfo(models.Model):
     role = models.ForeignKey(
         to=SIRoleInfo,
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
         null=False,
         blank=False
     )
@@ -96,7 +97,7 @@ class SIReccuringShiftInfo(models.Model):
     
     recuring_shift = models.ForeignKey(
         to=RecurringShift,
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
         null=False,
         blank=False
     )
