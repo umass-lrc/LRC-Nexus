@@ -1,0 +1,20 @@
+{% load crispy_forms_tags %} {% if success %}
+<!---->
+{% include 'opportunity_row.html'%}
+
+<div id="update-opportunity-message">{% include 'alerts.html' %}</div>
+{% elif opportunity is None %}
+<tr id="ot-{{opportunity.id}}"></tr>
+<div id="update-opportunity-form"></div>
+<div id="update-opportunity-message">{% include 'alerts.html' %}</div>
+{% else %} {% include 'opportunity_row.html' %}
+
+<div id="update-opportunity-form">
+  <div
+    hx-get="{% url 'update_opportunity_form' opportunity.id %}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+</div>
+{% endif %}

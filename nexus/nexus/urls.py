@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from django.contrib.auth.decorators import login_required
 
@@ -28,13 +28,24 @@ def index(request):
 def work_in_progress(request):
     return render(request, "work_in_progress_full_page.html")
 
-# handler404 = 'core.views.handler404'
+handler404 = 'core.views.handler404'
 
 urlpatterns = [
-    path("", index, name="index"),
+    path('', index, name='index'),
+    path('work_in_progress/', work_in_progress, name='work_in_progress'),
     path('admin/', admin.site.urls),
     path('explorer/', include('explorer.urls')),
+    path('tinymce/', include('tinymce.urls')),
     path('core/', include('core.urls')),
     path('users/', include('users.urls')),
-    path('work_in_progress/', work_in_progress, name='work_in_progress'),
+    path('patches/', include('patches.urls')),
+    path('shifts/', include('shifts.urls')),
+    path('SIs/', include('SIs.urls')),
+    path('students/', include('students.urls')),
+    path('payrolls/', include('payrolls.urls')),
+    path('tutors/', include('tutors.urls')),
+    path('htmx_apis/', include('htmx_apis.urls')),
+    path('ours/', include('ours.urls')),
+    path('oa/', include('oa.urls')),
+    path('hijack/', include('hijack.urls')),
 ]

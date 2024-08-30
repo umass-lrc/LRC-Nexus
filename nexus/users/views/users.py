@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from core.views import restrict_to_http_methods
+from core.views import restrict_to_http_methods, restrict_to_groups
 
 import json
 
@@ -17,6 +17,7 @@ from ..forms.users import (
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def users(request):
     users = NexusUser.objects.all()
     context = {'users': users}
@@ -24,6 +25,7 @@ def users(request):
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def create_user(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
@@ -49,6 +51,7 @@ def create_user(request):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def user_created(request, user_id):
     form = CreateUserForm()
     user = NexusUser.objects.get(id=user_id)
@@ -59,6 +62,7 @@ def user_created(request, user_id):
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def update_user(request, user_id):
     user = NexusUser.objects.get(id=user_id)
     if request.method == 'POST':
@@ -67,8 +71,8 @@ def update_user(request, user_id):
             messages.error(request, f'Form Errors: {form.errors}')
             return render(request, 'alerts.html')
         data = form.cleaned_data
-        user.first_name = data['first_name'].title()
-        user.last_name = data['last_name'].title()
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
         user.save()
         messages.success(request, 'User updated successfully.')
         context = {'success': True, 'curr_user': user}
@@ -80,6 +84,7 @@ def update_user(request, user_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def update_user_form(request, user_id):
     user = NexusUser.objects.get(id=user_id)
     form = UpdateUserForm(instance=user)
@@ -88,6 +93,7 @@ def update_user_form(request, user_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def get_user_row(request, user_id):
     user = NexusUser.objects.get(id=user_id)
     context = {'curr_user': user}
@@ -95,6 +101,7 @@ def get_user_row(request, user_id):
 
 @login_required
 @restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def reset_password(request, user_id):
     loged_in_user = request.user
     user = NexusUser.objects.get(id=user_id)

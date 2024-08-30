@@ -1,0 +1,232 @@
+<!--So forms look good-->
+{% comment %} {% load crispy_forms_tags %} {% load static %} {% block extra_head
+%}
+<link rel="stylesheet" href="{% static 'css/search.css' %}" />
+{% endblock %} {% endcomment %}
+
+<style>
+  .search {
+    padding: 0px;
+    position: relative;
+    box-shadow: 0 0 40px rgba(45, 6, 12, 0.1);
+  }
+
+  .search input {
+    padding: 6px 12px !important;
+    height: 60px !important;
+    text-indent: 25px !important;
+    border: 2px solid #d6d4d4 !important;
+    width: 100% !important;
+  }
+
+  .search input:focus {
+    box-shadow: none !important;
+    border: 2px solid #730f1e !important;
+  }
+
+  .search .fa-search {
+    position: absolute;
+    top: 20px;
+    left: 16px;
+  }
+
+  .search .btn {
+    margin: 0px !important;
+    padding: 6px 12px !important;
+    position: absolute !important;
+    top: 5px !important;
+    right: 5px !important;
+    height: 50px !important;
+    width: 110px !important;
+    background: #730f1e !important;
+    text-indent: 0% !important;
+    line-height: var(--bs-btn-line-height) !important;
+  }
+
+  .eyes {
+    aspect-ratio: 5 / 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    column-gap: 15%;
+    border-color: #730f1e;
+  }
+
+  .eye {
+    width: 20%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    border: thick solid #730f1e;
+  }
+
+  .pupil {
+    width: 50%;
+    height: 50%;
+    border-radius: 100%;
+    background-color: #730f1e;
+  }
+
+  .card-title {
+    font-size: 1.25rem !important;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .badge-red {
+    color: #fff !important;
+    background-color: var(--red) !important;
+  }
+
+  .badge-green {
+    color: #fff !important;
+    background-color: var(--green) !important;
+  }
+
+  .badge-blue {
+    color: #fff !important;
+    background-color: var(--blue) !important;
+  }
+
+  .badge-gray {
+    color: #fff !important;
+    background-color: var(--gray) !important;
+  }
+
+  .badge-warning {
+    color: #212529 !important;
+    background-color: var(--warning) !important;
+  }
+
+  .badge-info {
+    color: #212529 !important;
+    background-color: var(--info) !important;
+  }
+
+  .background-grey {
+    background-color: #f7f8f8 !important;
+  }
+</style>
+
+<!--Content of the page-->
+<div class="container">
+  <div
+    class="row height d-flex justify-content-center align-items-center"
+    style="z-index: 10000"
+  >
+    <div class="col-md-10">
+      <form
+        class="search"
+        hx-post="https://lrcstaff.umass.edu{% url 'api_opportunity_search' %}"
+        hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+        hx-trigger="click"
+        placeholder="Searching..."
+      >
+        <i class="fa fa-search"></i>
+        <input
+          type="text"
+          name="search_query"
+          class="form-control"
+          placeholder="Want to find some job/research opportunities? Search here!"
+        />
+        <input
+          type="submit"
+          name="submit"
+          value="Search"
+          class="btn btn-primary btn btn-primary text-center"
+          id="submit-id-submit"
+        />
+      </form>
+    </div>
+  </div>
+  <br />
+  <div id="below-search">
+    <div class="background-grey py-3">
+      <div class="container">
+        <div
+          hx-get="https://lrcstaff.umass.edu{% url 'api_opportunity_featured'%}"
+          hx-trigger="load"
+          hx-target="this"
+          hx-swap="outerHTML"
+        >
+          <h2>Featured Opportunities</h2>
+          <p>Loading...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div id="results-div">
+    <p id="result_stats">
+      Showing results for: "<b></b>", Found <b>0</b> opportunities.
+    </p>
+    <div id="results">
+      <div
+        hx-get="https://lrcstaff.umass.edu{% url 'api_search_no_result'%}"
+        hx-trigger="load"
+        hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+      ></div>
+    </div>
+  </div>
+  <div id="opportunity-div" class="d-none"></div>
+</div>
+<br />
+
+<script>
+  // get both pupils
+  let pupils = [];
+
+  document.body.addEventListener("htmx:afterSettle", function (e) {
+    let path = e.detail.requestConfig.path.split("/");
+    path.pop();
+    if (path.pop() == "search") {
+      pupils = document.querySelectorAll(".eye .pupil");
+      document.getElementById("results-div").classList.remove("d-none");
+      document.getElementById("below-search").classList.remove("d-none");
+      document.getElementById("opportunity-div").classList.add("d-none");
+    } else if (path.pop() == "opportunity_details") {
+      document.getElementById("results-div").classList.add("d-none");
+      document.getElementById("below-search").classList.add("d-none");
+      document.getElementById("opportunity-div").classList.remove("d-none");
+    }
+  });
+
+  function makeSearchVisible() {
+    pupils = document.querySelectorAll(".eye .pupil");
+    document.getElementById("results-div").classList.remove("d-none");
+    document.getElementById("below-search").classList.remove("d-none");
+    document.getElementById("opportunity-div").classList.add("d-none");
+  }
+
+  window.addEventListener("mousemove", (e) => {
+    if (pupils.length == 0) {
+      pupils = document.querySelectorAll(".eye .pupil");
+    }
+    pupils.forEach((pupil) => {
+      // get x and y postion of cursor
+      var rect = pupil.getBoundingClientRect();
+      var x = (e.pageX - rect.left) / 30 + "px";
+      var y = (e.pageY - rect.top) / 30 + "px";
+      pupil.style.transform = "translate3d(" + x + "," + y + ", 0px)";
+    });
+  });
+
+  function search_keyword(keyword) {
+    document.querySelector("input[name='search_query']").value = keyword;
+    document.querySelector("input[name='submit']").click();
+  }
+
+  function horizontalScroll(id, left_scroll) {
+    let value = document.querySelector(
+      "#featured-opportunities > div:nth-child(2)"
+    ).offsetWidth;
+    if (left_scroll) {
+      value = -value;
+    }
+    document.getElementById(id).scrollLeft += value;
+  }
+</script>

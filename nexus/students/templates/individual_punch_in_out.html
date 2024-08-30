@@ -1,0 +1,50 @@
+<div id="punch-in-out-{{position_id}}">
+  <div class="accordion" id="accordionForP{{position_id}}">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingP{{position_id}}">
+        <button
+          class="accordion-button"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapseP{{position_id}}"
+          aria-expanded="false"
+          aria-controls="collapseP{{position_id}}"
+        >
+          {{str_position}}
+        </button>
+      </h2>
+      <div
+        id="collapseP{{position_id}}"
+        class="accordion-collapse collapse show"
+        aria-labelledby="headingP{{position_id}}"
+        data-bs-parent="#accordionForP{{position_id}}"
+      >
+        <div class="accordion-body">
+          {% if not only_shifts %}
+          <div
+            id="pio-pos-{{position_id}}"
+            hx-get="{% url 'punch_in_out_position' position_id %}"
+            hx-trigger="intersect once"
+            hx-target="this"
+            hx-swap="innerHTML"
+          ></div>
+          {% endif %} {% for shift_id in shift_punch_in_out%}
+          <!---->
+          {% if forloop.first and not only_shifts %}
+          <br />
+          <div class="separator">Or Punch In/Out For Shift</div>
+          <br />
+          {% endif %}
+          <div
+            id="pio-shift-{{shift_id}}"
+            hx-get="{% url 'shift_punch_in_out' shift_id %}"
+            hx-trigger="intersect once"
+            hx-target="this"
+            hx-swap="innerHTML"
+          ></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

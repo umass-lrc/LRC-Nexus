@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from django.http import HttpResponse
 from django.shortcuts import render
-from . import restrict_to_http_methods
+from . import restrict_to_http_methods, restrict_to_groups
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
@@ -19,8 +19,14 @@ from ..models import (
     ClassTimes,
 )
 
+from SIs.models import (
+    SIReccuringShiftInfo,
+    SIRoleInfo,
+)
+
 @login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor')
 def all_classes(request):
     if request.method == 'POST':
         form = semesterSelector(request.POST)
@@ -36,7 +42,9 @@ def all_classes(request):
     context = {'form': form}
     return render(request, 'classes.html', context)
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor')
 def create_class(request, semester_id):
     if request.method == 'POST':
         sem = Semester.objects.get(id=semester_id)
@@ -57,7 +65,9 @@ def create_class(request, semester_id):
     context = {'form': form}
     return render(request, 'just_form.html', context)
 
+@login_required
 @restrict_to_http_methods('GET', 'POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor')
 def edit_class(request, class_id):
     _class = Classes.objects.get(id=class_id)
     if request.method == "POST":
@@ -78,7 +88,9 @@ def edit_class(request, class_id):
     response["HX-Trigger-After-Settle"] = json.dumps({"classUpdateClicked": f"ct-{class_id}"})
     return response
 
+@login_required
 @restrict_to_http_methods('GET','POST')
+@restrict_to_groups('Staff Admin', 'SI Supervisor')
 def add_class_time(request, class_id):
     if request.method == "POST":
         form = addClassTimeForm(class_id, request.POST)
@@ -94,6 +106,23 @@ def add_class_time(request, class_id):
             building=data['building'],
             room=data['room'],
         )
+        for role in SIRollInfo.objects.filter(assigned_class=class_time.orignal_class).all():
+            rs = RecurringShift.objects.create(
+                position=role.position,
+                day=class_time.class_day,
+                start_time=class_time.start_time,
+                duration=class_time.duration,
+                building=class_time.building,
+                room=class_time.room,
+                kind=ShiftKind.CLASS,
+                start_date=class_time.orignal_class.semester.classes_start,
+                end_date=class_time.orignal_class.semester.classes_end,
+            )
+            SIReccuringShiftInfo.objects.create(
+                role=role,
+                class_time=class_time,
+                recuring_shift=rs,
+            )
         _class = Classes.objects.get(id=class_id)
         messages.success(request, 'Class time added successfully.')
         context = {'success': True, 'class_time': class_time, 'class': _class}
@@ -102,9 +131,13 @@ def add_class_time(request, class_id):
     context = {'form': form}
     return render(request, 'just_form.html', context)
 
+@login_required
 @restrict_to_http_methods('DELETE')
+@restrict_to_groups('Staff Admin', 'SI Supervisor')
 def delete_class_time(request, class_time_id):
     class_time = ClassTimes.objects.get(id=class_time_id)
+    for rs in SIReccuringShiftInfo.objects.filter(class_time=self).all():
+        rs.recuring_shift.delete()
     _class = class_time.orignal_class 
     class_time.delete()
     context = {'class': _class}

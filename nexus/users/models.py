@@ -17,8 +17,8 @@ class NexusUserManager(BaseUserManager):
         
         user = self.model(
             email = self.normalize_email(email),
-            first_name = first_name.title(),
-            last_name = last_name.title(),
+            first_name = first_name,
+            last_name = last_name,
             **extra_fields
         )
         
@@ -29,8 +29,8 @@ class NexusUserManager(BaseUserManager):
     def create_superuser(self, email, first_name, last_name, password=None):
         user = self.create_user(
             email = self.normalize_email(email),
-            first_name=first_name.title(),
-            last_name=last_name.title(),
+            first_name=first_name,
+            last_name=last_name,
         )
         
         user.set_password(password)
@@ -56,16 +56,24 @@ class NexusUser(AbstractUser):
     
     class Meta(AbstractUser.Meta):
         ordering = ['last_name', 'first_name', 'email']
-        
+    
+    def is_ours_mentor(self):
+        return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OURS_MENTOR).exists()
+    
+    def is_oa(self):
+        return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OFFICE_ASSISTANT).exists()
+
 class PositionChoices(models.IntegerChoices):
     TECH = 0, 'Tech'
     SI = 1, 'SI'
-    Tutor = 2, 'Tutor'
+    TUTOR = 2, 'Tutor'
     SI_PM = 3, 'SI PM'
-    Tutor_PM = 4, 'Tutor PM'
+    TUTOR_PM = 4, 'Tutor PM'
     GROUP_TUTOR = 5, 'Group Tutor'
     OURS_MENTOR = 6, 'OURS Mentor'
     OFFICE_ASSISTANT = 7, 'Office Assistant'
+    OFFICE_ASSISTANT_PM = 8, 'Office Assistant PM'
+    OURS_MENTOR_PM = 9, 'OURS Mentor PM'
     
 
 class Positions(models.Model):
