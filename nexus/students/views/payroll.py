@@ -85,7 +85,7 @@ def individual_punch_in_out(request, position_id):
         (Q(position__id=position_id) & Q(require_punch_in_out=True)) & 
         (
             (Q(attendance_info__punch_in_time__isnull=False) & Q(attendance_info__punch_out_time__isnull=True)) | 
-            (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=timezone.now()) & Q(attendance_info__punch_in_time__isnull=True))
+            (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=timezone.now() + timedelta(minutes=5)) & Q(attendance_info__punch_in_time__isnull=True))
         )
     ).values_list('id', flat=True)
     
@@ -173,10 +173,11 @@ def shift_punch_in_out(request, shift_id):
     position = shift.position
     is_punched_in = AttendanceInfo.objects.filter(shift__position=position, punch_in_time__isnull=False, punch_out_time__isnull=True).exists()
     is_punched_in_this_shift = shift.attendance_info.punch_in_time is not None and shift.attendance_info.punch_out_time is None
+    is_punched_out_this_shift = shift.attendance_info.punch_in_time is not None and shift.attendance_info.punch_out_time is not None
     
     if request.method == 'POST':
         form = None
-        if not is_punched_in_this_shift and not is_punched_in:
+        if is_punched_out_this_shift:
             messages.error(request, 'You are already punched out for this shift.')
             return render(request, 'punch_in_out_response.html', context={'success': False})
         if not is_punched_in_this_shift:
@@ -226,7 +227,7 @@ def shift_punch_in_out(request, shift_id):
             'success': True,
         }
         return render(request, 'punch_in_out_response.html', context)
-    form = ShiftPunchInForm(shift, position, is_punched_in) if not is_punched_in_this_shift else ShiftPunchOutForm(shift, position)
+    form = ShiftPunchInForm(shift, position, is_punched_in) if not is_punched_in_this_shift and not is_punched_out_this_shift else ShiftPunchOutForm(shift, position)
     context = {
         'form': form,
     }
