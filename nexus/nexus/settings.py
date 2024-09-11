@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "explorer",
     "tinymce",
     "django_elasticsearch_dsl",
+    "hijack",
     # Local apps
     "core",
     "users",
@@ -82,6 +83,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Local middleware
+    "hijack.middleware.HijackUserMiddleware",
 ]
 
 ROOT_URLCONF = "nexus.urls"

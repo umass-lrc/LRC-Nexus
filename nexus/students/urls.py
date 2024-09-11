@@ -13,6 +13,7 @@ from .views.payroll import (
     approve_entire_week,
     get_user_payslips,
     get_payslip_for,
+    force_punch_out,
 )
 
 from .views.calendar import (
@@ -62,6 +63,7 @@ PAYROLL_URLS = [
     path('payroll/approve-entire-week/<int:payroll_id>/', approve_entire_week, name='approve_entire_week'),
     path('payroll/get-user-payslips/', get_user_payslips, name='get_user_payslips'),
     path('payroll/get-payslip-for/<date:week_end>/', get_payslip_for, name='get_payslip_for'),
+    path('force_punch_out/<int:id>/', force_punch_out, name='force_punch_out'),
 ]
 
 SCHEDULE_URLS = [

@@ -17,8 +17,8 @@ class NexusUserManager(BaseUserManager):
         
         user = self.model(
             email = self.normalize_email(email),
-            first_name = first_name.title(),
-            last_name = last_name.title(),
+            first_name = first_name,
+            last_name = last_name,
             **extra_fields
         )
         
@@ -29,8 +29,8 @@ class NexusUserManager(BaseUserManager):
     def create_superuser(self, email, first_name, last_name, password=None):
         user = self.create_user(
             email = self.normalize_email(email),
-            first_name=first_name.title(),
-            last_name=last_name.title(),
+            first_name=first_name,
+            last_name=last_name,
         )
         
         user.set_password(password)
@@ -59,6 +59,9 @@ class NexusUser(AbstractUser):
     
     def is_ours_mentor(self):
         return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OURS_MENTOR).exists()
+    
+    def is_oa(self):
+        return Positions.objects.filter(user=self, semester=Semester.objects.get_active_semester(), position=PositionChoices.OFFICE_ASSISTANT).exists()
 
 class PositionChoices(models.IntegerChoices):
     TECH = 0, 'Tech'

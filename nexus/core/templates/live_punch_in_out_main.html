@@ -13,22 +13,21 @@
         <th class="text-center" scope="col">Position</th>
         <th class="text-center" scope="col">Shift Kind</th>
         <th class="text-center" scope="col">Duration</th>
-        <th class="text-center" scope="col">Control</th>
+        <th class="text-center" scope="col">Punch Out</th>
       </tr>
     </thead>
     <tbody id="live_punch_body">
       {% for pid in punched_in %}
-      <tr 
-        id="rt-{{pid}}" 
-        style="height: 100px;" 
-        hx-get="{% url 'tutor_get_punched_in' pid %}" 
-        hx-target="this" 
+      <tr
+        id="rt-{{pid}}"
+        style="height: 100px"
+        hx-get="{% url 'tutor_get_punched_in' pid %}"
+        hx-target="this"
         hx-swap="outerHTML"
         hx-trigger="intersect once"
-      >
-      </tr>
+      ></tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
-{% endblock %} 
+{% endblock %}

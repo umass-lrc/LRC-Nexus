@@ -31,7 +31,6 @@ from .views.groups import (
     PositionAutocomplete,
 )
 
-
 AUTH_URLS = [
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
@@ -72,5 +71,5 @@ urlpatterns = (
     AUTH_URLS +
     USER_URLS +
     POSITION_URLS +
-    GROUP_URLS
+    GROUP_URLS 
 )
