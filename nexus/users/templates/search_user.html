@@ -1,0 +1,13 @@
+<form method="get">
+    {{ form | crispy }}
+</form>
+
+{% if users %}
+    <ul>
+        {% for user in users %}
+            <li>{{ user.first_name }} {{ user.last_name }} - {{ user.email }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No results found.</p>
+{% endif %}

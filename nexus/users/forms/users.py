@@ -1,14 +1,9 @@
 from django import forms
 from django.urls import reverse
-
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
-
 from crispy_bootstrap5.bootstrap5 import FloatingField
-
-from ..models import (
-    NexusUser,
-)
+from ..models import NexusUser
 
 class CreateUserForm(forms.ModelForm):
     class Meta:
@@ -62,3 +57,24 @@ class UpdateUserForm(forms.ModelForm):
                 css_class='text-center',
             ),
         )
+
+class SearchUserForm(forms.Form):
+    query = forms.CharField(
+        label="Search ",
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Enter search term...'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(SearchUserForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'GET'
+        self.helper.layout = Layout(
+            FloatingField('query'),
+            Div(
+                Submit('search', 'Search', css_class='btn btn-primary'),
+                css_class='text-center',
+            ),
+        )
+        

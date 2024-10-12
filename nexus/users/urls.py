@@ -5,6 +5,7 @@ from .views.login import (
     logout,
 )
 from .views.users import (
+    search_user,
     users,
     create_user,
     update_user,
@@ -73,3 +74,9 @@ urlpatterns = (
     POSITION_URLS +
     GROUP_URLS 
 )
+
+from users.forms.users import SearchUserForm
+
+urlpatterns = [
+    path('search/', search_user, name='search_user'),
+]
