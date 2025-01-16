@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import SearchUserForm
-from ..models import NexusUser
+from django.db.models import Q
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -21,9 +20,19 @@ from ..forms.users import (
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def users(request):
-    users = NexusUser.objects.all()
+    return render(request, 'users.html')
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
+def search(request):
+    search = request.GET.get('q')
+    if search:
+        users = NexusUser.objects.filter(Q(first_name__icontains=search)|Q(last_name__icontains=search)|Q(email__icontains=search))
+    else:
+        users = NexusUser.objects.all()
     context = {'users': users}
-    return render(request, 'users.html', context)
+    return render(request, 'users_search.html', context)
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
@@ -111,70 +120,3 @@ def reset_password(request, user_id):
         user.set_unusable_password()
         user.save()
     return redirect('get_user_row', user_id=user_id)
-
-def basic_search(self, search_query):
-        search_query = search_query.strip()
-        search_query_list = []
-        i = 0
-        # Parse the search query to handle quotes and spaces
-        while i < len(search_query):
-            if search_query[i] == '"':
-                start = i
-                i += 1
-                while i < len(search_query) and search_query[i] != '"':
-                    i += 1
-                search_query_list.append(search_query[start + 1:i])
-                i += 1
-            elif search_query[i] == ' ':
-                i += 1
-            else:
-                start = i
-                while i < len(search_query) and search_query[i] != ' ':
-                    i += 1
-                search_query_list.append(search_query[start:i])
-        
-        # Remove any empty strings from the search list
-        search_query_list = [query for query in search_query_list if query != '']
-        
-        # Build the filter query list for user-related fields
-        filter_query = [
-            (
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(email__icontains=query) 
-            ) if query not in ['AND', 'OR'] else query 
-            for query in search_query_list 
-        ]
-        
-        final_query = None
-        i = 0    
-        # Process the filter query list with AND/OR logic
-        while i < len(filter_query):
-            if final_query is None:
-                if filter_query[i] not in ['AND', 'OR']:
-                    final_query = filter_query[i]
-            elif filter_query[i] in ['AND', 'OR']:
-                j = i + 1
-                while j < len(filter_query) and filter_query[j] in ['AND', 'OR']:
-                    j += 1
-                if j < len(filter_query):
-                    final_query = final_query & filter_query[j] if filter_query[i] == 'AND' else final_query | filter_query[j]
-                i = j
-            else:
-                final_query = final_query & filter_query[i]
-            i += 1
-        
-        # Return the filtered queryset of users
-        return self.all().filter(final_query).distinct()
-
-
-def search_user(request):
-    form = SearchUserForm(request.GET or None)
-    users = NexusUser.objects.none()
-    if form.is_valid():
-        query = form.cleaned_data.get('query', '')
-        if query:
-            # You can adjust the search logic here to match your requirements.
-            users = NexusUser.objects.filter(first_name__icontains=query)  # Example filter
-
-    return render(request, 'search_user.html', {'form': form, 'users': users})
