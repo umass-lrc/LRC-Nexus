@@ -143,7 +143,7 @@ class RecurringShift(models.Model):
         update = self.id is not None
         recurring_shift = super(RecurringShift, self).save(*args, **kwargs)
         
-        todays_date = timezone.localdate(datetime.now())
+        todays_date = timezone.localdate(timezone.now())
         start_date = self.start_date if self.start_date > todays_date else todays_date
         
         if update:
@@ -197,7 +197,7 @@ class RecurringShift(models.Model):
         return recurring_shift
     
     def delete(self):
-        todays_date = timezone.localdate(datetime.now()).date()
+        todays_date = timezone.localdate(timezone.now())
         for shift in Shift.objects.filter(recurring_shift=self, start__date__gte=todays_date).all():
             shift.delete()
         super(RecurringShift, self).delete()
