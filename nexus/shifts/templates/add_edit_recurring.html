@@ -10,26 +10,67 @@
       <th class="text-center" scope="col">Edit</th>
     </tr>
   </thead>
-  <tbody id="recurring-body">
-    {% for rshift in recurring_shifts %}
-    <tr id="rt-{{rshift.id}}">
-      <td class="text-center">{{ rshift.kind }}</td>
-      <td class="text-center">{{ rshift.get_day_display }}</td>
-      <td class="text-center">{{ rshift.start_time }}</td>
-      <td class="text-center">
-        {{ rshift.building.short_name }}-{{ rshift.room }}
-      </td>
-      <td class="text-center">
-        <a
-          href=""
-          hx-get="{% url 'edit_recurring' rshift.id %}"
-          hx-trigger="click"
-          hx-target="#edit-recurring-form"
-          ><i class="bi bi-pencil-square"></i
-        ></a>
-      </td>
+  <tbody id="current_recurring-body">
+    <tr>
+      <th class="text-center" colspan="5">Current Recurring Shifts</th>
     </tr>
-    {% endfor %}
+    {% if current_recurring_shifts %}
+      {% for rshift in current_recurring_shifts %}
+      <tr id="rt-{{rshift.id}}">
+        <td class="text-center">{{ rshift.kind }}</td>
+        <td class="text-center">{{ rshift.get_day_display }}</td>
+        <td class="text-center">{{ rshift.start_time }}</td>
+        <td class="text-center">
+          {{ rshift.building.short_name }}-{{ rshift.room }}
+        </td>
+        <td class="text-center">
+          <a
+            href=""
+            hx-get="{% url 'edit_recurring' rshift.id %}"
+            hx-trigger="click"
+            hx-target="#edit-recurring-form"
+            ><i class="bi bi-pencil-square"></i
+          ></a>
+        </td>
+      </tr>
+      {% endfor %}
+    {% else %}
+    <tr>
+      <td class="text-center" colspan="5">There are no active recurring shifts</td>
+    </tr>
+    {% endif %}
+    
+  </tbody>
+  <tbody id="inactive_recurring-body">
+    <tr>
+      <th class="text-center" colspan="5">Inactive Recurring Shifts</th>
+    </tr>
+    {% if inactive_recurring_shifts %}
+      {% for rshift in inactive_recurring_shifts %}
+      <tr id="rt-{{rshift.id}}">
+        <td class="text-center">{{ rshift.kind }}</td>
+        <td class="text-center">{{ rshift.get_day_display }}</td>
+        <td class="text-center">{{ rshift.start_time }}</td>
+        <td class="text-center">
+          {{ rshift.building.short_name }}-{{ rshift.room }}
+        </td>
+        <td class="text-center">
+          <a
+            href=""
+            hx-get="{% url 'edit_recurring' rshift.id %}"
+            hx-trigger="click"
+            hx-target="#edit-recurring-form"
+            ><i class="bi bi-pencil-square"></i
+          ></a>
+        </td>
+      </tr>
+      {% endfor %}
+    {% else %}
+    <tr>
+      <td class="text-center" colspan="5">There are no inactive recurring shifts</td>
+    </tr>
+    {% endif %}
+    
   </tbody>
 </table>
 

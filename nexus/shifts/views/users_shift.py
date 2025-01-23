@@ -252,9 +252,13 @@ def edit_shift(request, shift_id):
 def add_edit_recurring(request, user_id):
     user = NexusUser.objects.get(id=user_id)
     recurring_shifts = RecurringShift.objects.filter(position__user=user).all()
+    current_datetime = timezone.now().date()
+    current_recurring_shifts = recurring_shifts.filter(start_date__lte=current_datetime, end_date__gte=current_datetime)
+    inactive_recurring_shifts = recurring_shifts.exclude(start_date__lte=current_datetime, end_date__gte=current_datetime)
     context = {
         "user_id": user_id,
-        "recurring_shifts": recurring_shifts,
+        "current_recurring_shifts": current_recurring_shifts,
+        "inactive_recurring_shifts": inactive_recurring_shifts,
         "edit_form": AddRecurringShiftForm(user_id, True, blank=True),
     }
     return render(request, "add_edit_recurring.html", context)
