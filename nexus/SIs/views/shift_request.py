@@ -69,7 +69,7 @@ def change_request(request, request_state):
 @restrict_to_groups("Staff Admin", "SI Supervisor")
 def drop_request(request, request_state):
     requests = DropRequest.objects.filter(
-        Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
+        Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(shift__position__position = PositionChoices.GROUP_TUTOR)),
     ).order_by('shift__start')
     context = {
         'd_requests': requests,
