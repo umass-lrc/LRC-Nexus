@@ -1,14 +1,9 @@
 from django import forms
 from django.urls import reverse
-
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
-
 from crispy_bootstrap5.bootstrap5 import FloatingField
-
-from ..models import (
-    NexusUser,
-)
+from ..models import NexusUser
 
 class CreateUserForm(forms.ModelForm):
     class Meta:

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Q
 
 from core.views import restrict_to_http_methods, restrict_to_groups
 
@@ -19,9 +20,19 @@ from ..forms.users import (
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
 def users(request):
-    users = NexusUser.objects.all()
+    return render(request, 'users.html')
+
+@login_required
+@restrict_to_http_methods('GET')
+@restrict_to_groups('Staff Admin', 'SI Supervisor', 'Tutor Supervisor', 'OURS Supervisor')
+def search(request):
+    search = request.GET.get('q')
+    if search:
+        users = NexusUser.objects.filter(Q(first_name__icontains=search)|Q(last_name__icontains=search)|Q(email__icontains=search))
+    else:
+        users = NexusUser.objects.all()
     context = {'users': users}
-    return render(request, 'users.html', context)
+    return render(request, 'users_search.html', context)
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
