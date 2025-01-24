@@ -1,0 +1,18 @@
+{% if not_signed_shifts_id|length == 0 %}
+<div id="attendance-shift-main"></div>
+{% else %}
+<div id="attendance-shift-main">
+  <h3 class="text-center">Attendance For Shifts</h3>
+  <div id="attendance-shift-message"></div>
+  {% for s_id in not_signed_shifts_id %}
+  <div
+    id="attendance-shift-{{s_id}}"
+    hx-get="{% url 'attendance_for_shift' s_id %}"
+    hx-trigger="intersect once"
+    hx-target="this"
+    hx-swap="innerHTML"
+  ></div>
+  {% endfor %}
+  <hr />
+</div>
+{% endif %}

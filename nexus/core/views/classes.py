@@ -24,6 +24,11 @@ from SIs.models import (
     SIRoleInfo,
 )
 
+from shifts.models import (
+    ShiftKind,
+    RecurringShift,
+)
+
 @login_required
 @restrict_to_http_methods('GET', 'POST')
 @restrict_to_groups('Staff Admin', 'SI Supervisor')
@@ -106,7 +111,7 @@ def add_class_time(request, class_id):
             building=data['building'],
             room=data['room'],
         )
-        for role in SIRollInfo.objects.filter(assigned_class=class_time.orignal_class).all():
+        for role in SIRoleInfo.objects.filter(assigned_class=class_time.orignal_class).all():
             rs = RecurringShift.objects.create(
                 position=role.position,
                 day=class_time.class_day,
@@ -136,7 +141,7 @@ def add_class_time(request, class_id):
 @restrict_to_groups('Staff Admin', 'SI Supervisor')
 def delete_class_time(request, class_time_id):
     class_time = ClassTimes.objects.get(id=class_time_id)
-    for rs in SIReccuringShiftInfo.objects.filter(class_time=self).all():
+    for rs in SIReccuringShiftInfo.objects.filter(class_time=class_time).all():
         rs.recuring_shift.delete()
     _class = class_time.orignal_class 
     class_time.delete()

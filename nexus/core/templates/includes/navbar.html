@@ -65,7 +65,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div style="overflow-y: scroll;">
       <ul class="sidebar nav flex-column" id="nav_accordion">
         {% if user.is_staff %}
         <li class="nav-item has-submenu">
@@ -282,6 +282,13 @@
             <li>
               <a
                 class="nav-link nav-menu-item"
+                href="{% url 'tutor_live_punch_in_out' %}"
+                >Live Punch In/Out</a
+              >
+            </li>
+            <li>
+              <a
+                class="nav-link nav-menu-item"
                 href="{% url 'tutor_shift_requests' %}"
                 >Shift Request</a
               >
@@ -304,7 +311,7 @@
         </li>
         <li class="nav-item has-submenu">
           <a class="nav-link nav-menu-item" href="#"
-            ><i class="bi bi-heart-pulse-fill me-3"></i>Office Assistant</a
+            ><i class="bi bi-person-hearts me-3"></i>Office Assistant</a
           >
           <ul class="submenu collapse">
             <li>
@@ -435,7 +442,9 @@
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link nav-menu-item" href="{% url 'user_payroll' %}"
+          <a
+            class="nav-link nav-menu-item"
+            href="{% url 'get_user_payroll_page' %}"
             ><i class="bi bi-cash-coin me-3"></i>Payroll</a
           >
         </li>

@@ -21,7 +21,7 @@ from shifts.views import (
 
 @login_required
 @restrict_to_http_methods("GET")
-@restrict_to_groups("Staff Admin", "SI Supervisor")
+@restrict_to_groups("Staff Admin", "Tutor Supervisor")
 def tutor_schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()
     context = {
