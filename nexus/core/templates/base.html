@@ -196,20 +196,11 @@
     <script src="{% static 'js/ResizeSensor.js'%}"></script>
     <script src="{% static 'js/ElementQueries.js'%}"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
-    {% comment %} <script
-      src="https://cdn.tiny.cloud/1/zdn8r15qlv0yyfxq5ojxjgzegqjtpq195br5yps6qno924ff/tinymce/7/tinymce.min.js"
-      referrerpolicy="origin"
-    ></script>
-    <script>
-      window.tinymce.dom.Event.domLoaded = true;
-      tinymce.init({
-        language: "en-us",
-      });
-    </script> {% endcomment %}
     <script src="/static/admin/js/vendor/select2/select2.full.js"></script>
     <script src="/static/autocomplete_light/autocomplete_light.js"></script>
     <script src="/static/autocomplete_light/select2.js"></script>
     <script src="/static/autocomplete_light/i18n/en.js"></script>
+    <script src="/static/tinymce/tinymce.min.js"></script>
     <script>
       let navbar = document.getElementById("menuHolder");
       let table_head = document.getElementsByClassName("stickyHeader")[0];
