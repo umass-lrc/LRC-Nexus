@@ -85,7 +85,7 @@ def individual_punch_in_out(request, position_id):
         (Q(position__id=position_id) & Q(require_punch_in_out=True)) & 
         (
             (Q(attendance_info__punch_in_time__isnull=False) & Q(attendance_info__punch_out_time__isnull=True)) | 
-            (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=timezone.now() + timedelta(minutes=5)) & Q(attendance_info__punch_in_time__isnull=True))
+            (Q(start__gte=(timezone.now() - timedelta(hours=8))) & Q(start__lte=timezone.now() + timedelta(minutes=60)) & Q(attendance_info__punch_in_time__isnull=True))
         )
     ).values_list('id', flat=True)
     
@@ -206,6 +206,11 @@ def shift_punch_in_out(request, shift_id):
             att_info = AttendanceInfo.objects.get(shift=shift)
             att_info.punch_in_time = punch_in_time.time()
             att_info.sign_datetime = timezone.now()
+            if att_info.shift.start > timezone.now():
+                difference = att_info.shift.start - timezone.now()
+                att_info.shift.duration += timedelta(minutes=difference.total_seconds()/60)
+                att_info.shift.start = timezone.now()
+                att_info.shift.save()
             att_info.save()
             messages.success(request, 'Punched in successfully.')
         else:
