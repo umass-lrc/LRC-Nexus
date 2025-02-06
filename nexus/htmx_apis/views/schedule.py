@@ -24,7 +24,7 @@ from shifts.views import (
     get_color_coder_dict,
 )
 
-@cache_page(60 * 60)
+# @cache_page(60 * 60)
 @restrict_to_http_methods("GET")
 def api_si_schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()
@@ -43,7 +43,7 @@ def api_si_schedule_for_all_course(request):
     }
     return render(request, "api_schedule_si.html", context)
 
-@cache_page(60 * 60)
+# @cache_page(60 * 60)
 @restrict_to_http_methods("GET")
 def api_tutor_schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()
