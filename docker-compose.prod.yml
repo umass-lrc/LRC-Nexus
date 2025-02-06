@@ -7,6 +7,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms8g -Xmx8g
       - node.name=es-nexus
       - cluster.name=es-docker-cluster
       - network.host=0.0.0.0
@@ -22,9 +23,11 @@ services:
     build:
       context: ./nexus
       dockerfile: Dockerfile.prod
-    command: gunicorn website.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn nexus.wsgi:application --bind 0.0.0.0:8000 --workers 8 --threads 2 --access-logfile /home/log/gunicorn/access.log --error-logfile /home/log/gunicorn/error.log
     volumes:
       - static_volume:/home/app/web/staticfiles
+      - ./nexus/database.sqlite3:/home/app/web/database.sqlite3
+      - ./gunicorn_logs:/home/log/gunicorn
     expose:
       - 8000
     env_file:
@@ -35,6 +38,7 @@ services:
       - nexus-network
 
   nginx-proxy:
+    container_name: nginx-nexus
     build: ./nginx
     restart: always
     volumes:
@@ -48,6 +52,8 @@ services:
       - 80:80
     depends_on:
       - django
+    networks:
+      - nexus-network
 
   acme-companion:
     image: nginxproxy/acme-companion
@@ -61,6 +67,8 @@ services:
       - acme:/etc/acme.sh
     depends_on:
       - nginx-proxy
+    networks:
+      - nexus-network
 
 volumes:
   elasticsearch_data:
