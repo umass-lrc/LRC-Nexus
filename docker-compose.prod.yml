@@ -69,3 +69,7 @@ volumes:
   html:
   vhost:
   acme:
+
+networks:
+  nexus-network:
+    driver: bridge
