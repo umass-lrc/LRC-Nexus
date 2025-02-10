@@ -25,17 +25,36 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("NEXUS_SECRET_KEY", "django-insecure-881r(ved7o)qr@@bkmapeg2ca88p1c&9^y*=5v9rwf9*0%%q%$")
 
-ALLOWED_HOSTS = os.environ.get("NEXUS_ALLOWED_HOSTS", ".localhost,127.0.0.1,[::1]").split(",")
+ALLOWED_HOSTS = os.environ.get("NEXUS_ALLOWED_HOSTS", "*").split(",")
 
-CSRF_TRUSTED_ORIGINS = ["http://3.137.183.137:80", "https://www.umass.edu"]
+CSRF_TRUSTED_ORIGINS = ["https://lrcstaff.umass.edu", "https://www.umass.edu", "http://nginx-nexus"]
 
-CORS_ORIGIN_WHITELIST = ["http://3.137.183.137:80", "https://www.umass.edu"]
+CORS_ORIGIN_WHITELIST = ["http://nginx-nexus", "https://www.umass.edu"]
 
-CORS_ALLOWED_ORIGINS = ["https://www.umass.edu"]
+CORS_ALLOWED_ORIGINS = ["http://nginx-nexus", "https://www.umass.edu"]
 
 # SECURITY WARNING: don"t run with debug turned on in production!
 DEBUG = os.environ.get("NEXUS_DEBUG", "0") == "1"
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
 
 # Application definition
 
@@ -179,7 +198,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-STATIC_ROOT = "/srv/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -211,10 +230,12 @@ TINYMCE_JS_URL = "tinymce/tinymce.min.js"
 TINYMCE_JS_ROOT = "tinymce/"
 TINYMCE_SPELLCHECKER = False
 
+
 ELASTICSEARCH_DSL={
     'default': {
-        'hosts': 'https://localhost:9200', 
-        'http_auth': ('django', os.environ.get("ES_DJANGO_PASS", "ES4LRC!!")),
-        'ssl_assert_fingerprint': os.environ.get("ES_SSL", '91d3dcd44b40de733de0e099f71a0b5a74af7a0c4697cbdc5646bc01974f12c8'),
+        'hosts': 'http://es-nexus:9200', 
+        'http_auth': ('elastic', os.environ.get("ELASTIC_PASSWORD", "ES4LRC")),
+        'timeout': 60,
+        # 'ssl_assert_fingerprint': os.environ.get("ES_SSL", '91d3dcd44b40de733de0e099f71a0b5a74af7a0c4697cbdc5646bc01974f12c8'),
     }
 }
