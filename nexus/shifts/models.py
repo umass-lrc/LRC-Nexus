@@ -233,6 +233,18 @@ class Shift(models.Model):
         help_text="The duration of the shift."
     )
     
+    original_start = models.DateTimeField(
+        null=True,
+        blank=False,
+        help_text="The start orignial date/time of the shift."
+    )
+    
+    original_duration = models.DurationField(
+        null=True,
+        blank=False,
+        help_text="The original duration of the shift."
+    )
+
     building = models.ForeignKey(
         to=Buildings,
         on_delete=models.RESTRICT,

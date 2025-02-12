@@ -100,7 +100,7 @@ class PunchInForm(forms.Form):
                 FloatingField('room'),
                 FloatingField('kind'),
                 Div(
-                    Submit('submit', 'Punch In' if not is_punched_in else 'Punch Out of Other & Punch In', css_class='btn btn-primary'),
+                    Submit('punch_in_submit', 'Punch In' if not is_punched_in else 'Punch Out of Other & Punch In', css_class='btn btn-primary',onclick="clickedButton(this)"),
                     css_class='text-center',
                 ),
             ),
@@ -119,7 +119,7 @@ class PunchOutForm(forms.Form):
             Fieldset(
                 str(position),
                 Div(
-                    Submit('submit', 'Punch Out', css_class='btn btn-primary'),
+                    Submit('submit', 'Punch Out', css_class='btn btn-primary',onclick="clickedButton(this)"),
                     css_class='text-center',
                 ),
             ),

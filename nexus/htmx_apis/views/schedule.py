@@ -52,12 +52,12 @@ def api_tutor_schedule_for_all_course(request):
         for i, day in enumerate(days):
             day_time_coverage = []
             for shift in day:
-                if len(day_time_coverage) != 0 and shift.start <= day_time_coverage[-1]['end']:
-                    day_time_coverage[-1]['end'] = max(day_time_coverage[-1]['end'], shift.start + shift.duration)
+                if len(day_time_coverage) != 0 and shift.original_start <= day_time_coverage[-1]['end']:
+                    day_time_coverage[-1]['end'] = max(day_time_coverage[-1]['end'], shift.original_start + shift.original_duration)
                 else:
                     day_time_coverage.append({
-                        'start': shift.start,
-                        'end': shift.start + shift.duration,
+                        'start': shift.original_start,
+                        'end': shift.original_start + shift.original_duration,
                     })
             tutor_schedule[course][i] = day_time_coverage
     context = {
