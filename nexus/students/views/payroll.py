@@ -212,6 +212,8 @@ def shift_punch_in_out(request, shift_id):
             att_info = AttendanceInfo.objects.get(shift=shift)
             punch_out_time = timezone.now()
             start = att_info.sign_datetime
+            att_info.shift.original_start = att_info.shift.start
+            att_info.shift.original_duration = att_info.shift.duration
             att_info.shift.start = start
             att_info.shift.duration = punch_out_time - start
             att_info.shift.save()

@@ -727,17 +727,3 @@ def list_all_duplicate_opportunities(request):
     for opp in opps:
         context['opps'].append(Opportunity.objects.filter(link=opp['link']).all())
     return render(request, 'list_all_duplicate_opportunities.html', context)
-
-
-@login_required
-@restrict_to_groups('Tech')
-def original_start_and_duration_fix(request):
-    shifts = Shift.objects.filter(position__semester=Semester.objects.get_active_semester()).all()
-
-    for shift in shifts:
-        if shift.original_start is None:
-            shift.original_start = shift.start
-        if shift.original_duration is None:
-            shift.original_duration = shift.duration
-        shift.save()
-    return HttpResponse("DONE!")

@@ -115,9 +115,7 @@ def add_shift(request, user_id):
         shift = Shift.objects.create(
             position=data["position"],
             start=data["start"],
-            original_start = data["start"],
             duration=timedelta(hours=data["hours"], minutes=data["minutes"]),
-            original_duration=timedelta(hours=data["hours"], minutes=data["minutes"]),
             building=data["building"],
             room=data["room"],
             kind=data["kind"],
@@ -202,8 +200,6 @@ def edit_shift(request, shift_id):
         data = form.cleaned_data
         shift.position = data["position"]
         shift.start = data["start"]
-        shift.original_start = data["start"]
-        shift.original_duration=timedelta(hours=data["hours"], minutes=data["minutes"])
         shift.duration = timedelta(hours=data["hours"], minutes=data["minutes"])
         shift.building = data["building"]
         shift.room = data["room"]
