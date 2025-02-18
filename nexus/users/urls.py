@@ -6,6 +6,7 @@ from .views.login import (
 )
 from .views.users import (
     users,
+    search,
     create_user,
     update_user,
     reset_password,
@@ -39,6 +40,7 @@ AUTH_URLS = [
 
 USER_URLS = [
     path('users/', users, name='users'),
+    path('users/search', search, name='search_users'),
     path('users/create/', create_user, name='create_user'),
     path('users/update/<int:user_id>/', update_user, name='update_user'),
     path('users/reset_password/<int:user_id>/', reset_password, name='reset_password'),
