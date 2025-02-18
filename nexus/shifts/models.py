@@ -234,12 +234,14 @@ class Shift(models.Model):
     )
     
     original_start = models.DateTimeField(
+        default=None,
         null=True,
         blank=False,
         help_text="The start orignial date/time of the shift."
     )
     
     original_duration = models.DurationField(
+        default=None,
         null=True,
         blank=False,
         help_text="The original duration of the shift."

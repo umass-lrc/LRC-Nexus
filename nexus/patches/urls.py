@@ -23,6 +23,7 @@ from .views import (
     load_majors,
     load_major_from_line,
     list_all_duplicate_opportunities,
+    original_start_and_duration_fix,
 )
 
 urlpatterns = [
@@ -48,4 +49,5 @@ urlpatterns = [
     path('load_majors/', load_majors, name='load_majors'),
     path('load_majors/load_major_from_line/<int:line_number>/', load_major_from_line, name='load_major_from_line'),
     path('list_all_duplicate_opportunities/', list_all_duplicate_opportunities, name='list_all_duplicate_opportunities'),
+    path('original_start_and_duration_fix/', original_start_and_duration_fix, name='original_start_and_duration_fix'),
 ]
