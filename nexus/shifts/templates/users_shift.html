@@ -182,6 +182,12 @@
         editShift(info.event.extendedProps.url);
       },
       eventDidMount: function (info) {
+
+        let eventTitle = info.el.querySelector('.fc-event-title');
+        if (eventTitle) {
+          eventTitle.innerHTML = info.event.title;
+        }
+        
         $(info.el).tooltip({
           html: true,
           title: info.event.extendedProps.description,

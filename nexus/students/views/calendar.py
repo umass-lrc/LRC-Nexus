@@ -72,6 +72,14 @@ def get_student_shifts(request):
     for shift in shifts:
         if change_shifts.filter(shift=shift).exists() or drop_shifts.filter(shift=shift).exists():
             continue
+        if timezone.now()> timezone.localtime(shift.start + shift.duration) and shift.attendance_info.attended == False:
+            title = f"""
+                <s style='background-color: #D3D3D3;'>{str(shift)}</s>
+            """
+            event_color = '#808080'
+        else:
+            title = str(shift)
+            event_color = color_coder(shift.kind)
         description = f"""
             <b>{shift.kind}</b>
             <hr/>
@@ -86,9 +94,9 @@ def get_student_shifts(request):
             "id": str(shift.id),
             "start": shift.start.isoformat(),
             "end": (shift.start + shift.duration).isoformat(),
-            "title": str(shift),
+            "title": title,
             "allDay": False,
-            "color": color_coder(shift.kind),
+            "color": event_color,
             "extendedProps": {
                 "url": reverse("change_or_drop_shift_request", kwargs={"shift_id": shift.id}),
                 "description": description,
@@ -135,7 +143,7 @@ def get_student_shifts(request):
             "id": f"{shift.id}",
             "start": shift.start.isoformat(),
             "end": (shift.start + shift.duration).isoformat(),
-            "title": f"Drop Rquested: {shift.kind} - {shift.position}",
+            "title": f"Drop Requested: {shift.kind} - {shift.position}",
             "allDay": False,
             "color": color_coder(shift.kind),
             "textColor": "#FFA500",

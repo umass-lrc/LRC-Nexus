@@ -78,6 +78,14 @@ def get_user_shifts(request):
     shifts = Shift.objects.filter(position__user=user, start__gte=start, start__lte=end).all()
     shifts_data = []
     for shift in shifts:
+        if timezone.now()> timezone.localtime(shift.start + shift.duration) and shift.attendance_info.attended == False:
+            title = f"""
+                <s style='background-color: #D3D3D3;'>{str(shift)}</s>
+            """
+            event_color = '#808080'
+        else:
+            title = str(shift)
+            event_color = color_coder(shift.kind)
         description = f"""
             <b>{shift.kind}</b>
             <hr/>
@@ -92,9 +100,9 @@ def get_user_shifts(request):
             "id": str(shift.id),
             "start": shift.start.isoformat(),
             "end": (shift.start + shift.duration).isoformat(),
-            "title": str(shift),
+            "title": title,
             "allDay": False,
-            "color": color_coder(shift.kind),
+            "color": event_color,
             "extendedProps": {
                 "url": reverse("edit_or_drop_shift", kwargs={"shift_id": shift.id}),
                 "description": description,
