@@ -1,0 +1,11 @@
+secretGenerator:
+  - name: db-password
+    literals:
+      - password=supersecretpassword
+  - name: django-secret
+    literals:
+      - nexus_secret_key=abc123
+      - nexus_debug=1
+resources:
+  - postgres.yaml
+  - django.yaml
