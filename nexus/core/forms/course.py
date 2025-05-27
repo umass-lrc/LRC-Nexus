@@ -21,13 +21,17 @@ class CourseForm(forms.ModelForm):
             'is_cross_listed',
             'main_course'
         )
-        widgets = {
-            'subject': forms.Select(choices=CourseSubject.objects.all()),
-            'main_course': forms.Select(choices=Course.objects.all()),
-        }
+        # widgets = {
+        #     'subject': forms.Select(choices=CourseSubject.objects.all()),
+        #     'main_course': forms.Select(choices=Course.objects.all()),
+        # }
     
     def __init__(self, edit, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
+
+        self.fields['subject'].widget = forms.Select(choices=CourseSubject.objects.all())
+        self.fields['main_course'].widget = forms.Select(choices=Course.objects.all())
+
         self.helper = FormHelper(self)
         if not edit:
             self.helper.attrs = {

@@ -48,14 +48,19 @@ class createClassForm(forms.ModelForm):
             'course',
             'faculty',
         ]
-        widgets = {
-            'semester': forms.Select(choices=Semester.objects.all(), attrs={'disabled': 'disabled'}),
-            'course': forms.Select(choices=Course.objects.all()),
-            'faculty': forms.Select(choices=Faculty.objects.all()),
-        }
+        # widgets = {
+        #     'semester': forms.Select(choices=Semester.objects.all(), attrs={'disabled': 'disabled'}),
+        #     'course': forms.Select(choices=Course.objects.all()),
+        #     'faculty': forms.Select(choices=Faculty.objects.all()),
+        # }
     
     def __init__(self, *args, edit=False, **kwargs):
         super(createClassForm, self).__init__(*args, **kwargs)
+        
+        self.fields['semester'].widget = forms.Select(choices=Semester.objects.all(), attrs={'disabled': 'disabled'})
+        self.fields['course'].widget = forms.Select(choices=Course.objects.all())
+        self.fields['faculty'].widget = forms.Select(choices=Faculty.objects.all())
+        
         self.helper = FormHelper(self)
         if not edit:
             self.helper.attrs = {

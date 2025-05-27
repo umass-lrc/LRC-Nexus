@@ -63,15 +63,21 @@ class PositionForm(forms.ModelForm):
     class Meta:
         model = Positions
         fields = ['semester', 'position', 'user', 'hourly_pay']
-        widgets = {
-            'semester': forms.Select(choices=Semester.objects.all(), attrs={'disabled': 'disabled'}),
-            'position': forms.Select(choices=PositionChoices.choices, attrs={'disabled': 'disabled'}),
-            'user': autocomplete.ModelSelect2(url='user_autocomplete'),
-            'hourly_pay': forms.NumberInput(attrs={'min': 0.00, 'max': 999.99, 'step': 0.01}),
-        }
+        # widgets = {
+        #     'semester': forms.Select(choices=Semester.objects.all(), attrs={'disabled': 'disabled'}),
+        #     'position': forms.Select(choices=PositionChoices.choices, attrs={'disabled': 'disabled'}),
+        #     'user': autocomplete.ModelSelect2(url='user_autocomplete'),
+        #     'hourly_pay': forms.NumberInput(attrs={'min': 0.00, 'max': 999.99, 'step': 0.01}),
+        # }
     
     def __init__(self, *args, **kwargs):
         super(PositionForm, self).__init__(*args, **kwargs)
+
+        self.fields['semester'].widget = forms.Select(choices=Semester.objects.all(), attrs={'disabled': 'disabled'})
+        self.fields['position'].widget = forms.Select(choices=PositionChoices.choices, attrs={'disabled': 'disabled'})
+        self.fields['user'].widget = autocomplete.ModelSelect2(url='user_autocomplete')
+        self.fields['hourly_pay'].widget = forms.NumberInput(attrs={'min': 0.00, 'max': 999.99, 'step': 0.01})
+
         self.helper = FormHelper(self)
         self.helper.attrs = {
             'hx-post': reverse('add_position', kwargs={'semester_id': self.initial.get('semester'), 'position_id': self.initial.get('position')}),

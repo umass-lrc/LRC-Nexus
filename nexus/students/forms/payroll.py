@@ -79,13 +79,19 @@ shift_type_choices = {
 }
 
 class PunchInForm(forms.Form):
-    building = forms.ModelChoiceField(queryset=Buildings.objects.all(), required=True, initial=Buildings.objects.get(short_name='LIBR'))
+    building = forms.ModelChoiceField(queryset=Buildings.objects.none(), required=True)
     room = forms.CharField(initial=1020, max_length=10, required=True)
     kind = forms.ChoiceField(choices=ShiftKind.choices, required=True)
     
     def __init__(self, position, is_punched_in, *args, **kwargs):
         super(PunchInForm, self).__init__(*args, **kwargs)
         
+        self.fields['building'].queryset = Buildings.objects.all()
+        try:
+            self.fields['building'].initial = Buildings.objects.get(short_name='LIBR')
+        except Buildings.DoesNotExist:
+            self.fields['building'].initial = None
+
         self.fields['kind'].choices = [(sk.value, sk.label) for sk in shift_type_choices[position.position]]
         
         self.helper = FormHelper(self)
