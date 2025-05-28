@@ -34,7 +34,7 @@ CORS_ORIGIN_WHITELIST = ["http://nginx-nexus", "https://www.umass.edu"]
 CORS_ALLOWED_ORIGINS = ["http://nginx-nexus", "https://www.umass.edu"]
 
 # SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = os.environ.get("NEXUS_DEBUG", "0") == "1"
+DEBUG = os.environ.get("NEXUS_DEBUG", "1") == "1"
 
 
 LOGGING = {
@@ -73,7 +73,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "corsheaders",
-    "explorer",
+    # "explorer",
     "tinymce",
     "django_elasticsearch_dsl",
     "hijack",
@@ -212,10 +212,10 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Exlorer for SQL queries
-EXPLORER_CONNECTIONS = {'default': 'default'}
-EXPLORER_DEFAULT_CONNECTION = 'default'
+# EXPLORER_CONNECTIONS = {'default': 'default'}
+# EXPLORER_DEFAULT_CONNECTION = 'default'
 
-EXPLORER_SQL_BLACKLIST = ()
+# EXPLORER_SQL_BLACKLIST = ()
 
 # Messages
 MESSAGE_TAGS = {
