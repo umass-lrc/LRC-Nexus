@@ -5,6 +5,8 @@ __pycache__/
 
 *.pem
 
+data_dump.json
+
 # C extensions
 *.so
 
