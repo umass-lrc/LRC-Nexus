@@ -1,9 +1,19 @@
 # If you want to run project locally
-run_local:
+run_local_docker:
+	docker-compose -f docker-compose.yml up -d
+
+run_local_docker_with_logs:
 	docker-compose -f docker-compose.yml up
 
-run_local_from_scratch:
+run_local_docker_from_scratch:
 	docker-compose -f docker-compose.yml up --build
+
+load_data_docker:
+	@echo "Loading data into local Docker container"
+	@docker exec -it django-nexus bash -c "cd /usr/src/app/datadump && python load_data.py"
+
+stop_local_docker:
+	docker-compose -f docker-compose.yml down
 
 # Check if you have the required tools installed
 check_version:
