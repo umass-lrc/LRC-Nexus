@@ -13,7 +13,6 @@ django-cors-headers==4.7.0
 django-crispy-forms==2.4
 django-cryptography-django5==2.2
 django-elasticsearch-dsl==8.0
-django-haystack==3.3.0
 django-hijack==3.7.2
 django-sql-explorer==5.3
 django-tinymce==4.1.0
@@ -26,6 +25,7 @@ greenlet==3.2.2
 gunicorn==23.0.0
 idna==3.10
 packaging==25.0
+psycopg2-binary==2.9.10
 pycparser==2.22
 pymemcache==4.0.0
 pysolr==3.10.0

@@ -1,4 +1,16 @@
 services:
+  postgres:
+    container_name: postgres-nexus
+    image: postgres:latest
+    env_file:
+      - ./.env.dev
+    ports:
+      - "5432:5432"
+    networks:
+      - nexus-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   elasticsearch:
     container_name: es-nexus
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
@@ -34,6 +46,8 @@ services:
   
 volumes:
   elasticsearch_data:
+    driver: local
+  postgres_data:
     driver: local
 
 networks:

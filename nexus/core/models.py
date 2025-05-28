@@ -160,7 +160,7 @@ class CourseSubject(models.Model):
     short_name = models.CharField(
         primary_key=True,
         unique=True,
-        max_length=10,
+        max_length=20,
         null=False,
         blank=False,
         help_text='The short name of the course subject. For example, "COMPSCI" for Computer Science.',
