@@ -1,11 +1,25 @@
 secretGenerator:
-  - name: db-password
+  - name: postgres-secret
     literals:
-      - password=supersecretpassword
+      - POSTGRES_DB=nexus-db
+      - POSTGRES_USER=django_user
+      - POSTGRES_PASSWORD=django_password
+      - DB_HOST=postgres-nexus
+      - DB_PORT=5432
+    type: Opaque
   - name: django-secret
     literals:
-      - nexus_secret_key=abc123
-      - nexus_debug=1
+      - NEXUS_SECRET_KEY=abc123
+      - NEXUS_DEBUG=1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+    type: Opaque
+  - name: elasticsearch-secret
+    literals:
+      - ELASTICSEARCH_HOST=elasticsearch-nexus
+      - ELASTICSEARCH_PORT=9200
+      - ELASTIC_PASSWORD=es4lrcnexus
+    type: Opaque
 resources:
   - postgres.yaml
   - django.yaml
+  - elasticsearch.yaml

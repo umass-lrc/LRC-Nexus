@@ -112,6 +112,7 @@ class FacultyDetails(models.Model):
     )
     
     personal_website = models.URLField(
+        max_length=500,
         blank=True,
         null=True
     )
@@ -123,6 +124,7 @@ class FacultyDetails(models.Model):
     )
     
     lab_website = models.URLField(
+        max_length=500,
         blank=True,
         null=True
     )
@@ -281,6 +283,7 @@ class Opportunity(models.Model):
     )
     
     link = models.URLField(
+        max_length=500,
         blank=False,
         null=False,
         unique=True

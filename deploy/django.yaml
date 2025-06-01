@@ -3,12 +3,12 @@ kind: Service
 metadata:
   name: django
   labels:
-    app: django
+    app: nexus
 spec:
   ports:
     - port: 8000
   selector:
-    app: django
+    app: nexus
     tier: app
   type: LoadBalancer
 
@@ -17,9 +17,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: django-app-pvc
+  name: django-pvc
   labels:
-    app: django
+    app: nexus
 spec:
   accessModes:
     - ReadWriteOnce
@@ -34,50 +34,87 @@ kind: Deployment
 metadata:
   name: django
   labels:
-    app: django
+    app: nexus
 spec:
   selector:
     matchLabels:
-      app: django
+      app: nexus
       tier: app
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: django
+        app: nexus
         tier: app
     spec:
       volumes:
-        - name: django-app-data
+        - name: django-data
           persistentVolumeClaim:
-            claimName: django-app-pvc
+            claimName: django-pvc
       containers:
         - name: app
           image: nexus:latest
           imagePullPolicy: Never
           volumeMounts:
-            - name: django-app-data
+            - name: django-data
               mountPath: /usr/src/app/
           env:
-            - name: DB_HOST
-              value: django-postgres
-            - name: DB_NAME
-              value: django_db
-            - name: DB_USER
-              value: django_user
-            - name: ALLOWED_HOSTS
-              value: "127.0.0.1,localhost"
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-password
-                  key: password
             - name: NEXUS_SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: django-secret
-                  key: nexus_secret_key
+                  key: NEXUS_SECRET_KEY
+            - name: NEXUS_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: NEXUS_DEBUG
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: ALLOWED_HOSTS
+            - name: ELASTICSEARCH_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: ELASTICSEARCH_HOST
+            - name: ELASTICSEARCH_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: ELASTICSEARCH_PORT
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: ELASTIC_PASSWORD
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_PORT
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_HOST
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
           ports:
             - containerPort: 8000
               name: django
@@ -89,7 +126,7 @@ spec:
             - containerPort: 80
               name: nginx
           volumeMounts:
-            - name: django-app-data
+            - name: django-data
               mountPath: /usr/src/proxy/
           env:
             - name: APP_HOST

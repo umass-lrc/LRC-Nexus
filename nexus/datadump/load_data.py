@@ -44,7 +44,7 @@ for doc_class in registry.get_documents():
 print("Loading data dump...")
 
 try:
-    # call_command("loaddata", "data_dump.json")
+    call_command("loaddata", "data_dump.json")
     print("Data loaded successfully.")
 except Exception as e:
     print(f"An error occurred during data loading: {e}")

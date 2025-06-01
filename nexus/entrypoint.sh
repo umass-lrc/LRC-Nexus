@@ -2,7 +2,7 @@
 
 # Wait for Elasticsearch to be ready
 echo "Waiting for Elasticsearch..."
-while ! curl -s http://es-nexus:9200 >/dev/null; do
+while ! curl -s http://elasticsearch-nexus:9200 >/dev/null; do
   sleep 3
 done
 

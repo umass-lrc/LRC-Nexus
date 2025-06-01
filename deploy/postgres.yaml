@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: django-postgres
+  name: postgres
   labels:
-    app: django
+    app: nexus
 spec:
   ports:
     - port: 5432
   selector:
-    app: django
+    app: nexus
     tier: postgres
   clusterIP: None
 
@@ -17,9 +17,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: django-postgres-pvc
+  name: postgres-pvc
   labels:
-    app: django
+    app: nexus
 spec:
   accessModes:
     - ReadWriteOnce
@@ -34,24 +34,24 @@ kind: Deployment
 metadata:
   name: postgres
   labels:
-    app: django-postgres
+    app: nexus
 spec:
   selector:
     matchLabels:
-      app: django
+      app: nexus
       tier: postgres
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: django
+        app: nexus
         tier: postgres
     spec:
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: django-postgres-pvc
+            claimName: postgres-pvc
       containers:
         - name: postgres
           image: postgres:latest
@@ -63,11 +63,17 @@ spec:
               mountPath: /var/lib/postgresql/data
           env:
             - name: POSTGRES_DB
-              value: django_db
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
             - name: POSTGRES_USER
-              value: django_user
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: db-password
-                  key: password
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
