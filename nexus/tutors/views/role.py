@@ -36,7 +36,10 @@ from ..forms.role import (
 @restrict_to_groups("Staff Admin", "SI Supervisor", "Tutor Supervisor", "OURS Supervisor", "Payroll Supervisor")
 def assign_role(request):
     sem = Semester.objects.get_active_semester()
-    tutor_positions = Positions.objects.filter(semester=sem, position=PositionChoices.TUTOR)
+    tutor_positions = Positions.objects.filter(
+        semester=sem, 
+        position__in=[PositionChoices.TUTOR, PositionChoices.GRADUATE_TUTOR]
+    )
     for position in tutor_positions:
         if not TutorRoleInfo.objects.filter(position=position).exists():
             TutorRoleInfo.objects.create(position=position)
