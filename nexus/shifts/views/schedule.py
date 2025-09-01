@@ -61,7 +61,7 @@ def schedule_for_all_course_for_start(request, start_date, shift_kind, remove_em
     
     filtered_tutor_role = TutorRoleInfo.objects.filter(
         position__semester = Semester.objects.get_active_semester(),
-    ).exclude(position__position=PositionChoices.GRADUATE_TUTOR)
+    )
     
     courses = Course.objects.all()
     

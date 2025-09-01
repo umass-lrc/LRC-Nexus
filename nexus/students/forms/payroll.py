@@ -34,9 +34,7 @@ shift_type_choices = {
         ShiftKind.TRAINING,
         ShiftKind.OTHER,
     ],
-    PositionChoices.GRADUATE_TUTOR: [
-        ShiftKind.TUTOR_DROP_IN,
-        ShiftKind.TUTOR_APPOINTMENT,
+    PositionChoices.GRADUATE: [
         ShiftKind.MEETING,
         ShiftKind.TRAINING,
         ShiftKind.OTHER,

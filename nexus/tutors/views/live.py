@@ -30,7 +30,7 @@ def convert_timedelta(duration):
 @restrict_to_http_methods("GET")
 def live_punch_in_out(request):
     punched_in = AttendanceInfo.objects.filter(
-        shift__position__position__in=[PositionChoices.TUTOR, PositionChoices.TUTOR_PM, PositionChoices.GRADUATE_TUTOR],
+        shift__position__position__in=[PositionChoices.TUTOR, PositionChoices.TUTOR_PM],
         shift__position__semester = Semester.objects.get_active_semester(), 
         punch_in_time__isnull=False, 
         punch_out_time__isnull=True,

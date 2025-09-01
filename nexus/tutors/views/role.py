@@ -38,7 +38,7 @@ def assign_role(request):
     sem = Semester.objects.get_active_semester()
     tutor_positions = Positions.objects.filter(
         semester=sem, 
-        position__in=[PositionChoices.TUTOR, PositionChoices.GRADUATE_TUTOR]
+        position=PositionChoices.TUTOR
     )
     for position in tutor_positions:
         if not TutorRoleInfo.objects.filter(position=position).exists():
