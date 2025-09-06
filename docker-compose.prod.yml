@@ -7,7 +7,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms8g -Xmx8g
+      - ES_JAVA_OPTS=-Xms6g -Xmx6g
       - node.name=es-nexus
       - cluster.name=es-docker-cluster
       - network.host=0.0.0.0
@@ -23,7 +23,7 @@ services:
     build:
       context: ./nexus
       dockerfile: Dockerfile.prod
-    command: gunicorn nexus.wsgi:application --bind 0.0.0.0:8000 --workers 8 --threads 2 --access-logfile /home/log/gunicorn/access.log --error-logfile /home/log/gunicorn/error.log
+    command: gunicorn nexus.wsgi:application --bind 0.0.0.0:8000 --workers 10 --threads 2 --access-logfile /home/log/gunicorn/access.log --error-logfile /home/log/gunicorn/error.log
     volumes:
       - static_volume:/home/app/web/staticfiles
       - ./nexus/database.sqlite3:/home/app/web/database.sqlite3
