@@ -27,7 +27,12 @@ class TutorRoleInfo(models.Model):
     )
     
     def str_assigned_courses(self):
-        return f"[{', '.join([str(course) for course in self.assigned_courses.all()])}]"
+        # Use prefetched data if available, otherwise query
+        if hasattr(self, '_prefetched_objects_cache') and 'assigned_courses' in self._prefetched_objects_cache:
+            courses = self._prefetched_objects_cache['assigned_courses']
+        else:
+            courses = self.assigned_courses.all()
+        return f"[{', '.join([str(course) for course in courses])}]"
     
     def __str__(self):
         return f"{self.position.user.first_name} - {self.str_assigned_courses()}"

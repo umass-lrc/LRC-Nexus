@@ -51,42 +51,68 @@ from . import (
 )
 
 def schedule_for_all_course_for_start(request, start_date, shift_kind, remove_empty = False):
-    filtered_shift = Shift.objects.filter(
+    # Optimize: Get active semester once
+    active_semester = Semester.objects.get_active_semester()
+    
+    # Optimize: Use select_related to avoid N+1 queries
+    filtered_shift = Shift.objects.select_related(
+        'position', 'position__user', 'building'
+    ).filter(
         Q(start__date__gte = start_date) & Q(start__date__lte = (start_date + timedelta(days=6))) & Q(kind__in = shift_kind)
     ).order_by("start")   
     
-    filtered_si_role = SIRoleInfo.objects.filter(
-        position__semester = Semester.objects.get_active_semester(),
+    # Optimize: Get all SI and tutor roles with select_related
+    filtered_si_role = SIRoleInfo.objects.select_related(
+        'position', 'position__user', 'assigned_class', 'assigned_class__course'
+    ).filter(position__semester = active_semester)
+    
+    filtered_tutor_role = TutorRoleInfo.objects.select_related(
+        'position', 'position__user'
+    ).prefetch_related('assigned_courses').filter(
+        position__semester = active_semester
     )
     
-    filtered_tutor_role = TutorRoleInfo.objects.filter(
-        position__semester = Semester.objects.get_active_semester(),
-    )
+    # Optimize: Get courses with related data
+    courses = Course.objects.select_related('subject').all()
     
-    courses = Course.objects.all()
+    # Optimize: Build position mappings in bulk
+    si_course_positions = {}
+    for role in filtered_si_role:
+        course = role.assigned_class.course
+        if course not in si_course_positions:
+            si_course_positions[course] = set()
+        si_course_positions[course].add(role.position_id)
+    
+    tutor_course_positions = {}
+    for role in filtered_tutor_role:
+        for course in role.assigned_courses.all():
+            if course not in tutor_course_positions:
+                tutor_course_positions[course] = set()
+            tutor_course_positions[course].add(role.position_id)
+    
+    # Optimize: Group shifts by position for faster lookup
+    shifts_by_position = {}
+    for shift in filtered_shift:
+        if shift.position_id not in shifts_by_position:
+            shifts_by_position[shift.position_id] = []
+        shifts_by_position[shift.position_id].append(shift)
     
     schedule = {}
     
     for course in courses:
         shifts_info = [[], [], [], [], [], [], []]
         
-        si_positions = filtered_si_role.filter(
-            assigned_class__course = course,
-        ).values_list("position", flat=True).distinct()
+        # Get all positions for this course
+        course_positions = set()
+        course_positions.update(si_course_positions.get(course, set()))
+        course_positions.update(tutor_course_positions.get(course, set()))
         
-        tutor_positions = filtered_tutor_role.filter(
-            assigned_courses__in = [course],
-        ).values_list("position", flat=True).distinct()
-        
-        Shifts = filtered_shift.filter(
-            Q(position__in = si_positions) | Q(position__in = tutor_positions)
-        ).all()
-
-        for shift in Shifts:
-            index = (timezone.localtime(shift.start).date() - start_date).days
-            if index < 0 or index > 6:
-                continue
-            shifts_info[index].append(shift)
+        # Get all shifts for these positions
+        for position_id in course_positions:
+            for shift in shifts_by_position.get(position_id, []):
+                index = (timezone.localtime(shift.start).date() - start_date).days
+                if 0 <= index <= 6:
+                    shifts_info[index].append(shift)
 
         schedule[str(course)] = shifts_info
         

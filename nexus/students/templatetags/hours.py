@@ -31,3 +31,20 @@ def multiply(value, arg):
     
     # Fallback for unexpected types
     return str(value)
+
+@register.filter
+def duration(value):
+    """
+    Format a duration (timedelta or integer microseconds) as hours:minutes
+    """
+    if isinstance(value, int):
+        # Convert microseconds to timedelta
+        value = timedelta(microseconds=value)
+    
+    if isinstance(value, timedelta):
+        total_seconds = int(value.total_seconds())
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        return f"{hours}:{minutes:02d}"
+    
+    return str(value)
