@@ -18,15 +18,15 @@
       </tr>
     </thead>
     <tbody id="roles_body">
-      {% for role in roles %}
-      <tr id="rt-{{role.id}}">
-        <td class="text-center">{{ role.position.user.last_name }}</td>
-        <td class="text-center">{{ role.position.user.first_name }}</td>
-        <td class="text-center">{{ role.assigned_class }}</td>
+      {% for item in roles_with_classes %}
+      <tr id="rt-{{item.role.id}}">
+        <td class="text-center">{{ item.role.position.user.last_name }}</td>
+        <td class="text-center">{{ item.role.position.user.first_name }}</td>
+        <td class="text-center">{{ item.class_string }}</td>
         <td class="text-center">
           <a
             href=""
-            hx-get="{% url 'update_role' role.id %}"
+            hx-get="{% url 'update_role' item.role.id %}"
             hx-trigger="click"
             hx-target="#update-role-form"
             ><i class="bi bi-pencil-square"></i

@@ -1,4 +1,4 @@
-{% load crispy_forms_tags %} {% crispy form %}
+{% load crispy_forms_tags %} {% load hours %} {% crispy form %}
 <hr />
 <h4 class="text-center">List of Class Times</h4>
 <div class="table-responsive">
@@ -17,7 +17,7 @@
       <tr id="ctt-{{class_time.id}}">
         <td class="text-center">{{class_time.get_class_day_display}}</td>
         <td class="text-center">{{class_time.start_time}}</td>
-        <td class="text-center">{{class_time.duration}}</td>
+        <td class="text-center">{{class_time.duration|duration}}</td>
         <td class="text-center">
           {{class_time.building.short_name}} - {{class_time.room}}
         </td>

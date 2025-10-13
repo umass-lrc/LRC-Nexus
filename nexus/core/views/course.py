@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 from . import restrict_to_http_methods, restrict_to_groups
 
@@ -84,6 +85,26 @@ def edit_course(request, course_id):
 @restrict_to_http_methods('GET')
 @restrict_to_groups('Staff Admin', 'Tutor Supervisor', 'SI Supervisor')
 def list_courses(request):
-    courses = Course.objects.all()
-    context = { 'courses': courses }
+    # Optimize: Use select_related to avoid N+1 queries for course subjects
+    courses_queryset = Course.objects.select_related('subject', 'main_course', 'main_course__subject').order_by('subject__short_name', 'number')
+    
+    # Add smart pagination - only paginate if there are many courses
+    course_count = courses_queryset.count()
+    if course_count > 100:  # Only paginate if more than 100 courses
+        paginator = Paginator(courses_queryset, 50)  # Show 50 courses per page
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+        context = { 
+            'courses': page_obj,
+            'paginator': paginator,
+            'page_obj': page_obj,
+            'total_courses': course_count
+        }
+    else:
+        # Show all courses if not too many
+        context = { 
+            'courses': courses_queryset,
+            'total_courses': course_count
+        }
+    
     return render(request, 'courses.html', context)
