@@ -72,12 +72,6 @@ def api_tutor_schedule_for_all_course(request):
     start_date = timezone.localtime(timezone.now()).date()
     tutor_schedule = schedule_for_all_course_for_start(request, start_date, [ShiftKind.TUTOR_DROP_IN], True)
     
-    # Helper function to safely convert duration
-    def safe_duration_convert(duration):
-        if isinstance(duration, int):
-            return timedelta(microseconds=duration)
-        return duration
-    
     for course, days in tutor_schedule.items():
         for i, day in enumerate(days):
             day_time_coverage = []
@@ -85,9 +79,7 @@ def api_tutor_schedule_for_all_course(request):
                 shift_start = shift.original_start if shift.original_start is not None else shift.start
                 shift_duration = shift.original_duration if shift.original_duration is not None else shift.duration
                 
-                # Convert duration to proper timedelta if needed
-                shift_duration = safe_duration_convert(shift_duration)
-                
+                # Duration is now stored as timedelta directly (PostgreSQL INTERVAL type)
                 if len(day_time_coverage) != 0 and shift_start <= day_time_coverage[-1]['end']:
                     day_time_coverage[-1]['end'] = max(day_time_coverage[-1]['end'], shift_start + shift_duration)
                 else:
