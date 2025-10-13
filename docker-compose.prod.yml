@@ -20,7 +20,6 @@ services:
 
   django:
     container_name: django-nexus
-    image: 986626909392.dkr.ecr.us-east-2.amazonaws.com/lrc-nexus:django-latest
     build:
       context: ./nexus
       dockerfile: Dockerfile.prod
@@ -40,7 +39,6 @@ services:
 
   nginx-proxy:
     container_name: nginx-nexus
-    image: 986626909392.dkr.ecr.us-east-2.amazonaws.com/lrc-nexus:nginx-latest
     build: ./nginx
     restart: always
     volumes:
