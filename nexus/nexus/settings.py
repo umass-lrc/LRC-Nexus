@@ -149,11 +149,11 @@ WSGI_APPLICATION = "nexus.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': env("POSTGRES_PASSWORD"),
+        'HOST': 'lrc-main.cjq8dcs2pk0m.us-east-2.rds.amazonaws.com',
+        'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
         },
