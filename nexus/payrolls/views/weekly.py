@@ -149,7 +149,7 @@ def all_weekly_payroll(request):
             final_payrolls.append(payroll)
     
     # Add pagination to prevent loading too many payrolls at once
-    paginator = Paginator(final_payrolls, 50)  # Show 50 payrolls per page
+    paginator = Paginator(final_payrolls, 100)  # Show 100 payrolls per page
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
     
