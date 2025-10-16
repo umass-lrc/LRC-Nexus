@@ -117,6 +117,7 @@ def api_tutor_schedule_for_all_course(request):
             .filter(
                 position_id__in=role_positions,
                 kind=ShiftKind.TUTOR_DROP_IN,
+                dropped=False,
                 start__date__gte=start_date,
                 start__date__lte=end_date,
             )
