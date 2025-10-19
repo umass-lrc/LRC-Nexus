@@ -1,4 +1,5 @@
 from datetime import timedelta
+import datetime
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -65,8 +66,40 @@ def all_weekly_payroll(request):
         week = get_weekend(data["week"])
         positions = data["position"]
     else:
-        week = get_weekend(timezone.now().date())
-        positions = [ps[0] for ps in PositionChoices.choices]
+        # If paginating or using links, the week and positions may be passed via GET.
+        # Prefer GET params if provided so page navigation preserves the selected week/positions.
+        week_param = request.GET.get('week')
+        if week_param:
+            try:
+                # expect ISO format YYYY-MM-DD
+                parsed = datetime.date.fromisoformat(week_param)
+                week = get_weekend(parsed)
+            except Exception:
+                week = get_weekend(timezone.now().date())
+        else:
+            week = get_weekend(timezone.now().date())
+
+        # Positions can be provided as multiple GET params (?position=1&position=2)
+        positions = request.GET.getlist('position')
+        if not positions:
+            # or as a comma-separated list in 'positions'
+            pos_csv = request.GET.get('positions')
+            if pos_csv:
+                positions = [p for p in pos_csv.split(',') if p != '']
+
+        if positions:
+            # cast numeric position values to ints when possible
+            parsed_positions = []
+            for p in positions:
+                try:
+                    parsed_positions.append(int(p))
+                except Exception:
+                    parsed_positions.append(p)
+            positions = parsed_positions
+        else:
+            positions = [ps[0] for ps in PositionChoices.choices]
+
+    # (no debug prints) incoming GET params are handled above and passed to template
     
     # Optimize: Get all positions with select_related to avoid N+1 queries
     all_positions = Positions.objects.select_related('user', 'semester').filter(
@@ -156,6 +189,11 @@ def all_weekly_payroll(request):
     return render(request, "weekly_all.html", {
         "payrolls": page_obj, 
         "week": week,
+        # string version of the week (YYYY-MM-DD) so templates can preserve it in links
+        "week_str": week.isoformat() if hasattr(week, 'isoformat') else str(week),
+        # comma-separated positions for use in pagination links
+        "positions": positions,
+        "positions_str": ",".join([str(p) for p in positions]) if positions else "",
         "paginator": paginator,
         "page_obj": page_obj
     })
