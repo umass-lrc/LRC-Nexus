@@ -91,6 +91,7 @@ def get_student_shifts(request):
             "color": color_coder(shift.kind),
             "extendedProps": {
                 "url": reverse("change_or_drop_shift_request", kwargs={"shift_id": shift.id}),
+                "shift_id": shift.id,
                 "description": description,
             }
         })
@@ -278,7 +279,9 @@ def change_or_drop_shift_request(request, shift_id):
 @login_required
 @restrict_to_http_methods("GET", "POST")
 def change_shift_request(request, shift_id):
-    shift = Shift.objects.get(id=shift_id)
+    shift = Shift.objects.filter(id=shift_id, dropped=False).first()
+    if shift is None:
+        return render(request, "change_or_drop_shift_req_response.html", {"success": False})
     if request.method == "POST":
         form = ChangeShiftRequestForm(shift, request.POST)
         if not form.is_valid():
@@ -350,7 +353,80 @@ def change_shift_request(request, shift_id):
     if (shift.kind == ShiftKind.SI_SESSION or shift.kind == ShiftKind.CLASS) and shift.start - timezone.now() < timedelta(days=7):
         return render(request, "si_directions_7_days.html")
     form = ChangeShiftRequestForm(shift)
-    return render(request, "just_form.html", {"form": form})
+    # Render manual HTML form to work around Crispy hanging with PostgreSQL
+    
+    # Workaround: Render form fields manually to avoid Crispy hanging with PostgreSQL
+    from django.http import HttpResponse
+    from core.models import Buildings
+    
+    from django.middleware.csrf import get_token
+    csrf_token = get_token(request)
+    
+    buildings = Buildings.objects.all()
+    html = f'''
+    <form method="post" hx-post="/students/calendar/change-shift-request/{shift.id}/" hx-swap="multi:#shift-request-message:innerHTML,#shift-request:innerHTML">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
+        <div class="mb-3 form-floating">
+            <input type="text" value="{shift}" class="form-control" disabled>
+            <label>Current Shift</label>
+            <input type="hidden" name="shift" value="{shift.id}">
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <input type="datetime-local" name="start" class="form-control" id="id_start" required>
+            <label for="id_start">Start Date/Time</label>
+        </div>
+        
+        <label class="form-label requiredField">Duration<span class="asteriskField">*</span></label>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="number" name="hours" min="0" max="24" class="form-control" required>
+                    <label>Hours</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="number" name="minutes" min="0" max="59" class="form-control" required>
+                    <label>Minutes</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <select name="building" class="form-select" id="id_building" required>
+    '''
+    
+    for building in buildings:
+        html += f'<option value="{building.short_name}">{building.name}</option>'
+    
+    html += f'''
+            </select>
+            <label for="id_building">Building</label>
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <input type="text" name="room" class="form-control" id="id_room" required>
+            <label for="id_room">Room</label>
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <input type="text" name="kind" value="{shift.kind}" class="form-control" id="id_kind" required>
+            <label for="id_kind">Kind</label>
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <textarea name="reason" class="form-control" id="id_reason" required style="height: 100px;"></textarea>
+            <label for="id_reason">Reason</label>
+        </div>
+        
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Make Change Request</button>
+        </div>
+    </form>
+    '''
+    
+    return HttpResponse(html)
 
 @login_required
 @restrict_to_http_methods("GET", "POST")
@@ -396,5 +472,35 @@ def drop_shift_request(request, shift_id):
         return response
     if (shift.kind == ShiftKind.SI_SESSION or shift.kind == ShiftKind.CLASS) and shift.start - timezone.now() < timedelta(days=7):
         return render(request, "si_directions_7_days.html")
-    form = DropShiftRequestForm(shift)
-    return render(request, "just_form.html", {"form": form})
+    
+    # Render manual HTML form to work around Crispy hanging with PostgreSQL
+    from django.http import HttpResponse
+    from django.middleware.csrf import get_token
+    
+    csrf_token = get_token(request)
+    html = f'''
+    <form method="post" hx-post="/students/calendar/drop-shift-request/{shift.id}/" hx-swap="multi:#shift-request-message:innerHTML,#shift-request:innerHTML">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
+        
+        <div class="mb-3 form-floating">
+            <input type="text" value="{shift}" class="form-control" disabled>
+            <label>Current Shift</label>
+            <input type="hidden" name="shift" value="{shift.id}">
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <textarea name="reason" class="form-control" id="id_reason" required style="height: 150px;"></textarea>
+            <label for="id_reason">Reason for Dropping</label>
+        </div>
+        
+        <p class="text-center">
+            <b>Are you sure you want to drop this shift?</b>
+        </p>
+        
+        <div class="text-center">
+            <button type="submit" class="btn btn-danger">Make Drop Request</button>
+        </div>
+    </form>
+    '''
+    
+    return HttpResponse(html)
