@@ -38,6 +38,7 @@ from ..forms.calendar import (
     ChangeShiftRequestForm,
     DropShiftRequestForm,
 )
+from ..forms.payroll import shift_type_choices
 
 from shifts.views import (
     get_color_coder_dict,
@@ -363,6 +364,15 @@ def change_shift_request(request, shift_id):
     csrf_token = get_token(request)
     
     buildings = Buildings.objects.all()
+    
+    # Format start datetime for datetime-local input (YYYY-MM-DDTHH:MM)
+    start_datetime = timezone.localtime(shift.start).strftime('%Y-%m-%dT%H:%M')
+    
+    # Calculate hours and minutes from duration
+    total_seconds = int(shift.duration.total_seconds())
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    
     html = f'''
     <form method="post" hx-post="/students/calendar/change-shift-request/{shift.id}/" hx-swap="multi:#shift-request-message:innerHTML,#shift-request:innerHTML">
         <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
@@ -373,7 +383,7 @@ def change_shift_request(request, shift_id):
         </div>
         
         <div class="mb-3 form-floating">
-            <input type="datetime-local" name="start" class="form-control" id="id_start" required>
+            <input type="datetime-local" name="start" class="form-control" id="id_start" value="{start_datetime}" required>
             <label for="id_start">Start Date/Time</label>
         </div>
         
@@ -381,13 +391,13 @@ def change_shift_request(request, shift_id):
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="form-floating">
-                    <input type="number" name="hours" min="0" max="24" class="form-control" required>
+                    <input type="number" name="hours" min="0" max="24" class="form-control" value="{hours}" required>
                     <label>Hours</label>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-floating">
-                    <input type="number" name="minutes" min="0" max="59" class="form-control" required>
+                    <input type="number" name="minutes" min="0" max="59" class="form-control" value="{minutes}" required>
                     <label>Minutes</label>
                 </div>
             </div>
@@ -398,7 +408,8 @@ def change_shift_request(request, shift_id):
     '''
     
     for building in buildings:
-        html += f'<option value="{building.short_name}">{building.name}</option>'
+        selected = 'selected' if building.short_name == shift.building.short_name else ''
+        html += f'<option value="{building.short_name}" {selected}>{building.name}</option>'
     
     html += f'''
             </select>
@@ -406,12 +417,32 @@ def change_shift_request(request, shift_id):
         </div>
         
         <div class="mb-3 form-floating">
-            <input type="text" name="room" class="form-control" id="id_room" required>
+            <input type="text" name="room" class="form-control" id="id_room" value="{shift.room}" maxlength="10" required>
             <label for="id_room">Room</label>
         </div>
         
         <div class="mb-3 form-floating">
-            <input type="text" name="kind" value="{shift.kind}" class="form-control" id="id_kind" required>
+            <select name="kind" class="form-select" id="id_kind" required>
+    '''
+    
+    # Get allowed kinds for this position type
+    position_type = shift.position.position
+    allowed_kinds = shift_type_choices.get(position_type, [])
+    
+    # If position type is in mapping, only show allowed kinds
+    # Otherwise, fall back to all kinds
+    if allowed_kinds:
+        for kind in allowed_kinds:
+            selected = 'selected' if kind.value == shift.kind else ''
+            html += f'<option value="{kind.value}" {selected}>{kind.label}</option>'
+    else:
+        # Fallback to all kinds if position type not in mapping
+        for kind_value, kind_label in ShiftKind.choices:
+            selected = 'selected' if kind_value == shift.kind else ''
+            html += f'<option value="{kind_value}" {selected}>{kind_label}</option>'
+    
+    html += '''
+            </select>
             <label for="id_kind">Kind</label>
         </div>
         
@@ -486,6 +517,31 @@ def drop_shift_request(request, shift_id):
             <input type="text" value="{shift}" class="form-control" disabled>
             <label>Current Shift</label>
             <input type="hidden" name="shift" value="{shift.id}">
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <select class="form-select" id="id_kind" disabled>
+    '''
+    
+    # Get allowed kinds for this position type (for display purposes)
+    position_type = shift.position.position
+    allowed_kinds = shift_type_choices.get(position_type, [])
+    
+    # If position type is in mapping, only show allowed kinds
+    # Otherwise, fall back to all kinds
+    if allowed_kinds:
+        for kind in allowed_kinds:
+            selected = 'selected' if kind.value == shift.kind else ''
+            html += f'<option value="{kind.value}" {selected}>{kind.label}</option>'
+    else:
+        # Fallback to all kinds if position type not in mapping
+        for kind_value, kind_label in ShiftKind.choices:
+            selected = 'selected' if kind_value == shift.kind else ''
+            html += f'<option value="{kind_value}" {selected}>{kind_label}</option>'
+    
+    html += '''
+            </select>
+            <label for="id_kind">Kind</label>
         </div>
         
         <div class="mb-3 form-floating">

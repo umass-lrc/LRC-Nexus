@@ -105,6 +105,7 @@ def all_weekly_payroll(request):
     all_positions = Positions.objects.select_related('user', 'semester').filter(
         semester=Semester.objects.get_active_semester(),
         position__in=positions,
+        user__is_active=True,
     )
     
     # Optimize: Get existing payrolls in a single query
