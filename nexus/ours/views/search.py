@@ -58,62 +58,78 @@ def make_query_from_list(search_query_list):
     new_query = None
     opp = 'AND'
     i = 0
+
     while i < len(search_query_list):
-        print(i)
-        type, query = search_query_list[i]
-        if type == 0:
+        type_, query = search_query_list[i]
+
+        if type_ == 0:  # regular word
             query_list = [query]
             i += 1
             while i < len(search_query_list) and search_query_list[i][0] == 0:
                 query_list.append(search_query_list[i][1])
                 i += 1
-            new_query = None
+
             if len(query_list) == 1:
-                new_query = Q('bool', should = [Q(MultiMatch(
-                    query=query_list[0],
-                    type="most_fields", 
-                    fields=[
-                        'title^5',
-                        'short_description^3',
-                        'description^2',
-                        'website_data',
-                        'additional_information',
-                        'location^5'
+                # single word query
+                new_query = Q(
+                    'bool',
+                    should=[
+                        Q(MultiMatch(
+                            query=query_list[0],
+                            type="most_fields",
+                            fields=[
+                                'title^5',
+                                'short_description^3',
+                                'description^2',
+                                'website_data',
+                                'additional_information',
+                                'location^5'
+                            ],
+                            fuzziness='AUTO'
+                        )),
+                        Q(
+                            'nested',
+                            path='keywords',
+                            query=MatchPhrase(**{"keywords.keyword": query_list[0]}),
+                            boost=300
+                        )
                     ],
-                    fuzziness='AUTO'
-                    )), Q(
-                        'nested',
-                        path='keywords',
-                        query=Match(keyword=query_list[0])
-                    )],
                     minimum_should_match=1,
                     boost=100
                 )
             else:
-                # 1st priority: If the exact phrase is found
+                # phrase query
                 query_for_phrase = " ".join(query_list)
-                phrase_query = Q('bool', should = [Q(MultiMatch(
-                    query=query_for_phrase, 
-                    type="phrase", 
-                    fields=[
-                        'title^5',
-                        'short_description^3',
-                        'description^2',
-                        'website_data',
-                        'additional_information',
-                        'location^5'
-                    ]
-                    )), Q(
-                        'nested',
-                        path='keywords',
-                        query=MatchPhrase(keyword=query_for_phrase)
-                    )],
+                phrase_query = Q(
+                    'bool',
+                    should=[
+                        Q(MultiMatch(
+                            query=query_for_phrase,
+                            type="phrase",
+                            fields=[
+                                'title^5',
+                                'short_description^3',
+                                'description^2',
+                                'website_data',
+                                'additional_information',
+                                'location^5'
+                            ]
+                        )),
+                        Q(
+                            'nested',
+                            path='keywords',
+                            query=MatchPhrase(**{"keywords.keyword": query_for_phrase}),
+                            boost=300
+                        )
+                    ],
                     minimum_should_match=1,
                     boost=100
                 )
-                
-                # 2nd priority: If the words are found in same order with gap between them
-                interval_query = Q('bool', should =[
+
+                # interval query (words in order with gaps)
+                interval_query = Q(
+                    'bool',
+                    should=[
                         interval_query_per_field(query_list, 'title'),
                         interval_query_per_field(query_list, 'short_description'),
                         interval_query_per_field(query_list, 'description'),
@@ -124,9 +140,11 @@ def make_query_from_list(search_query_list):
                     minimum_should_match=1,
                     boost=50
                 )
-                
-                # 3rd priority: If the words are found in any order
-                words_query = Q('bool', must=[
+
+                # individual word queries
+                words_query = Q(
+                    'bool',
+                    must=[
                         MultiMatch(
                             query=_query,
                             type="most_fields",
@@ -139,43 +157,54 @@ def make_query_from_list(search_query_list):
                                 'location^5'
                             ],
                             fuzziness='AUTO'
-                        ) for _query in query_list
-                    ],
+                        )
+                        for _query in query_list
+                    ]
                 )
-                
+
                 new_query = Q('bool', should=[phrase_query, interval_query, words_query], minimum_should_match=1)
             i -= 1
-        elif type == 1:
+
+        elif type_ == 1:  # AND / OR operator
             opp = query
             i += 1
             continue
-        elif type == 2:
-            new_query = Q('bool', should=[MultiMatch(
-                    query=query, 
-                    type="phrase", 
-                    fields=[
-                        'title^5',
-                        'short_description^3',
-                        'description^2',
-                        'website_data',
-                        'additional_information',
-                        'location^5'
-                    ]
-                ), Q(
-                    'nested', 
-                    path='keywords', 
-                    query=MatchPhrase(keyword=query)
-                )], 
-                minimum_should_match=1, 
+
+        elif type_ == 2:  # quoted phrase
+            new_query = Q(
+                'bool',
+                should=[
+                    Q(MultiMatch(
+                        query=query,
+                        type="phrase",
+                        fields=[
+                            'title^5',
+                            'short_description^3',
+                            'description^2',
+                            'website_data',
+                            'additional_information',
+                            'location^5'
+                        ]
+                    )),
+                    Q(
+                        'nested',
+                        path='keywords',
+                        query=MatchPhrase(**{"keywords.keyword": query}),
+                        boost=300
+                    )
+                ],
+                minimum_should_match=1,
                 boost=100
             )
-        
+
+        # combine queries with AND/OR
         if es_query is None:
             es_query = new_query
         else:
             es_query = es_query & new_query if opp == 'AND' else es_query | new_query
-        
+
         i += 1
+
     return es_query
 
 def es_opportunity_search(search_query, ours_website=False):
