@@ -78,10 +78,11 @@ def schedule_for_all_course_for_start(request, start_date, shift_kind, remove_em
     # Optimize: Build position mappings in bulk
     si_course_positions = {}
     for role in filtered_si_role:
-        course = role.assigned_class.course
-        if course not in si_course_positions:
-            si_course_positions[course] = set()
-        si_course_positions[course].add(role.position_id)
+        if role.assigned_class is not None:
+            course = role.assigned_class.course
+            if course not in si_course_positions:
+                si_course_positions[course] = set()
+            si_course_positions[course].add(role.position_id)
     
     tutor_course_positions = {}
     for role in filtered_tutor_role:
