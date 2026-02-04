@@ -364,12 +364,28 @@ def get_approve_entire_weeks(request):
 @restrict_to_http_methods('GET', 'POST')
 def approve_entire_week(request, payroll_id):
     payroll = Payroll.objects.get(id=payroll_id)
+    
+    position = payroll.position
+    is_punched_in = AttendanceInfo.objects.filter(shift__position=position, punch_in_time__isnull=False, punch_out_time__isnull=True).exists()
+    
+    now = timezone.localtime(timezone.now())
+    has_more = Shift.objects.filter(
+    position=position,
+    start__gte=now.date(),
+    start__date__lte=payroll.week_end
+    ).exists()
+    
     if request.method == 'POST':
-        now = timezone.localtime(timezone.now())
         error = False
-        if now.date() + timedelta(days=1) < payroll.week_end:
+        if has_more:
             error = True
-            messages.error(request, "You can't sign for the week before end of the week.")
+            messages.error(request,"You can't sign for the week if you still have shifts scheduled for the week. ")
+        elif is_punched_in:
+            error = True
+            messages.error(request, 'You are currently punched in. Please punch out first.')
+        # elif now.date() + timedelta(days=1) < payroll.week_end:
+        #     error = True
+        #     messages.error(request, "You can't sign for the week before end of the week.")
         elif payroll.not_signed.total_hours > timedelta(hours=0):
             error = True
             messages.error(request, 'Records indicate you have un-signed shift. Please sign those first.')

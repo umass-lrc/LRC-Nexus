@@ -253,8 +253,15 @@ def add_edit_recurring(request, user_id):
     user = NexusUser.objects.get(id=user_id)
     recurring_shifts = RecurringShift.objects.filter(position__user=user).all()
     current_datetime = timezone.now().date()
-    current_recurring_shifts = recurring_shifts.filter(start_date__lte=current_datetime, end_date__gte=current_datetime)
-    inactive_recurring_shifts = recurring_shifts.exclude(start_date__lte=current_datetime, end_date__gte=current_datetime)
+    sem = Semester.objects.get_active_semester()
+    # if we have an active semester, show recurring shifts in the semester
+    if sem:
+        current_recurring_shifts = recurring_shifts.filter(start_date__lte=sem.classes_end, end_date__gte=sem.classes_start).all()
+        inactive_recurring_shifts = recurring_shifts.exclude(start_date__lte=sem.classes_end, end_date__gte=sem.classes_start).all()
+    else:
+        # fallback: use current date if no active semester
+        current_recurring_shifts = recurring_shifts.filter(start_date__lte=current_datetime, end_date__gte=current_datetime).all()
+        inactive_recurring_shifts = recurring_shifts.exclude(start_date__lte=current_datetime, end_date__gte=current_datetime).all()
     context = {
         "user_id": user_id,
         "current_recurring_shifts": current_recurring_shifts,
