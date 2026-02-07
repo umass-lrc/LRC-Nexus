@@ -369,9 +369,10 @@ def approve_entire_week(request, payroll_id):
     is_punched_in = AttendanceInfo.objects.filter(shift__position=position, punch_in_time__isnull=False, punch_out_time__isnull=True).exists()
     
     now = timezone.localtime(timezone.now())
+    
     has_more = Shift.objects.filter(
     position=position,
-    start__gte=now.date(),
+    start__gte=now,
     start__date__lte=payroll.week_end
     ).exists()
     
