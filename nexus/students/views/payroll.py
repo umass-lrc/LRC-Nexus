@@ -381,9 +381,10 @@ def approve_entire_week(request, payroll_id):
         if has_more:
             error = True
             messages.error(request,"You can't sign for the week if you still have shifts scheduled for the week. ")
-        elif is_punched_in:
+        elif is_punched_in and now.date() <= payroll.week_end:
             error = True
             messages.error(request, 'You are currently punched in. Please punch out first.')
+        # Note: Old logic, when you could only approve on Fridays
         # elif now.date() + timedelta(days=1) < payroll.week_end:
         #     error = True
         #     messages.error(request, "You can't sign for the week before end of the week.")
