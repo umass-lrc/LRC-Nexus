@@ -47,6 +47,17 @@ from ..forms.payroll import (
     WeekPayrollApproveForm,
 )
 
+
+def _require_week_reapproval_for_shift(shift):
+    payroll = Payroll.objects.filter(
+        position=shift.position,
+        week_end=get_weekend(timezone.localdate(shift.start)),
+    ).first()
+    if payroll is None:
+        return
+    payroll.not_in_hr.approved_by_user = False
+    payroll.not_in_hr.save(update_fields=['approved_by_user'])
+
 @login_required
 @restrict_to_http_methods('GET')
 def get_user_payroll_page(request):
@@ -128,6 +139,7 @@ def punch_in_out_position(request, position_id):
                 att_info.sign_datetime = timezone.now()
                 att_info.save()
                 att_info.did_attend()
+                _require_week_reapproval_for_shift(att_info.shift)
                 messages.success(request, 'Punched out successfully.')
             punch_in_time = timezone.now()
             shift = Shift.objects.create(
@@ -154,6 +166,7 @@ def punch_in_out_position(request, position_id):
             att_info.sign_datetime = timezone.now()
             att_info.save()
             att_info.did_attend()
+            _require_week_reapproval_for_shift(att_info.shift)
             messages.success(request, 'Punched out successfully.')
         context = {
             'position_id': position.id,
@@ -201,6 +214,7 @@ def shift_punch_in_out(request, shift_id):
                 att_info.sign_datetime = timezone.now()
                 att_info.save()
                 att_info.did_attend()
+                _require_week_reapproval_for_shift(att_info.shift)
                 messages.success(request, 'Punched out successfully.')
             punch_in_time = timezone.now()
             att_info = AttendanceInfo.objects.get(shift=shift)
@@ -223,6 +237,7 @@ def shift_punch_in_out(request, shift_id):
             att_info.sign_datetime = timezone.now()
             att_info.save()
             att_info.did_attend()
+            _require_week_reapproval_for_shift(att_info.shift)
             messages.success(request, 'Punched out successfully.')
         context = {
             'position_id': position.id,
@@ -300,6 +315,7 @@ def attendance_for_shift(request, shift_id):
             att.sign_datetime = timezone.now()
             att.save()
             att.did_attend()
+            _require_week_reapproval_for_shift(att.shift)
             
             if shift.kind == ShiftKind.SI_SESSION or shift.kind == ShiftKind.GROUP_TUTORING:
                 duration = timedelta(hours=2)
@@ -320,6 +336,7 @@ def attendance_for_shift(request, shift_id):
                 prep_shift.attendance_info.sign_datetime = timezone.now()
                 prep_shift.attendance_info.save()
                 prep_shift.attendance_info.did_attend()
+                _require_week_reapproval_for_shift(prep_shift)
         elif 'did_not_attend' in request.POST:
             att = AttendanceInfo.objects.get(shift=shift)
             att.attended = False
@@ -328,6 +345,7 @@ def attendance_for_shift(request, shift_id):
             att.sign_datetime = timezone.now()
             att.save()
             att.did_not_attend()
+            _require_week_reapproval_for_shift(att.shift)
         messages.success(request, 'Shift signed successfully.')
         return render(request, 'sign_shift_response.html', context={'success': True, 'shift_id': shift.id})
     form = SignShiftForm(requires_punch_in_out, initial={
