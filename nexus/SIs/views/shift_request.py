@@ -43,7 +43,11 @@ def shift_requests(request):
 def add_request(request, request_state):
     requests = ChangeRequest.objects.filter(
         Q(state = request_state) & (Q(position__position = PositionChoices.SI) | Q(position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
-    ).order_by('start')
+    )
+    if request_state in [State.APPROVED, State.DENIED]:
+        requests = requests.order_by('-last_changed_on')
+    else:
+        requests = requests.order_by('start')
     context = {
         'a_requests': requests,
         'url_name': 'si_add_request_form',
@@ -56,7 +60,11 @@ def add_request(request, request_state):
 def change_request(request, request_state):
     requests = ChangeRequest.objects.filter(
         Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(position__position = PositionChoices.GROUP_TUTOR)),
-    ).order_by('start')
+    )
+    if request_state in [State.APPROVED, State.DENIED]:
+        requests = requests.order_by('-last_changed_on')
+    else:
+        requests = requests.order_by('start')
     context = {
         'c_requests': requests,
         'url_name': 'si_change_request_form',
@@ -70,7 +78,11 @@ def change_request(request, request_state):
 def drop_request(request, request_state):
     requests = DropRequest.objects.filter(
         Q(state = request_state) & (Q(shift__position__position = PositionChoices.SI) | Q(shift__position__position = PositionChoices.SI_PM) | Q(shift__position__position = PositionChoices.GROUP_TUTOR)),
-    ).order_by('shift__start')
+    )
+    if request_state in [State.APPROVED, State.DENIED]:
+        requests = requests.order_by('-last_changed_on')
+    else:
+        requests = requests.order_by('shift__start')
     context = {
         'd_requests': requests,
         'url_name': 'si_drop_request_form',
