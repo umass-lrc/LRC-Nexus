@@ -58,7 +58,7 @@ def schedule_for_all_course_for_start(request, start_date, shift_kind, remove_em
     filtered_shift = Shift.objects.select_related(
         'position', 'position__user', 'building'
     ).filter(
-        Q(start__date__gte = start_date) & Q(start__date__lte = (start_date + timedelta(days=6))) & Q(kind__in = shift_kind)
+        Q(start__date__gte = start_date) & Q(start__date__lte = (start_date + timedelta(days=6))) & Q(kind__in = shift_kind) & Q(dropped = False)
     ).order_by("start")   
     
     # Optimize: Get all SI and tutor roles with select_related
