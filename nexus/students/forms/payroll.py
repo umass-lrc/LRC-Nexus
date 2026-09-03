@@ -81,6 +81,19 @@ shift_type_choices = {
         ShiftKind.TRAINING,
         ShiftKind.OTHER,
     ],
+    PositionChoices.MCAT_TUTOR: [
+        ShiftKind.TUTOR_DROP_IN,
+        ShiftKind.TUTOR_APPOINTMENT,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
+    PositionChoices.DEPARTMENTAL_ASSISTANT: [
+        ShiftKind.OA_HOURS,
+        ShiftKind.MEETING,
+        ShiftKind.TRAINING,
+        ShiftKind.OTHER,
+    ],
 }
 
 class PunchInForm(forms.Form):
