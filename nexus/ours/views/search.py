@@ -207,21 +207,36 @@ def make_query_from_list(search_query_list):
 
     return es_query
 
-def es_opportunity_search(search_query, ours_website=False):
+def parse_tri_state(value):
+    """Turn a 'true'/'false'/'' form value into True/False/None (None = no filter)."""
+    if value == 'true':
+        return True
+    if value == 'false':
+        return False
+    return None
+
+def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_paid=None, is_for_credit=None):
     search_query_list = divide_query(search_query)
-    if len(search_query_list) == 0:
+    has_filters = on_campus is not None or is_paid is not None or is_for_credit is not None
+    if len(search_query_list) == 0 and not has_filters:
         return []
-    
+
     filter_query = Q(Match(active=True))
     if ours_website:
         filter_query = filter_query & \
             Q(Match(show_on_website=True)) & \
             Q('range', show_on_website_start_date={'lte': datetime.datetime.now()}) & \
             Q('range', show_on_website_end_date={'gte': datetime.datetime.now()})
-    
-    query = make_query_from_list(search_query_list)
+    if on_campus is not None:
+        filter_query = filter_query & Q(Match(on_campus=on_campus))
+    if is_paid is not None:
+        filter_query = filter_query & Q(Match(is_paid=is_paid))
+    if is_for_credit is not None:
+        filter_query = filter_query & Q(Match(is_for_credit=is_for_credit))
+
+    query = make_query_from_list(search_query_list) if search_query_list else Q('match_all')
     result_opp = OpportunityDocument.search().extra(size=1000).filter(filter_query).query(query).execute()
-    
+
     result_opp = [opp.meta.id for opp in result_opp]
     return result_opp
 
@@ -230,9 +245,18 @@ def es_opportunity_search(search_query, ours_website=False):
 def opportunity_search(request):
     if request.method == 'POST':
         search_query = request.POST.get('search_query', '')
-        if len(search_query) == 0:
+        on_campus = parse_tri_state(request.POST.get('on_campus', ''))
+        is_paid = parse_tri_state(request.POST.get('is_paid', ''))
+        is_for_credit = parse_tri_state(request.POST.get('is_for_credit', ''))
+        has_filters = on_campus is not None or is_paid is not None or is_for_credit is not None
+        if len(search_query) == 0 and not has_filters:
             return redirect('search_no_result')
-        result_opp = es_opportunity_search(search_query)
+        result_opp = es_opportunity_search(
+            search_query,
+            on_campus=on_campus,
+            is_paid=is_paid,
+            is_for_credit=is_for_credit,
+        )
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)

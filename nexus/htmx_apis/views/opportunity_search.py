@@ -22,7 +22,7 @@ from ours.models import (
     Keyword,
 )
 
-from ours.views.search import es_opportunity_search
+from ours.views.search import es_opportunity_search, parse_tri_state
 
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')
@@ -30,10 +30,19 @@ def opportunity_search(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         if len(body_unicode) < 13:
-            return search_no_result(request, search_query, 0)
-        body = parse_qs(body_unicode, strict_parsing=True)
+            return search_no_result(request, "", 0)
+        body = parse_qs(body_unicode)
         search_query = body['search_query'][0] if 'search_query' in body else ""
-        result_opp = es_opportunity_search(search_query, ours_website=True)
+        on_campus = parse_tri_state(body.get('on_campus', [''])[0])
+        is_paid = parse_tri_state(body.get('is_paid', [''])[0])
+        is_for_credit = parse_tri_state(body.get('is_for_credit', [''])[0])
+        result_opp = es_opportunity_search(
+            search_query,
+            ours_website=True,
+            on_campus=on_campus,
+            is_paid=is_paid,
+            is_for_credit=is_for_credit,
+        )
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)

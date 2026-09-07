@@ -30,7 +30,7 @@
     left: 16px;
   }
 
-  .search .btn {
+  .search #submit-id-submit {
     margin: 0px !important;
     padding: 6px 12px !important;
     position: absolute !important;
@@ -41,6 +41,56 @@
     background: #730f1e !important;
     text-indent: 0% !important;
     line-height: var(--bs-btn-line-height) !important;
+  }
+
+  .search-filters {
+    margin-top: 14px;
+    padding-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filter-group {
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #d6d4d4;
+  }
+
+  .filter-group .btn {
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 6px 16px !important;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #555;
+    background: #fff !important;
+    text-indent: 0 !important;
+    line-height: normal !important;
+  }
+
+  .filter-group .btn:not(:last-child) {
+    border-right: 1px solid #d6d4d4 !important;
+  }
+
+  .filter-group .btn:hover {
+    background: #f6e9eb !important;
+    color: #730f1e;
+  }
+
+  .filter-group .btn-check:checked + .btn {
+    background: #730f1e !important;
+    color: #fff;
+  }
+
+  .filter-group .btn-check:checked + .btn:hover {
+    background: #730f1e !important;
+    color: #fff;
+  }
+
+  .filter-group .btn-check:focus-visible + .btn {
+    box-shadow: inset 0 0 0 2px #730f1e66;
   }
 
   .eyes {
@@ -122,8 +172,8 @@
       <form
         class="search"
         hx-post="https://lrcstaff.umass.edu{% url 'api_opportunity_search' %}"
-        hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
-        hx-trigger="click"
+        hx-swap="multi:#result_stats:outerHTML,#results:innerHTML"
+        hx-trigger="click from:#submit-id-submit, change from:.search-filters"
         placeholder="Searching..."
       >
         <i class="fa fa-search"></i>
@@ -140,6 +190,32 @@
           class="btn btn-primary btn btn-primary text-center"
           id="submit-id-submit"
         />
+        <div class="search-filters">
+          <div class="btn-group filter-group" role="group" aria-label="Location filter">
+            <input type="radio" class="btn-check" name="on_campus" id="api_on_campus_any" value="" checked>
+            <label class="btn" for="api_on_campus_any">Any location</label>
+            <input type="radio" class="btn-check" name="on_campus" id="api_on_campus_true" value="true">
+            <label class="btn" for="api_on_campus_true">On-campus</label>
+            <input type="radio" class="btn-check" name="on_campus" id="api_on_campus_false" value="false">
+            <label class="btn" for="api_on_campus_false">Off-campus</label>
+          </div>
+          <div class="btn-group filter-group" role="group" aria-label="Pay filter">
+            <input type="radio" class="btn-check" name="is_paid" id="api_is_paid_any" value="" checked>
+            <label class="btn" for="api_is_paid_any">Any pay</label>
+            <input type="radio" class="btn-check" name="is_paid" id="api_is_paid_true" value="true">
+            <label class="btn" for="api_is_paid_true">Paid</label>
+            <input type="radio" class="btn-check" name="is_paid" id="api_is_paid_false" value="false">
+            <label class="btn" for="api_is_paid_false">Unpaid</label>
+          </div>
+          <div class="btn-group filter-group" role="group" aria-label="Credit filter">
+            <input type="radio" class="btn-check" name="is_for_credit" id="api_is_for_credit_any" value="" checked>
+            <label class="btn" for="api_is_for_credit_any">Any credit</label>
+            <input type="radio" class="btn-check" name="is_for_credit" id="api_is_for_credit_true" value="true">
+            <label class="btn" for="api_is_for_credit_true">For credit</label>
+            <input type="radio" class="btn-check" name="is_for_credit" id="api_is_for_credit_false" value="false">
+            <label class="btn" for="api_is_for_credit_false">Not for credit</label>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -168,7 +244,7 @@
       <div
         hx-get="https://lrcstaff.umass.edu{% url 'api_search_no_result'%}"
         hx-trigger="load"
-        hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+        hx-swap="multi:#result_stats:outerHTML,#results:innerHTML"
       ></div>
     </div>
   </div>

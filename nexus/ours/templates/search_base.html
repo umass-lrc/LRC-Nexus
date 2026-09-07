@@ -16,8 +16,8 @@
     <form
       class="search"
       hx-post="{% url 'opportunity_search' %}"
-      hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
-      hx-trigger="click"
+      hx-swap="multi:#result_stats:outerHTML,#results:innerHTML"
+      hx-trigger="click from:#submit-id-submit, change from:.search-filters"
       placeholder="Searching..."
     >
       <i class="fa fa-search"></i>
@@ -34,6 +34,32 @@
         class="btn btn-primary btn btn-primary text-center"
         id="submit-id-submit"
       />
+      <div class="search-filters">
+        <div class="btn-group filter-group" role="group" aria-label="Location filter">
+          <input type="radio" class="btn-check" name="on_campus" id="on_campus_any" value="" checked>
+          <label class="btn" for="on_campus_any">Any location</label>
+          <input type="radio" class="btn-check" name="on_campus" id="on_campus_true" value="true">
+          <label class="btn" for="on_campus_true">On-campus</label>
+          <input type="radio" class="btn-check" name="on_campus" id="on_campus_false" value="false">
+          <label class="btn" for="on_campus_false">Off-campus</label>
+        </div>
+        <div class="btn-group filter-group" role="group" aria-label="Pay filter">
+          <input type="radio" class="btn-check" name="is_paid" id="is_paid_any" value="" checked>
+          <label class="btn" for="is_paid_any">Any pay</label>
+          <input type="radio" class="btn-check" name="is_paid" id="is_paid_true" value="true">
+          <label class="btn" for="is_paid_true">Paid</label>
+          <input type="radio" class="btn-check" name="is_paid" id="is_paid_false" value="false">
+          <label class="btn" for="is_paid_false">Unpaid</label>
+        </div>
+        <div class="btn-group filter-group" role="group" aria-label="Credit filter">
+          <input type="radio" class="btn-check" name="is_for_credit" id="is_for_credit_any" value="" checked>
+          <label class="btn" for="is_for_credit_any">Any credit</label>
+          <input type="radio" class="btn-check" name="is_for_credit" id="is_for_credit_true" value="true">
+          <label class="btn" for="is_for_credit_true">For credit</label>
+          <input type="radio" class="btn-check" name="is_for_credit" id="is_for_credit_false" value="false">
+          <label class="btn" for="is_for_credit_false">Not for credit</label>
+        </div>
+      </div>
     </form>
   </div>
 </div>
@@ -45,7 +71,7 @@
   <div
     hx-get="{% url 'search_no_result'%}"
     hx-trigger="load"
-    hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+    hx-swap="multi:#result_stats:outerHTML,#results:innerHTML"
   ></div>
 </div>
 {% endblock %} {% block extra_scripts %}

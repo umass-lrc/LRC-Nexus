@@ -94,7 +94,7 @@ class OpportunityDocument(Document):
     keywords = fields.NestedField(properties={
         "keyword": fields.TextField(),
     })
-    
+
     related_to_major = fields.NestedField(properties={
         "major": fields.TextField(),
     })
@@ -120,6 +120,9 @@ class OpportunityDocument(Document):
             "show_on_website_start_date",
             "show_on_website_end_date",
             "featured",
+            "on_campus",
+            "is_paid",
+            "is_for_credit",
         ]
         related_models = [Keyword, Majors, Tracks, CitizenshipStatus]
     
