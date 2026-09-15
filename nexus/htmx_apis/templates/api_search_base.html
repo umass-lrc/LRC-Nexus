@@ -4,6 +4,13 @@
 <link rel="stylesheet" href="{% static 'css/search.css' %}" />
 {% endblock %} {% endcomment %}
 
+
+<!--Content of the page-->
+<div class="container">
+  <!-- This style block must stay INSIDE a body-level element. htmx parses the
+       response with DOMParser and keeps only .body; a style block appearing
+       before the first element is parsed into head instead and silently
+       dropped on swap, which is why this embed was unstyled for a long time. -->
 <style>
   .search {
     padding: 0px;
@@ -93,6 +100,43 @@
     box-shadow: inset 0 0 0 2px #730f1e66;
   }
 
+  /* The host page (Drupal, umass.edu/ours) ships no Bootstrap, so .btn-check,
+     .btn-group and .btn are inert there. Everything below must stand alone. */
+
+  .filter-group {
+    display: inline-flex;
+  }
+
+  /* Visually-hidden radio. Needs !important to beat `.search input` above,
+     which would otherwise make these 60px tall and full width. */
+  .filter-group input[type="radio"] {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    text-indent: 0 !important;
+  }
+
+  /* Host theme sets `label { margin-bottom: .5rem }` and
+     `form label { text-transform: uppercase; color: #666 !important }`. */
+  .filter-group label {
+    margin-bottom: 0 !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    color: #555 !important;
+    cursor: pointer;
+  }
+
+  .filter-group input[type="radio"]:checked + label {
+    background: #730f1e !important;
+    color: #fff !important;
+  }
+
   .eyes {
     aspect-ratio: 5 / 1;
     width: 100%;
@@ -161,9 +205,6 @@
     background-color: #f7f8f8 !important;
   }
 </style>
-
-<!--Content of the page-->
-<div class="container">
   <div
     class="row height d-flex justify-content-center align-items-center"
     style="z-index: 10000"
