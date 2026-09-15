@@ -19,7 +19,13 @@
 
 }
 
-.search-bar .fa-search {
+/* Font Awesome's kit JS replaces the <i> with an <svg> and renames the FA5
+ class fa-search to the FA6 name fa-magnifying-glass, so neither FA class is
+ dependable. search-icon is ours and FA copies user classes onto the svg;
+ the FA names are kept as fallbacks for webfont mode. */
+.search-bar .search-icon,
+.search-bar .fa-search,
+.search-bar .fa-magnifying-glass {
     position: absolute;
     top: 20px;
     left: 16px;
