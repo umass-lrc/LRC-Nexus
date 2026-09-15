@@ -1,27 +1,31 @@
-.search {
+/* Wraps the text input + button only, so the shadow and the absolutely
+   positioned icon/button do not enclose the filter row below. */
+.search-bar {
     position: relative;
     box-shadow: 0 0 40px rgba(51, 51, 51, .1);
 }
 
-.search input {
+.search-bar input[type="text"] {
+    display: block;
+    margin: 0;
     height: 60px;
     text-indent: 25px;
     border: 2px solid #d6d4d4;
 }
 
-.search input:focus {
+.search-bar input[type="text"]:focus {
     box-shadow: none;
     border: 2px solid #0d6efd;
 
 }
 
-.search .fa-search {
+.search-bar .fa-search {
     position: absolute;
     top: 20px;
     left: 16px;
 }
 
-.search #submit-id-submit {
+.search-bar #submit-id-submit {
     position: absolute;
     top: 5px;
     right: 5px;

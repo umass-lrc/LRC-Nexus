@@ -20,20 +20,23 @@
       hx-trigger="click from:#submit-id-submit, change from:.search-filters"
       placeholder="Searching..."
     >
-      <i class="fa fa-search"></i>
-      <input
-        type="text"
-        name="search_query"
-        class="form-control"
-        placeholder="Want to find some job/research opportunities? Search here!"
-      />
-      <input
-        type="submit"
-        name="submit"
-        value="Search"
-        class="btn btn-primary btn btn-primary text-center"
-        id="submit-id-submit"
-      />
+      <div class="search-bar">
+        <i class="fa fa-search"></i>
+        <input
+          type="text"
+          name="search_query"
+          class="form-control"
+          placeholder="Want to find some job/research opportunities? Search here!"
+        />
+        <input
+          type="submit"
+          name="submit"
+          value="Search"
+          class="btn btn-primary btn btn-primary text-center"
+          id="submit-id-submit"
+        />
+      </div>
+
       <div class="search-filters">
         <div class="btn-group filter-group" role="group" aria-label="Location filter">
           <input type="radio" class="btn-check" name="on_campus" id="on_campus_any" value="" checked>

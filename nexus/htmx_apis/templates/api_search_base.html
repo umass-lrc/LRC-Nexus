@@ -14,11 +14,19 @@
 <style>
   .search {
     padding: 0px;
+  }
+
+  /* Wraps the text input + button only. The shadow and the absolutely
+     positioned icon/button anchor here, not on the form, so they no longer
+     enclose the filter row that sits below. */
+  .search-bar {
     position: relative;
     box-shadow: 0 0 40px rgba(45, 6, 12, 0.1);
   }
 
-  .search input {
+  .search-bar input[type="text"] {
+    display: block;
+    margin: 0 !important;
     padding: 6px 12px !important;
     height: 60px !important;
     text-indent: 25px !important;
@@ -26,18 +34,18 @@
     width: 100% !important;
   }
 
-  .search input:focus {
+  .search-bar input[type="text"]:focus {
     box-shadow: none !important;
     border: 2px solid #730f1e !important;
   }
 
-  .search .fa-search {
+  .search-bar .fa-search {
     position: absolute;
     top: 20px;
     left: 16px;
   }
 
-  .search #submit-id-submit {
+  .search-bar #submit-id-submit {
     margin: 0px !important;
     padding: 6px 12px !important;
     position: absolute !important;
@@ -47,7 +55,7 @@
     width: 110px !important;
     background: #730f1e !important;
     text-indent: 0% !important;
-    line-height: var(--bs-btn-line-height) !important;
+    line-height: 1.5 !important;
   }
 
   .search-filters {
@@ -107,8 +115,8 @@
     display: inline-flex;
   }
 
-  /* Visually-hidden radio. Needs !important to beat `.search input` above,
-     which would otherwise make these 60px tall and full width. */
+  /* Visually-hidden radio. The !important guards are defensive: the host
+     theme styles form controls, and Bootstrap's .btn-check is absent here. */
   .filter-group input[type="radio"] {
     position: absolute !important;
     width: 1px !important;
@@ -217,20 +225,23 @@
         hx-trigger="click from:#submit-id-submit, change from:.search-filters"
         placeholder="Searching..."
       >
-        <i class="fa fa-search"></i>
-        <input
-          type="text"
-          name="search_query"
-          class="form-control"
-          placeholder="Want to find some job/research opportunities? Search here!"
-        />
-        <input
-          type="submit"
-          name="submit"
-          value="Search"
-          class="btn btn-primary btn btn-primary text-center"
-          id="submit-id-submit"
-        />
+        <div class="search-bar">
+          <i class="fa fa-search"></i>
+          <input
+            type="text"
+            name="search_query"
+            class="form-control"
+            placeholder="Want to find some job/research opportunities? Search here!"
+          />
+          <input
+            type="submit"
+            name="submit"
+            value="Search"
+            class="btn btn-primary btn btn-primary text-center"
+            id="submit-id-submit"
+          />
+        </div>
+
         <div class="search-filters">
           <div class="btn-group filter-group" role="group" aria-label="Location filter">
             <input type="radio" class="btn-check" name="on_campus" id="api_on_campus_any" value="" checked>
