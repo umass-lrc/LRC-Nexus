@@ -121,9 +121,9 @@
     display: inline-flex;
   }
 
-  /* Visually-hidden radio. The !important guards are defensive: the host
+  /* Visually-hidden checkbox. The !important guards are defensive: the host
      theme styles form controls, and Bootstrap's .btn-check is absent here. */
-  .filter-group input[type="radio"] {
+  .filter-group input[type="checkbox"] {
     position: absolute !important;
     width: 1px !important;
     height: 1px !important;
@@ -146,7 +146,7 @@
     cursor: pointer;
   }
 
-  .filter-group input[type="radio"]:checked + label {
+  .filter-group input[type="checkbox"]:checked + label {
     background: #730f1e !important;
     color: #fff !important;
   }
@@ -249,29 +249,13 @@
         </div>
 
         <div class="search-filters">
-          <div class="btn-group filter-group" role="group" aria-label="Location filter">
-            <input type="radio" class="btn-check" name="on_campus" id="api_on_campus_any" value="" checked>
-            <label class="btn" for="api_on_campus_any">Any location</label>
-            <input type="radio" class="btn-check" name="on_campus" id="api_on_campus_true" value="true">
+          <div class="filter-group">
+            <input type="checkbox" class="btn-check" name="on_campus" id="api_on_campus_true" value="true">
             <label class="btn" for="api_on_campus_true">On-campus</label>
-            <input type="radio" class="btn-check" name="on_campus" id="api_on_campus_false" value="false">
-            <label class="btn" for="api_on_campus_false">Off-campus</label>
           </div>
-          <div class="btn-group filter-group" role="group" aria-label="Pay filter">
-            <input type="radio" class="btn-check" name="is_paid" id="api_is_paid_any" value="" checked>
-            <label class="btn" for="api_is_paid_any">Any pay</label>
-            <input type="radio" class="btn-check" name="is_paid" id="api_is_paid_true" value="true">
+          <div class="filter-group">
+            <input type="checkbox" class="btn-check" name="is_paid" id="api_is_paid_true" value="true">
             <label class="btn" for="api_is_paid_true">Paid</label>
-            <input type="radio" class="btn-check" name="is_paid" id="api_is_paid_false" value="false">
-            <label class="btn" for="api_is_paid_false">Unpaid</label>
-          </div>
-          <div class="btn-group filter-group" role="group" aria-label="Credit filter">
-            <input type="radio" class="btn-check" name="is_for_credit" id="api_is_for_credit_any" value="" checked>
-            <label class="btn" for="api_is_for_credit_any">Any credit</label>
-            <input type="radio" class="btn-check" name="is_for_credit" id="api_is_for_credit_true" value="true">
-            <label class="btn" for="api_is_for_credit_true">For credit</label>
-            <input type="radio" class="btn-check" name="is_for_credit" id="api_is_for_credit_false" value="false">
-            <label class="btn" for="api_is_for_credit_false">Not for credit</label>
           </div>
         </div>
       </form>

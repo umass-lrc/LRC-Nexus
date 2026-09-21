@@ -50,6 +50,7 @@
 }
 
 .filter-group {
+    display: inline-flex;
     border-radius: 999px;
     overflow: hidden;
     border: 1px solid #d6d4d4;

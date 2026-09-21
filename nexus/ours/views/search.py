@@ -215,9 +215,9 @@ def parse_tri_state(value):
         return False
     return None
 
-def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_paid=None, is_for_credit=None):
+def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_paid=None):
     search_query_list = divide_query(search_query)
-    has_filters = on_campus is not None or is_paid is not None or is_for_credit is not None
+    has_filters = on_campus is not None or is_paid is not None
     if len(search_query_list) == 0 and not has_filters:
         return []
 
@@ -231,8 +231,6 @@ def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_p
         filter_query = filter_query & Q(Match(on_campus=on_campus))
     if is_paid is not None:
         filter_query = filter_query & Q(Match(is_paid=is_paid))
-    if is_for_credit is not None:
-        filter_query = filter_query & Q(Match(is_for_credit=is_for_credit))
 
     query = make_query_from_list(search_query_list) if search_query_list else Q('match_all')
     result_opp = OpportunityDocument.search().extra(size=1000).filter(filter_query).query(query).execute()
@@ -247,15 +245,13 @@ def opportunity_search(request):
         search_query = request.POST.get('search_query', '')
         on_campus = parse_tri_state(request.POST.get('on_campus', ''))
         is_paid = parse_tri_state(request.POST.get('is_paid', ''))
-        is_for_credit = parse_tri_state(request.POST.get('is_for_credit', ''))
-        has_filters = on_campus is not None or is_paid is not None or is_for_credit is not None
+        has_filters = on_campus is not None or is_paid is not None
         if len(search_query) == 0 and not has_filters:
             return redirect('search_no_result')
         result_opp = es_opportunity_search(
             search_query,
             on_campus=on_campus,
             is_paid=is_paid,
-            is_for_credit=is_for_credit,
         )
         num_results = len(result_opp)
         if num_results == 0:
