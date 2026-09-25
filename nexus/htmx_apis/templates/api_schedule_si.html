@@ -40,22 +40,59 @@
     font-size: 16px;
   }
 
-  .stickyHeader,
-  .stickyHeader tr,
-  .stickyHeader th,
-  .stickyHeader td {
+  /* This fragment is embedded on external pages, so don't rely on the host's
+     CSS: pin the header with native sticky positioning (no overflow wrapper,
+     which would trap it) and set the header alignment explicitly. */
+  .nexus-schedule thead th {
     position: sticky;
+    top: 0;
     z-index: 100;
+    background-color: #fff;
+    text-align: left;
+    vertical-align: middle;
+    overflow-wrap: break-word;
+  }
+
+  /* Equal-width day columns instead of sizing each one to its content. */
+  .nexus-schedule table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  /* On phones, keep columns readable and scroll sideways instead. The wrapper
+     becomes the scroll box, so the header sticks to it rather than the page;
+     the course column stays pinned on the left while scrolling. */
+  @media (max-width: 767.98px) {
+    .nexus-schedule {
+      overflow: auto;
+      max-height: 80vh;
+    }
+
+    .nexus-schedule table {
+      min-width: 900px;
+    }
+
+    .nexus-schedule th:first-child,
+    .nexus-schedule td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 50;
+      background-color: #fff;
+    }
+
+    .nexus-schedule thead th:first-child {
+      z-index: 150;
+    }
   }
 </style>
 
-<div class="table-responsive px-3">
+<div class="nexus-schedule px-3">
   <table class="table table-bordered text-center equal-col">
-    <thead class="stickyHeader">
+    <thead>
       <tr>
-        <th scope="col" class="text-uppercase align-middle">Course</th>
+        <th scope="col" class="text-uppercase">Course</th>
         {% for day in dates %}
-        <th scope="col" class="text-uppercase align-middle">
+        <th scope="col" class="text-uppercase">
           <span>{{ day|date:"l" }}</span>
           <div>{{ day|date:"m/d" }}</div>
         </th>
@@ -110,24 +147,3 @@
   </table>
 </div>
 
-<script
-  src="https://code.jquery.com/jquery-3.7.1.js"
-  integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-  crossorigin="anonymous"
-></script>
-<script>
-  let table_head = document.getElementsByClassName("stickyHeader")[0];
-  let initial_t_head = table_head.getBoundingClientRect().top;
-
-  function stickyTableHeader() {
-    let scroll = $(window).scrollTop();
-    if (scroll > initial_t_head) {
-      table_head.style.top = parseInt(scroll - initial_t_head) + "px";
-    } else {
-      table_head.style.top = "0px";
-    }
-  }
-
-  const interval = setInterval(stickyTableHeader, 1000);
-  document.addEventListener("scroll", stickyTableHeader);
-</script>
