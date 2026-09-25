@@ -50,8 +50,7 @@ def opportunity_search(request):
             'result_opp': result_opp,
         }
         return render(request, 'api_search_results.html', context)
-    context = {'featured_opp': [1,3,4]}
-    return render(request, 'api_search_base.html', context)
+    return render(request, 'api_search_base.html')
 
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')
