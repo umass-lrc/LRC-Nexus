@@ -48,8 +48,17 @@
     top: 0;
     z-index: 100;
     background-color: #fff;
+    color: #000 !important;
     text-align: left;
     vertical-align: middle;
+    overflow-wrap: break-word;
+  }
+
+  /* Course names sit in the first column and inherit the host theme's base
+     size, which reads small next to the time chips. */
+  .nexus-schedule tbody td:first-child {
+    font-size: 18px;
+    font-weight: 500;
     overflow-wrap: break-word;
   }
 
