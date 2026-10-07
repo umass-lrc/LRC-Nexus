@@ -7,6 +7,7 @@ from .models import (
     Majors,
     Tracks,
     CitizenshipStatus,
+    Location,
     Opportunity,
     MinGPARestriction,
     MajorRestriction,
@@ -53,6 +54,12 @@ class CitizenshipStatusAdmin(admin.ModelAdmin):
     search_fields = ('citizenship_status',)
     ordering = ('citizenship_status',)
     
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+    ordering = ('name',)
+
 @admin.register(Opportunity)
 class OpportunityAdmin(admin.ModelAdmin):
     list_display = ('title',)

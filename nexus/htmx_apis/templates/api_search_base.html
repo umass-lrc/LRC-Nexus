@@ -151,6 +151,125 @@
     color: #fff !important;
   }
 
+  /* Location filter. Like the pills above, it cannot rely on Bootstrap and
+     has to override the host theme's form/label styling. */
+  .location-filter {
+    position: relative;
+  }
+
+  .location-filter summary {
+    list-style: none;
+    cursor: pointer;
+    border-radius: 999px;
+    border: 1px solid #d6d4d4;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: normal;
+    color: #555;
+    background: #fff;
+  }
+
+  .location-filter summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .location-filter summary:hover {
+    background: #f6e9eb;
+    color: #730f1e;
+  }
+
+  .location-filter.has-selection summary {
+    background: #730f1e;
+    color: #fff;
+  }
+
+  .location-filter-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 1000;
+    width: 280px;
+    max-width: 90vw;
+    padding: 10px;
+    border: 1px solid #d6d4d4;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(45, 6, 12, 0.15);
+  }
+
+  .location-filter-search {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 6px 10px !important;
+    border: 1px solid #d6d4d4 !important;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-indent: 0 !important;
+  }
+
+  .location-filter-search:focus {
+    outline: none;
+    box-shadow: none !important;
+    border-color: #730f1e !important;
+  }
+
+  .location-filter-options {
+    max-height: 240px;
+    margin: 8px 0;
+    overflow-y: auto;
+  }
+
+  .location-filter label.location-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 !important;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: normal;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    color: #333 !important;
+    cursor: pointer;
+  }
+
+  .location-filter label.location-filter-option:hover {
+    background: #f6e9eb;
+  }
+
+  .location-filter label.location-filter-option[hidden] {
+    display: none;
+  }
+
+  .location-filter-option input[type="checkbox"] {
+    flex: none;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    accent-color: #730f1e;
+  }
+
+  .location-filter-empty {
+    margin: 0 !important;
+    padding: 4px 6px;
+    font-size: 0.9rem;
+    color: #777;
+  }
+
+  .location-filter-clear {
+    border: none !important;
+    padding: 0 !important;
+    background: none !important;
+    font-size: 0.85rem;
+    color: #730f1e !important;
+    cursor: pointer;
+  }
+
   .eyes {
     aspect-ratio: 5 / 1;
     width: 100%;
@@ -253,6 +372,29 @@
             <input type="checkbox" class="btn-check" name="is_paid" id="api_is_paid_true" value="true">
             <label class="btn" for="api_is_paid_true">Paid</label>
           </div>
+          {% if locations %}
+          <details class="location-filter">
+            <summary>Location<span class="location-filter-count"></span></summary>
+            <div class="location-filter-panel">
+              <input
+                type="search"
+                class="location-filter-search"
+                placeholder="Search locations..."
+                autocomplete="off"
+              />
+              <div class="location-filter-options">
+                {% for location in locations %}
+                <label class="location-filter-option">
+                  <input type="checkbox" name="locations" value="{{location.id}}" />
+                  <span>{{location.name}}</span>
+                </label>
+                {% endfor %}
+                <p class="location-filter-empty" hidden>No matching locations.</p>
+              </div>
+              <button type="button" class="location-filter-clear">Clear</button>
+            </div>
+          </details>
+          {% endif %}
         </div>
       </form>
     </div>
@@ -313,5 +455,63 @@
   function search_keyword(keyword) {
     document.querySelector("input[name='search_query']").value = keyword;
     document.querySelector("input[name='submit']").click();
+  }
+
+  // Location filter: narrow the option list as the user types
+  document.addEventListener("input", (e) => {
+    if (!e.target.matches(".location-filter-search")) return;
+    const filter = e.target.closest(".location-filter");
+    const query = e.target.value.trim().toLowerCase();
+    let visible = 0;
+    filter.querySelectorAll(".location-filter-option").forEach((option) => {
+      const match = option.textContent.toLowerCase().includes(query);
+      option.hidden = !match;
+      if (match) visible++;
+    });
+    filter.querySelector(".location-filter-empty").hidden = visible > 0;
+  });
+
+  // Capture phase, so the search box's own change event never reaches
+  // .search-filters and re-runs the search; only the checkboxes should.
+  document.addEventListener(
+    "change",
+    (e) => {
+      if (e.target.matches(".location-filter-search")) {
+        e.stopPropagation();
+      } else if (e.target.matches(".location-filter input[name='locations']")) {
+        updateLocationCount(e.target.closest(".location-filter"));
+      }
+    },
+    true
+  );
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key == "Enter" && e.target.matches(".location-filter-search")) {
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.matches(".location-filter-clear")) {
+      const filter = e.target.closest(".location-filter");
+      filter
+        .querySelectorAll("input[name='locations']:checked")
+        .forEach((input) => (input.checked = false));
+      updateLocationCount(filter);
+      filter.dispatchEvent(new Event("change", { bubbles: true }));
+      return;
+    }
+    document.querySelectorAll(".location-filter[open]").forEach((filter) => {
+      if (!filter.contains(e.target)) filter.removeAttribute("open");
+    });
+  });
+
+  function updateLocationCount(filter) {
+    const count = filter.querySelectorAll(
+      "input[name='locations']:checked"
+    ).length;
+    filter.querySelector(".location-filter-count").textContent =
+      count > 0 ? " (" + count + ")" : "";
+    filter.classList.toggle("has-selection", count > 0);
   }
 </script>

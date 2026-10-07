@@ -15,6 +15,7 @@ from ..models import (
     CitizenshipRestriction,
     StudyLevelRestriction,
     Keyword,
+    Location,
 )
 
 from ..forms.opportunity import CreateOpportunityForm, SimpleSearchForm
@@ -69,6 +70,13 @@ def update_opportunity(request, opp_id, check_opportunity=False):
             key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
+        locations = request.POST.getlist('locations')
+        for i, location in enumerate(locations):
+            if location.isnumeric() and Location.objects.filter(id=int(location)).exists():
+                continue
+            loc = Location.objects.get_or_create(name=location.strip())[0]
+            locations[i] = str(loc.id)
+        updated_post.setlist('locations', locations)
         form = CreateOpportunityForm(updated_post, instance=opportunity)
         if not form.is_valid():
             messages.error(request, f'Form Errors: {form.errors}')
@@ -176,6 +184,13 @@ def create_opportunity_form(request):
             key = Keyword.objects.get_or_create(keyword=keyword)[0]
             keywords[i] = str(key.id)
         updated_post.setlist('keywords', keywords)
+        locations = request.POST.getlist('locations')
+        for i, location in enumerate(locations):
+            if location.isnumeric() and Location.objects.filter(id=int(location)).exists():
+                continue
+            loc = Location.objects.get_or_create(name=location.strip())[0]
+            locations[i] = str(loc.id)
+        updated_post.setlist('locations', locations)
         form = CreateOpportunityForm(updated_post)
         success = False
         if form.is_valid():
@@ -234,4 +249,11 @@ class KeywordAutocomplete(autocomplete.Select2QuerySetView):
         qs = Keyword.objects.all()
         if self.q:
             qs = Keyword.objects.filter(keyword__icontains=self.q)
+        return qs
+
+class LocationAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Location.objects.all()
+        if self.q:
+            qs = Location.objects.filter(name__icontains=self.q)
         return qs

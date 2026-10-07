@@ -19,6 +19,7 @@ from ..models import (
     CitizenshipRestriction,
     StudyLevelRestriction,
     Keyword,
+    Location,
 )
 
 import datetime
@@ -83,7 +84,7 @@ def make_query_from_list(search_query_list):
                                 'description^2',
                                 'website_data',
                                 'additional_information',
-                                'location^5'
+                                'locations.name^5'
                             ],
                             fuzziness='AUTO'
                         )),
@@ -112,7 +113,7 @@ def make_query_from_list(search_query_list):
                                 'description^2',
                                 'website_data',
                                 'additional_information',
-                                'location^5'
+                                'locations.name^5'
                             ]
                         )),
                         Q(
@@ -135,7 +136,7 @@ def make_query_from_list(search_query_list):
                         interval_query_per_field(query_list, 'description'),
                         interval_query_per_field(query_list, 'website_data'),
                         interval_query_per_field(query_list, 'additional_information'),
-                        interval_query_per_field(query_list, 'location')
+                        interval_query_per_field(query_list, 'locations.name')
                     ],
                     minimum_should_match=1,
                     boost=50
@@ -154,7 +155,7 @@ def make_query_from_list(search_query_list):
                                 'description^2',
                                 'website_data',
                                 'additional_information',
-                                'location^5'
+                                'locations.name^5'
                             ],
                             fuzziness='AUTO'
                         )
@@ -183,7 +184,7 @@ def make_query_from_list(search_query_list):
                             'description^2',
                             'website_data',
                             'additional_information',
-                            'location^5'
+                            'locations.name^5'
                         ]
                     )),
                     Q(
@@ -215,9 +216,17 @@ def parse_tri_state(value):
         return False
     return None
 
-def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_paid=None):
+def parse_location_ids(values):
+    """Turn the submitted 'locations' form values into a list of Location ids."""
+    return [int(value) for value in values if value.isdigit()]
+
+def filterable_locations():
+    """Locations offered in the search filter: those used by at least one active opportunity."""
+    return Location.objects.filter(opportunity__active=True).distinct()
+
+def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_paid=None, locations=None):
     search_query_list = divide_query(search_query)
-    has_filters = on_campus is not None or is_paid is not None
+    has_filters = on_campus is not None or is_paid is not None or bool(locations)
     if len(search_query_list) == 0 and not has_filters:
         return []
 
@@ -231,6 +240,9 @@ def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_p
         filter_query = filter_query & Q(Match(on_campus=on_campus))
     if is_paid is not None:
         filter_query = filter_query & Q(Match(is_paid=is_paid))
+    if locations:
+        # matches opportunities in any of the selected locations
+        filter_query = filter_query & Q('terms', **{'locations.id': locations})
 
     query = make_query_from_list(search_query_list) if search_query_list else Q('match_all')
     result_opp = OpportunityDocument.search().extra(size=1000).filter(filter_query).query(query).execute()
@@ -245,13 +257,15 @@ def opportunity_search(request):
         search_query = request.POST.get('search_query', '')
         on_campus = parse_tri_state(request.POST.get('on_campus', ''))
         is_paid = parse_tri_state(request.POST.get('is_paid', ''))
-        has_filters = on_campus is not None or is_paid is not None
+        locations = parse_location_ids(request.POST.getlist('locations'))
+        has_filters = on_campus is not None or is_paid is not None or len(locations) > 0
         if len(search_query) == 0 and not has_filters:
             return redirect('search_no_result')
         result_opp = es_opportunity_search(
             search_query,
             on_campus=on_campus,
             is_paid=is_paid,
+            locations=locations,
         )
         num_results = len(result_opp)
         if num_results == 0:
@@ -262,7 +276,7 @@ def opportunity_search(request):
             'result_opp': result_opp,
         }
         return render(request, 'search_result.html', context)
-    return render(request, 'search_base.html')
+    return render(request, 'search_base.html', {'locations': filterable_locations()})
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')

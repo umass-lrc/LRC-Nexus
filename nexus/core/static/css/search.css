@@ -89,6 +89,90 @@
     box-shadow: inset 0 0 0 2px #0d6efd66;
 }
 
+.location-filter {
+    position: relative;
+}
+
+.location-filter summary {
+    list-style: none;
+    cursor: pointer;
+    border-radius: 999px;
+    border: 1px solid #d6d4d4;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #555;
+    background: #fff;
+}
+
+.location-filter summary::-webkit-details-marker {
+    display: none;
+}
+
+.location-filter summary:hover {
+    background: #eef4ff;
+    color: #0d6efd;
+}
+
+.location-filter.has-selection summary {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.location-filter-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 1000;
+    width: 280px;
+    max-width: 90vw;
+    padding: 10px;
+    border: 1px solid #d6d4d4;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(51, 51, 51, .15);
+}
+
+.location-filter-options {
+    max-height: 240px;
+    margin: 8px 0;
+    overflow-y: auto;
+}
+
+.location-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.location-filter-option:hover {
+    background: #eef4ff;
+}
+
+.location-filter-option[hidden] {
+    display: none;
+}
+
+.location-filter-empty {
+    margin: 0;
+    padding: 4px 6px;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.location-filter-clear {
+    border: none;
+    padding: 0;
+    background: none;
+    font-size: 0.85rem;
+    color: #0d6efd;
+}
+
 .eyes {
     aspect-ratio: 5 / 1;
     width: 100%;
