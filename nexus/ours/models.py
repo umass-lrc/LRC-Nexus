@@ -379,7 +379,9 @@ class Opportunity(models.Model):
             status = status and req.status_code >= 200 and req.status_code < 300
             if status and (self.link_not_working or self.website_data == ""):
                 self.link_not_working = False
-                self.website_data = '\n'.join([line for line in req.text.split('\n') if line.strip() != ''])
+                # Postgres rejects NUL characters in text, and some pages contain them
+                text = req.text.replace('\x00', '')
+                self.website_data = '\n'.join([line for line in text.split('\n') if line.strip() != ''])
                 self.save()
             if not status:
                 self.link_not_working = True
