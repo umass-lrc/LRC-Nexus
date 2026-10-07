@@ -18,6 +18,20 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
+  db:
+    container_name: db-nexus
+    image: postgres:17
+    environment:
+      - POSTGRES_DB=nexus
+      - POSTGRES_USER=nexus
+      - POSTGRES_PASSWORD=nexus
+    ports:
+      - "5432:5432"
+    networks:
+      - nexus-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   django:
     container_name: django-nexus
     build: ./nexus
@@ -29,11 +43,14 @@ services:
       - ./.env.dev
     depends_on:
       - elasticsearch
+      - db
     networks:
       - nexus-network
-  
+
 volumes:
   elasticsearch_data:
+    driver: local
+  postgres_data:
     driver: local
 
 networks:
