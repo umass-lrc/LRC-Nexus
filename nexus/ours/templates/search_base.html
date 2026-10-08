@@ -46,6 +46,7 @@
           <input type="checkbox" class="btn-check" name="is_paid" id="is_paid_true" value="true">
           <label class="btn" for="is_paid_true">Paid</label>
         </div>
+        {% include "location_filter.html" with search_class="form-control" %}
       </div>
     </form>
   </div>
@@ -82,5 +83,7 @@
     document.querySelector("input[name='search_query']").value = keyword;
     document.querySelector("input[name='submit']").click();
   }
+
+  {% include "location_filter_script.html" %}
 </script>
 {% endblock %}

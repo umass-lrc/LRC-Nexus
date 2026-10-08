@@ -50,12 +50,14 @@
     </div>
     {% endif %}
     <hr />
-    {% if not opportunity.on_campus %}
+    {% with location_display=opportunity.location_display %}
+    <!--Locations-->
+    {% if location_display %}
     <div class="fs-5">
-      <span class="h5">Location:</span> {{ opportunity.location }}
+      <span class="h5">Location:</span> {{ location_display }}
     </div>
     <hr />
-    {% endif %} {% if opportunity.deadline %}
+    {% endif %} {% endwith %} {% if opportunity.deadline %}
     <div class="fs-5">
       <span class="h5">Deadline:</span> {{ opportunity.deadline }}
     </div>

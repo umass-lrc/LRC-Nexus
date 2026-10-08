@@ -8,7 +8,9 @@
       <span class="badge text-bg-primary">On Campus</span>
       {% endif %}{% if opportunity.is_for_credit %}
       <span class="badge text-bg-danger">For Credit</span>
-      {% endif %}
+      {% endif %}{% for location in opportunity.locations.all %}
+      <span class="badge text-bg-secondary text-wrap text-start">{{location.name}}</span>
+      {% endfor %}
     </div>
     <p class="card-text" style="font-size: 1rem">
       {{opportunity.short_description|striptags|truncatewords:40}}

@@ -180,6 +180,18 @@ class CitizenshipStatus(models.Model):
         opp_ids = CitizenshipRestriction.objects.filter(citizenship_status__in=[self]).values_list('opportunity__id', flat=True)
         return Opportunity.objects.filter(id__in=opp_ids)
 
+class Location(models.Model):
+    name = models.CharField(
+        max_length=255,
+        unique=True
+    )
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
 class OpportunityManager(models.Manager):
     def basic_search(self, search_query):
         search_query = search_query.strip()
@@ -210,7 +222,7 @@ class OpportunityManager(models.Manager):
             Q(keywords__keyword__icontains=query) |
             Q(related_to_major__major__icontains=query) |
             Q(related_to_track__track__icontains=query) |
-            Q(location__icontains=query) |
+            Q(locations__name__icontains=query) |
             Q(additional_info__icontains=query)) if query not in ['AND', 'OR'] else query 
             for query in search_query_list 
         ]
@@ -274,12 +286,11 @@ class Opportunity(models.Model):
         default=False
     )
     
-    location = models.CharField(
-        max_length=255,
+    locations = models.ManyToManyField(
+        to=Location,
         blank=True,
-        null=True
     )
-    
+
     link = models.URLField(
         blank=False,
         null=False,
@@ -347,7 +358,11 @@ class Opportunity(models.Model):
     
     def __str__(self):
         return self.title
-    
+
+    @property
+    def location_display(self):
+        return "; ".join(location.name for location in self.locations.all())
+
     def get_link(self):
         if self.link_not_working and not self.link_not_working_override:
             return reverse('opp_page_not_found')
@@ -379,7 +394,9 @@ class Opportunity(models.Model):
             status = status and req.status_code >= 200 and req.status_code < 300
             if status and (self.link_not_working or self.website_data == ""):
                 self.link_not_working = False
-                self.website_data = '\n'.join([line for line in req.text.split('\n') if line.strip() != ''])
+                # Postgres rejects NUL characters in text, and some pages contain them
+                text = req.text.replace('\x00', '')
+                self.website_data = '\n'.join([line for line in text.split('\n') if line.strip() != ''])
                 self.save()
             if not status:
                 self.link_not_working = True
