@@ -216,9 +216,17 @@ def parse_tri_state(value):
         return False
     return None
 
+# locations.id is indexed as an Elasticsearch integer, which rejects anything larger
+MAX_LOCATION_ID = 2**31 - 1
+
 def parse_location_ids(values):
     """Turn the submitted 'locations' form values into a list of Location ids."""
-    return [int(value) for value in values if value.isdigit()]
+    location_ids = []
+    for value in values:
+        # isdigit() alone also accepts characters int() rejects, such as '²'
+        if value.isascii() and value.isdigit() and int(value) <= MAX_LOCATION_ID:
+            location_ids.append(int(value))
+    return location_ids
 
 def filterable_locations():
     """Locations offered in the search filter: those used by at least one active opportunity."""
