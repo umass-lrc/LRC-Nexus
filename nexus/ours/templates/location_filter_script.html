@@ -1,0 +1,57 @@
+  // Location filter: narrow the option list as the user types
+  document.addEventListener("input", (e) => {
+    if (!e.target.matches(".location-filter-search")) return;
+    const filter = e.target.closest(".location-filter");
+    const query = e.target.value.trim().toLowerCase();
+    let visible = 0;
+    filter.querySelectorAll(".location-filter-option").forEach((option) => {
+      const match = option.textContent.toLowerCase().includes(query);
+      option.hidden = !match;
+      if (match) visible++;
+    });
+    filter.querySelector(".location-filter-empty").hidden = visible > 0;
+  });
+
+  // Capture phase, so the search box's own change event never reaches
+  // .search-filters and re-runs the search; only the checkboxes should.
+  document.addEventListener(
+    "change",
+    (e) => {
+      if (e.target.matches(".location-filter-search")) {
+        e.stopPropagation();
+      } else if (e.target.matches(".location-filter input[name='locations']")) {
+        updateLocationCount(e.target.closest(".location-filter"));
+      }
+    },
+    true
+  );
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key == "Enter" && e.target.matches(".location-filter-search")) {
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.matches(".location-filter-clear")) {
+      const filter = e.target.closest(".location-filter");
+      filter
+        .querySelectorAll("input[name='locations']:checked")
+        .forEach((input) => (input.checked = false));
+      updateLocationCount(filter);
+      filter.dispatchEvent(new Event("change", { bubbles: true }));
+      return;
+    }
+    document.querySelectorAll(".location-filter[open]").forEach((filter) => {
+      if (!filter.contains(e.target)) filter.removeAttribute("open");
+    });
+  });
+
+  function updateLocationCount(filter) {
+    const count = filter.querySelectorAll(
+      "input[name='locations']:checked"
+    ).length;
+    filter.querySelector(".location-filter-count").textContent =
+      count > 0 ? " (" + count + ")" : "";
+    filter.classList.toggle("has-selection", count > 0);
+  }
