@@ -205,7 +205,7 @@ def create_opportunity_form(request):
             if min_gpa:
                 MinGPARestriction.objects.update_or_create(opportunity=opp, defaults={'gpa': min_gpa})
             if restricted_majors:
-                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})
+                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})[0]
                 mr.majors.set(restricted_majors)
                 mr.save()
             if restricted_to_citizenship_status:
