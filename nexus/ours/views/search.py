@@ -223,8 +223,9 @@ def parse_location_ids(values):
     """Turn the submitted 'locations' form values into a list of Location ids."""
     location_ids = []
     for value in values:
-        # isdigit() alone also accepts characters int() rejects, such as '²'
-        if value.isascii() and value.isdigit() and int(value) <= MAX_LOCATION_ID:
+        # isdigit() alone also accepts characters int() rejects, such as '²',
+        # and int() itself raises on digit strings thousands of characters long
+        if value.isascii() and value.isdigit() and len(value) <= 10 and int(value) <= MAX_LOCATION_ID:
             location_ids.append(int(value))
     return location_ids
 

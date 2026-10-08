@@ -30,8 +30,9 @@ def split_tag_values(model, values):
     """Split a tag field's submitted values into ids of existing rows and newly typed names."""
     ids, names = [], []
     for value in values:
-        # An existing choice is submitted as its plain pk; "01003" or "²" can only have been typed
-        is_pk = value.isascii() and value.isdigit() and str(int(value)) == value
+        # An existing choice is submitted as its plain pk; "01003" or "²" can only have been typed.
+        # The length cap keeps int() from raising on digit strings thousands of characters long.
+        is_pk = value.isascii() and value.isdigit() and len(value) <= 19 and str(int(value)) == value
         if is_pk and model.objects.filter(id=int(value)).exists():
             ids.append(value)
             continue
