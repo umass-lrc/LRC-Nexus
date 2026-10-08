@@ -12,10 +12,14 @@ def copy_location_to_locations(apps, schema_editor):
     for name in MULTIPLE_LOCATIONS:
         Location.objects.get_or_create(name=name)
     for opportunity in Opportunity.objects.exclude(location__isnull=True):
-        name = opportunity.location.strip()
+        # Collapse whitespace and match case-insensitively, so "amherst,  MA"
+        # and "Amherst, MA" end up as one location
+        name = ' '.join(opportunity.location.split())
         if len(name) == 0:
             continue
-        location = Location.objects.get_or_create(name=name)[0]
+        location = Location.objects.filter(name__iexact=name).first()
+        if location is None:
+            location = Location.objects.create(name=name)
         opportunity.locations.add(location)
 
 
