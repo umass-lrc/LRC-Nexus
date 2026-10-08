@@ -57,7 +57,7 @@ def opportunity_search(request):
             'result_opp': result_opp,
         }
         return render(request, 'api_search_results.html', context)
-    return render(request, 'api_search_base.html', {'locations': filterable_locations()})
+    return render(request, 'api_search_base.html', {'locations': filterable_locations(ours_website=True)})
 
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')

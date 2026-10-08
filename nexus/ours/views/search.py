@@ -228,9 +228,18 @@ def parse_location_ids(values):
             location_ids.append(int(value))
     return location_ids
 
-def filterable_locations():
-    """Locations offered in the search filter: those used by at least one active opportunity."""
-    return Location.objects.filter(opportunity__active=True).distinct()
+def filterable_locations(ours_website=False):
+    """Locations offered in the search filter: those used by at least one opportunity the search can return."""
+    # One filter() call, so every condition has to hold for the same opportunity
+    visible = {'opportunity__active': True}
+    if ours_website:
+        today = datetime.date.today()
+        visible.update(
+            opportunity__show_on_website=True,
+            opportunity__show_on_website_start_date__lte=today,
+            opportunity__show_on_website_end_date__gte=today,
+        )
+    return Location.objects.filter(**visible).distinct()
 
 def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_paid=None, locations=None):
     search_query_list = divide_query(search_query)
