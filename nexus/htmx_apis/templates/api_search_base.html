@@ -304,34 +304,53 @@
     line-height: 1.2;
   }
 
+  /* The host page has no Bootstrap, so .badge has no shape of its own and the
+     --red/--green/... variables are undefined there. Colours are literal for
+     that reason: with var() the background was dropped and the white text
+     vanished on the white page. */
+  #results-div .badge,
+  #opportunity-div .badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 0.375rem;
+    vertical-align: baseline;
+  }
+
+  #opportunity-div .badge.rounded-pill {
+    border-radius: 50rem;
+  }
+
   .badge-red {
     color: #fff !important;
-    background-color: var(--red) !important;
+    background-color: #dc3545 !important;
   }
 
   .badge-green {
     color: #fff !important;
-    background-color: var(--green) !important;
+    background-color: #198754 !important;
   }
 
   .badge-blue {
     color: #fff !important;
-    background-color: var(--blue) !important;
+    background-color: #0d6efd !important;
   }
 
   .badge-gray {
     color: #fff !important;
-    background-color: var(--gray) !important;
+    background-color: #6c757d !important;
   }
 
   .badge-warning {
     color: #212529 !important;
-    background-color: var(--warning) !important;
+    background-color: #ffc107 !important;
   }
 
   .badge-info {
     color: #212529 !important;
-    background-color: var(--info) !important;
+    background-color: #0dcaf0 !important;
   }
 </style>
   <div
