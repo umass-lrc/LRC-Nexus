@@ -22,18 +22,32 @@ from ours.models import (
     Keyword,
 )
 
-from ours.views.search import es_opportunity_search
+from ours.views.search import (
+    es_opportunity_search,
+    parse_tri_state,
+    parse_location_ids,
+    filterable_locations,
+)
 
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')
 def opportunity_search(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
-        if len(body_unicode) < 13:
-            return search_no_result(request, search_query, 0)
-        body = parse_qs(body_unicode, strict_parsing=True)
+        body = parse_qs(request.body.decode('utf-8'))
         search_query = body['search_query'][0] if 'search_query' in body else ""
-        result_opp = es_opportunity_search(search_query, ours_website=True)
+        on_campus = parse_tri_state(body.get('on_campus', [''])[0])
+        is_paid = parse_tri_state(body.get('is_paid', [''])[0])
+        locations = parse_location_ids(body.get('locations', []))
+        has_filters = on_campus is not None or is_paid is not None or len(locations) > 0
+        if len(search_query) == 0 and not has_filters:
+            return search_no_result(request, "", 0)
+        result_opp = es_opportunity_search(
+            search_query,
+            ours_website=True,
+            on_campus=on_campus,
+            is_paid=is_paid,
+            locations=locations,
+        )
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)
@@ -43,8 +57,7 @@ def opportunity_search(request):
             'result_opp': result_opp,
         }
         return render(request, 'api_search_results.html', context)
-    context = {'featured_opp': [1,3,4]}
-    return render(request, 'api_search_base.html', context)
+    return render(request, 'api_search_base.html', {'locations': filterable_locations(ours_website=True)})
 
 @csrf_exempt
 @restrict_to_http_methods('GET', 'POST')

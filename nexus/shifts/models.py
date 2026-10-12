@@ -210,7 +210,10 @@ def shift_directory_path(instance, filename):
 
 class ShiftManager(models.Manager):
     def filter(self, *args, **kwargs):
-        return super().filter(*args, **kwargs, dropped=False)
+        # Only add dropped=False if not already specified
+        if 'dropped' not in kwargs:
+            kwargs['dropped'] = False
+        return super().filter(*args, **kwargs)
 
 class Shift(models.Model):
     position = models.ForeignKey(

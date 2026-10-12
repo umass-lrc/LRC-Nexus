@@ -49,7 +49,7 @@ def check_opp_row(request, opp_id):
     long_desc_warning = len(opportunity.description.strip()) <= len(opportunity.short_description.strip())
     link_check = not opportunity.link_not_working
     link_override = opportunity.link_not_working_override
-    location_check = opportunity.on_campus or (opportunity.location is not None and len(opportunity.location.strip()) > 0)
+    location_check = opportunity.on_campus or opportunity.locations.exists()
     
     context = {
         'opportunity': opportunity,

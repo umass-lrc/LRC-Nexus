@@ -36,13 +36,53 @@ from ..forms.role import (
 @restrict_to_groups("Staff Admin", "SI Supervisor", "Tutor Supervisor", "OURS Supervisor", "Payroll Supervisor")
 def assign_role(request):
     sem = Semester.objects.get_active_semester()
-    si_positions = Positions.objects.filter(semester=sem, position=PositionChoices.SI)
+    
+    # Optimize: Get SI positions with select_related
+    si_positions = Positions.objects.select_related('user').filter(
+        semester=sem, 
+        position=PositionChoices.SI
+    )
+    
+    # Optimize: Get existing roles in bulk to avoid N+1 queries
+    existing_role_positions = set(
+        SIRoleInfo.objects.filter(
+            position__semester=sem
+        ).values_list('position_id', flat=True)
+    )
+    
+    # Bulk create missing roles
+    roles_to_create = []
     for position in si_positions:
-        if not SIRoleInfo.objects.filter(position=position).exists():
-            SIRoleInfo.objects.create(position=position)
-    roles = SIRoleInfo.objects.filter(position__semester=sem).all()
+        if position.id not in existing_role_positions:
+            roles_to_create.append(SIRoleInfo(position=position))
+    
+    if roles_to_create:
+        SIRoleInfo.objects.bulk_create(roles_to_create, ignore_conflicts=True)
+    
+    # Optimize: Get roles with select_related (no pagination needed)
+    roles = SIRoleInfo.objects.select_related(
+        'position', 'position__user', 'assigned_class', 'assigned_class__course', 'assigned_class__course__subject', 'assigned_class__faculty'
+    ).filter(position__semester=sem).order_by('position__user__last_name', 'position__user__first_name')
+    
+    # Pre-compute class strings efficiently to avoid expensive __str__ calls
+    roles_with_classes = []
+    for role in roles:
+        # Pre-compute the class display string without calling expensive __str__ method
+        if role.assigned_class:
+            # Build a simple class string without expensive database queries
+            class_str = f"{role.assigned_class.course} - {role.assigned_class.faculty}"
+        else:
+            class_str = "No class assigned"
+            
+        roles_with_classes.append({
+            'role': role,
+            'class_string': class_str,
+            'has_class': role.assigned_class is not None
+        })
+    
     context = {
-        'roles': roles,
+        'roles_with_classes': roles_with_classes,
+        'roles': roles,  # Keep for compatibility
     }
     return render(request, 'assign_role.html', context)
 

@@ -62,11 +62,13 @@ class CreateOpportunityForm(forms.ModelForm):
     
     class Meta:
         model = Opportunity
-        fields = ['title', 'short_description', 'description', 'keywords', 'related_to_major', 'related_to_track', 'on_campus', 'location', 'link', 'deadline', 'additional_info', 'is_paid', 'is_for_credit', 'active', 'show_on_website', 'show_on_website_start_date', 'show_on_website_end_date']
+        fields = ['title', 'short_description', 'description', 'keywords', 'related_to_major', 'related_to_track', 'on_campus', 'locations', 'link', 'deadline', 'additional_info', 'is_paid', 'is_for_credit', 'active', 'show_on_website', 'show_on_website_start_date', 'show_on_website_end_date']
         widgets = {
             'related_to_track': autocomplete.ModelSelect2Multiple(),
             'related_to_major': autocomplete.ModelSelect2Multiple(),
             'keywords': autocomplete.ModelSelect2Multiple(url='autocomplete-keyword',attrs={'data-tags': 'true'}),
+            # token separators off: data-tags alone splits typed text on commas, breaking "City, ST"
+            'locations': autocomplete.ModelSelect2Multiple(url='autocomplete-location', attrs={'data-tags': 'true', 'data-token-separators': 'null'}),
             'link': forms.URLInput(),
             'short_description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
             'description': TinyMCE(attrs={'cols': 80, 'rows': 30}),
@@ -75,7 +77,10 @@ class CreateOpportunityForm(forms.ModelForm):
             'show_on_website_start_date': forms.DateInput(attrs={'type': 'date'}),
             'show_on_website_end_date': forms.DateInput(attrs={'type': 'date'}),
         }
-    
+        help_texts = {
+            'locations': 'Select a location or type a new one. For opportunities spread over many places, pick "Multiple Locations : US" or "Multiple Locations : International".',
+        }
+
     def __init__(self, *args, check_opportunity=False, **kwargs):
         super(CreateOpportunityForm, self).__init__(*args, **kwargs)
         
@@ -117,7 +122,7 @@ class CreateOpportunityForm(forms.ModelForm):
                 FloatingField('related_to_major'),
                 FloatingField('related_to_track'),
                 'on_campus',
-                FloatingField('location'),
+                FloatingField('locations'),
                 FloatingField('link'),
                 FloatingField('deadline'),
                 'additional_info',

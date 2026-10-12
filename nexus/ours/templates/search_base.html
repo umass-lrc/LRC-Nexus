@@ -16,24 +16,38 @@
     <form
       class="search"
       hx-post="{% url 'opportunity_search' %}"
-      hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
-      hx-trigger="click"
+      hx-swap="multi:#result_stats:outerHTML,#results:innerHTML"
+      hx-trigger="click from:#submit-id-submit, change from:.search-filters"
       placeholder="Searching..."
     >
-      <i class="fa fa-search"></i>
-      <input
-        type="text"
-        name="search_query"
-        class="form-control"
-        placeholder="Want to find some job/research opportunities? Search here!"
-      />
-      <input
-        type="submit"
-        name="submit"
-        value="Search"
-        class="btn btn-primary btn btn-primary text-center"
-        id="submit-id-submit"
-      />
+      <div class="search-bar">
+        <i class="fa fa-search search-icon"></i>
+        <input
+          type="text"
+          name="search_query"
+          class="form-control"
+          placeholder="Want to find some job/research opportunities? Search here!"
+        />
+        <input
+          type="submit"
+          name="submit"
+          value="Search"
+          class="btn btn-primary btn btn-primary text-center"
+          id="submit-id-submit"
+        />
+      </div>
+
+      <div class="search-filters">
+        <div class="filter-group">
+          <input type="checkbox" class="btn-check" name="on_campus" id="on_campus_true" value="true">
+          <label class="btn" for="on_campus_true">On-campus</label>
+        </div>
+        <div class="filter-group">
+          <input type="checkbox" class="btn-check" name="is_paid" id="is_paid_true" value="true">
+          <label class="btn" for="is_paid_true">Paid</label>
+        </div>
+        {% include "location_filter.html" with search_class="form-control" %}
+      </div>
     </form>
   </div>
 </div>
@@ -45,7 +59,7 @@
   <div
     hx-get="{% url 'search_no_result'%}"
     hx-trigger="load"
-    hx-swap="multi:#result_stats:outterHTML,#results:innerHTML"
+    hx-swap="multi:#result_stats:outerHTML,#results:innerHTML"
   ></div>
 </div>
 {% endblock %} {% block extra_scripts %}
@@ -69,5 +83,7 @@
     document.querySelector("input[name='search_query']").value = keyword;
     document.querySelector("input[name='submit']").click();
   }
+
+  {% include "location_filter_script.html" %}
 </script>
 {% endblock %}

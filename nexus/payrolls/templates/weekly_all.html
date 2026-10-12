@@ -2,6 +2,53 @@
   <hr />
   <h3 class="text-center">Showing Payroll for Week of {{week}}</h3>
   <hr />
+  
+  <!-- Pagination Info -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries
+    </div>
+    <div>
+      {% if paginator.num_pages > 1 %}
+        <nav aria-label="Payroll pagination">
+          <ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+           <a class="page-link" href="{% url 'all_weekly_payroll' %}?page=1{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-get="{% url 'all_weekly_payroll' %}?page=1{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-target="#payroll-body" hx-swap="outerHTML">&laquo; First</a>
+              </li>
+              <li class="page-item">
+           <a class="page-link" href="{% url 'all_weekly_payroll' %}?page={{ page_obj.previous_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-get="{% url 'all_weekly_payroll' %}?page={{ page_obj.previous_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-target="#payroll-body" hx-swap="outerHTML">Previous</a>
+              </li>
+            {% endif %}
+            
+            <li class="page-item active">
+              <span class="page-link">
+                Page {{ page_obj.number }} of {{ paginator.num_pages }}
+              </span>
+            </li>
+            
+            {% if page_obj.has_next %}
+              <li class="page-item">
+           <a class="page-link" href="{% url 'all_weekly_payroll' %}?page={{ page_obj.next_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-get="{% url 'all_weekly_payroll' %}?page={{ page_obj.next_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-target="#payroll-body" hx-swap="outerHTML">Next</a>
+              </li>
+              <li class="page-item">
+           <a class="page-link" href="{% url 'all_weekly_payroll' %}?page={{ paginator.num_pages }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-get="{% url 'all_weekly_payroll' %}?page={{ paginator.num_pages }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+             hx-target="#payroll-body" hx-swap="outerHTML">Last &raquo;</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    </div>
+  </div>
+  
   <table class="table">
     <thead class="stickyHeader" style="position: sticky;top: 74px;">
       <tr>
@@ -27,4 +74,53 @@
     ></tbody>
     {% endfor %}
   </table>
+  
+  <!-- Bottom Pagination -->
+  {% if paginator.num_pages > 1 %}
+    <div class="d-flex justify-content-center mt-3">
+      <nav aria-label="Payroll pagination">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="{% url 'all_weekly_payroll' %}?page=1{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-get="{% url 'all_weekly_payroll' %}?page=1{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-target="#payroll-body" hx-swap="outerHTML">&laquo; First</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="{% url 'all_weekly_payroll' %}?page={{ page_obj.previous_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-get="{% url 'all_weekly_payroll' %}?page={{ page_obj.previous_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-target="#payroll-body" hx-swap="outerHTML">Previous</a>
+            </li>
+          {% endif %}
+          
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="{% url 'all_weekly_payroll' %}?page={{ num }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                   hx-get="{% url 'all_weekly_payroll' %}?page={{ num }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                   hx-target="#payroll-body" hx-swap="outerHTML">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="{% url 'all_weekly_payroll' %}?page={{ page_obj.next_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-get="{% url 'all_weekly_payroll' %}?page={{ page_obj.next_page_number }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-target="#payroll-body" hx-swap="outerHTML">Next</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="{% url 'all_weekly_payroll' %}?page={{ paginator.num_pages }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-get="{% url 'all_weekly_payroll' %}?page={{ paginator.num_pages }}{% if week_str %}&week={{ week_str }}{% endif %}{% if positions_str %}&positions={{ positions_str }}{% endif %}"
+                 hx-target="#payroll-body" hx-swap="outerHTML">Last &raquo;</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  {% endif %}
 </div>

@@ -22,6 +22,7 @@ from .views.opportunities import (
     delete_opportunity,
     OpportunityAutocomplete,
     KeywordAutocomplete,
+    LocationAutocomplete,
 )
 
 from .views.search import (
@@ -76,6 +77,7 @@ OPPORTUNITY_URLS = [
     path('view_opportunity_full_page/<int:opp_id>/', view_opportunity_full_page, name='view_opportunity_full_page'),
     re_path(r'^opportunity/autocomplete/$', OpportunityAutocomplete.as_view(), name='autocomplete-opportunity'),
     re_path(r'^keyword/autocomplete/$', KeywordAutocomplete.as_view(), name='autocomplete-keyword'),
+    re_path(r'^location/autocomplete/$', LocationAutocomplete.as_view(), name='autocomplete-location'),
     path('page_not_found/', page_not_found, name='opp_page_not_found'),
     path('delete_opportunity/<int:opp_id>/', delete_opportunity, name='delete_opportunity'),
 ]

@@ -54,8 +54,8 @@ button.siteLink {
 #menuDrawer {
     background: #fff;
     position: fixed;
-    /* height: 100vh; */
-    overflow: auto;
+    height: 100vh;
+    overflow-y: auto;
     z-index: 12312;
     top: 0;
     left: 0;

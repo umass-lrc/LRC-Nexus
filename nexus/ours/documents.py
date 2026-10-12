@@ -9,6 +9,7 @@ from .models import (
     Majors,
     Tracks,
     CitizenshipStatus,
+    Location,
     Opportunity,
     MinGPARestriction,
     MajorRestriction,
@@ -94,7 +95,7 @@ class OpportunityDocument(Document):
     keywords = fields.NestedField(properties={
         "keyword": fields.TextField(),
     })
-    
+
     related_to_major = fields.NestedField(properties={
         "major": fields.TextField(),
     })
@@ -103,8 +104,14 @@ class OpportunityDocument(Document):
         "track": fields.TextField(),
     })
     
+    # Object (not nested) so locations.name can sit in the multi_match field lists
+    locations = fields.ObjectField(properties={
+        "id": fields.IntegerField(),
+        "name": fields.TextField(),
+    })
+
     additional_information = fields.TextField(attr="additional_information", analyzer=html_strip)
-    
+
     class Index:
         name = "opportunities"
         settings = {"number_of_shards": 1, "number_of_replicas": 0}
@@ -113,18 +120,22 @@ class OpportunityDocument(Document):
         model = Opportunity
         fields = [
             "title",
-            "location",
             "deadline",
             "active",
             "show_on_website",
             "show_on_website_start_date",
             "show_on_website_end_date",
             "featured",
+            "on_campus",
+            "is_paid",
+            "is_for_credit",
         ]
-        related_models = [Keyword, Majors, Tracks, CitizenshipStatus]
-    
+        related_models = [Keyword, Majors, Tracks, CitizenshipStatus, Location]
+
     def get_instances_from_related(self, related_instance):
         if isinstance(related_instance, Keyword):
+            return related_instance.opportunity_set.all()
+        elif isinstance(related_instance, Location):
             return related_instance.opportunity_set.all()
         elif isinstance(related_instance, Majors):
             return related_instance.opportunity_set.all()

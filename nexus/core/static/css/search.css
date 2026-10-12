@@ -1,27 +1,37 @@
-.search {
+/* Wraps the text input + button only, so the shadow and the absolutely
+   positioned icon/button do not enclose the filter row below. */
+.search-bar {
     position: relative;
     box-shadow: 0 0 40px rgba(51, 51, 51, .1);
 }
 
-.search input {
+.search-bar input[type="text"] {
+    display: block;
+    margin: 0;
     height: 60px;
     text-indent: 25px;
     border: 2px solid #d6d4d4;
 }
 
-.search input:focus {
+.search-bar input[type="text"]:focus {
     box-shadow: none;
     border: 2px solid #0d6efd;
 
 }
 
-.search .fa-search {
+/* Font Awesome's kit JS replaces the <i> with an <svg> and renames the FA5
+ class fa-search to the FA6 name fa-magnifying-glass, so neither FA class is
+ dependable. search-icon is ours and FA copies user classes onto the svg;
+ the FA names are kept as fallbacks for webfont mode. */
+.search-bar .search-icon,
+.search-bar .fa-search,
+.search-bar .fa-magnifying-glass {
     position: absolute;
     top: 20px;
     left: 16px;
 }
 
-.search .btn {
+.search-bar #submit-id-submit {
     position: absolute;
     top: 5px;
     right: 5px;
@@ -29,6 +39,138 @@
     width: 110px;
     background: #0d6efd;
     text-indent: 0%;
+}
+
+.search-filters {
+    margin-top: 14px;
+    padding-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-group {
+    display: inline-flex;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #d6d4d4;
+}
+
+.filter-group .btn {
+    border: none;
+    border-radius: 0;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #555;
+    background: #fff;
+}
+
+.filter-group .btn:not(:last-child) {
+    border-right: 1px solid #d6d4d4;
+}
+
+.filter-group .btn:hover {
+    background: #eef4ff;
+    color: #0d6efd;
+}
+
+.filter-group .btn-check:checked + .btn {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.filter-group .btn-check:checked + .btn:hover {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.filter-group .btn-check:focus-visible + .btn {
+    box-shadow: inset 0 0 0 2px #0d6efd66;
+}
+
+.location-filter {
+    position: relative;
+}
+
+.location-filter summary {
+    list-style: none;
+    cursor: pointer;
+    border-radius: 999px;
+    border: 1px solid #d6d4d4;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #555;
+    background: #fff;
+}
+
+.location-filter summary::-webkit-details-marker {
+    display: none;
+}
+
+.location-filter summary:hover {
+    background: #eef4ff;
+    color: #0d6efd;
+}
+
+.location-filter.has-selection summary {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.location-filter-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 1000;
+    width: 280px;
+    max-width: 90vw;
+    padding: 10px;
+    border: 1px solid #d6d4d4;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(51, 51, 51, .15);
+}
+
+.location-filter-options {
+    max-height: 240px;
+    margin: 8px 0;
+    overflow-y: auto;
+}
+
+.location-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.location-filter-option:hover {
+    background: #eef4ff;
+}
+
+.location-filter-option[hidden] {
+    display: none;
+}
+
+.location-filter-empty {
+    margin: 0;
+    padding: 4px 6px;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.location-filter-clear {
+    border: none;
+    padding: 0;
+    background: none;
+    font-size: 0.85rem;
+    color: #0d6efd;
 }
 
 .eyes {

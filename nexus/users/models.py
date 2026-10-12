@@ -75,7 +75,9 @@ class PositionChoices(models.IntegerChoices):
     OFFICE_ASSISTANT_PM = 8, 'Office Assistant PM'
     OURS_MENTOR_PM = 9, 'OURS Mentor PM'
     GRADUATE = 10, 'Graduate'
-    
+    MCAT_TUTOR = 11, 'MCAT Tutor'
+    DEPARTMENTAL_ASSISTANT = 12, 'Departmental Assistant'
+
 
 class Positions(models.Model):
     semester = models.ForeignKey(

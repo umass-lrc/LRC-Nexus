@@ -276,8 +276,10 @@ class Faculty(models.Model):
     )
     
     def __str__(self):
-        if Faculty.objects.filter(first_name=self.first_name, last_name=self.last_name).count() == 1:
-            return f'{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name}'
+    
+    def display_name_with_email(self):
+        """Returns faculty name with email in parentheses for administrative purposes."""
         return f'{self.first_name} {self.last_name} ({self.email})'
 
     class Meta:

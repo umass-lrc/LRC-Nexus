@@ -15,9 +15,62 @@ from ..models import (
     CitizenshipRestriction,
     StudyLevelRestriction,
     Keyword,
+    Location,
 )
 
 from ..forms.opportunity import CreateOpportunityForm, SimpleSearchForm
+
+# Fields of the opportunity form that take typed-in tags: (form field, model, name field)
+TAG_FIELDS = (
+    ('keywords', Keyword, 'keyword'),
+    ('locations', Location, 'name'),
+)
+
+def split_tag_values(model, values):
+    """Split a tag field's submitted values into ids of existing rows and newly typed names."""
+    ids, names = [], []
+    for value in values:
+        # An existing choice is submitted as its plain pk; "01003" or "²" can only have been typed.
+        # The length cap keeps int() from raising on digit strings thousands of characters long.
+        is_pk = value.isascii() and value.isdigit() and len(value) <= 19 and str(int(value)) == value
+        if is_pk and model.objects.filter(id=int(value)).exists():
+            ids.append(value)
+            continue
+        name = ' '.join(value.split())
+        if name:
+            names.append(name)
+    return ids, names
+
+def bind_opportunity_form(post, **form_kwargs):
+    """
+    Bind CreateOpportunityForm to the POST data. Keywords and locations that were
+    typed in rather than picked are only created once the rest of the form is valid.
+    """
+    post = post.copy()
+    typed = {}
+    for field, model, name_field in TAG_FIELDS:
+        ids, typed[field] = split_tag_values(model, post.getlist(field))
+        post.setlist(field, ids)
+    form = CreateOpportunityForm(post, **form_kwargs)
+    form.is_valid()
+    for field, model, name_field in TAG_FIELDS:
+        max_length = model._meta.get_field(name_field).max_length
+        for name in typed[field]:
+            if len(name) > max_length:
+                form.add_error(field, f'"{name[:50]}..." is longer than {max_length} characters.')
+    if form.errors or not any(typed.values()):
+        return form
+    for field, model, name_field in TAG_FIELDS:
+        ids = post.getlist(field)
+        for name in typed[field]:
+            # Case-insensitive, so "boston, ma" reuses "Boston, MA" instead of duplicating it
+            obj = model.objects.filter(**{f'{name_field}__iexact': name}).first()
+            if obj is None:
+                obj = model.objects.create(**{name_field: name})
+            if str(obj.id) not in ids:
+                ids.append(str(obj.id))
+        post.setlist(field, ids)
+    return CreateOpportunityForm(post, **form_kwargs)
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')
@@ -61,15 +114,7 @@ def update_opportunity(request, opp_id, check_opportunity=False):
         response['HX-Trigger-After-Settle'] = json.dumps({"formScroll": "#update-opportunity-message"})
         return response
     if request.method == 'POST':
-        updated_post = request.POST.copy()
-        keywords = request.POST.getlist('keywords')
-        for i, keyword in enumerate(keywords):
-            if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
-                continue
-            key = Keyword.objects.get_or_create(keyword=keyword)[0]
-            keywords[i] = str(key.id)
-        updated_post.setlist('keywords', keywords)
-        form = CreateOpportunityForm(updated_post, instance=opportunity)
+        form = bind_opportunity_form(request.POST, instance=opportunity)
         if not form.is_valid():
             messages.error(request, f'Form Errors: {form.errors}')
         else:
@@ -168,15 +213,7 @@ def view_opportunity_full_page(request, opp_id):
 @restrict_to_groups('Staff Admin', 'OURS Supervisor', 'Staff-OURS-Mentor')
 def create_opportunity_form(request):
     if request.method == 'POST':
-        updated_post = request.POST.copy()
-        keywords = request.POST.getlist('keywords')
-        for i, keyword in enumerate(keywords):
-            if keyword.isnumeric() and Keyword.objects.filter(id=int(keyword)).exists():
-                continue
-            key = Keyword.objects.get_or_create(keyword=keyword)[0]
-            keywords[i] = str(key.id)
-        updated_post.setlist('keywords', keywords)
-        form = CreateOpportunityForm(updated_post)
+        form = bind_opportunity_form(request.POST)
         success = False
         if form.is_valid():
             data = form.cleaned_data
@@ -190,7 +227,7 @@ def create_opportunity_form(request):
             if min_gpa:
                 MinGPARestriction.objects.update_or_create(opportunity=opp, defaults={'gpa': min_gpa})
             if restricted_majors:
-                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})
+                mr = MajorRestriction.objects.update_or_create(opportunity=opp, defaults={'must_be_all_majors': require_all_majors})[0]
                 mr.majors.set(restricted_majors)
                 mr.save()
             if restricted_to_citizenship_status:
@@ -234,4 +271,11 @@ class KeywordAutocomplete(autocomplete.Select2QuerySetView):
         qs = Keyword.objects.all()
         if self.q:
             qs = Keyword.objects.filter(keyword__icontains=self.q)
+        return qs
+
+class LocationAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Location.objects.all()
+        if self.q:
+            qs = Location.objects.filter(name__icontains=self.q)
         return qs

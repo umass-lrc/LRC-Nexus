@@ -19,6 +19,7 @@ from ..models import (
     CitizenshipRestriction,
     StudyLevelRestriction,
     Keyword,
+    Location,
 )
 
 import datetime
@@ -58,75 +59,93 @@ def make_query_from_list(search_query_list):
     new_query = None
     opp = 'AND'
     i = 0
+
     while i < len(search_query_list):
-        print(i)
-        type, query = search_query_list[i]
-        if type == 0:
+        type_, query = search_query_list[i]
+
+        if type_ == 0:  # regular word
             query_list = [query]
             i += 1
             while i < len(search_query_list) and search_query_list[i][0] == 0:
                 query_list.append(search_query_list[i][1])
                 i += 1
-            new_query = None
+
             if len(query_list) == 1:
-                new_query = Q('bool', should = [Q(MultiMatch(
-                    query=query_list[0],
-                    type="most_fields", 
-                    fields=[
-                        'title^5',
-                        'short_description^3',
-                        'description^2',
-                        'website_data',
-                        'additional_information',
-                        'location^5'
+                # single word query
+                new_query = Q(
+                    'bool',
+                    should=[
+                        Q(MultiMatch(
+                            query=query_list[0],
+                            type="most_fields",
+                            fields=[
+                                'title^5',
+                                'short_description^3',
+                                'description^2',
+                                'website_data',
+                                'additional_information',
+                                'locations.name^5'
+                            ],
+                            fuzziness='AUTO'
+                        )),
+                        Q(
+                            'nested',
+                            path='keywords',
+                            query=MatchPhrase(**{"keywords.keyword": query_list[0]}),
+                            boost=300
+                        )
                     ],
-                    fuzziness='AUTO'
-                    )), Q(
-                        'nested',
-                        path='keywords',
-                        query=Match(keyword=query_list[0])
-                    )],
                     minimum_should_match=1,
                     boost=100
                 )
             else:
-                # 1st priority: If the exact phrase is found
+                # phrase query
                 query_for_phrase = " ".join(query_list)
-                phrase_query = Q('bool', should = [Q(MultiMatch(
-                    query=query_for_phrase, 
-                    type="phrase", 
-                    fields=[
-                        'title^5',
-                        'short_description^3',
-                        'description^2',
-                        'website_data',
-                        'additional_information',
-                        'location^5'
-                    ]
-                    )), Q(
-                        'nested',
-                        path='keywords',
-                        query=MatchPhrase(keyword=query_for_phrase)
-                    )],
+                phrase_query = Q(
+                    'bool',
+                    should=[
+                        Q(MultiMatch(
+                            query=query_for_phrase,
+                            type="phrase",
+                            fields=[
+                                'title^5',
+                                'short_description^3',
+                                'description^2',
+                                'website_data',
+                                'additional_information',
+                                'locations.name^5'
+                            ]
+                        )),
+                        Q(
+                            'nested',
+                            path='keywords',
+                            query=MatchPhrase(**{"keywords.keyword": query_for_phrase}),
+                            boost=300
+                        )
+                    ],
                     minimum_should_match=1,
                     boost=100
                 )
-                
-                # 2nd priority: If the words are found in same order with gap between them
-                interval_query = Q('bool', should =[
+
+                # interval query (words in order with gaps)
+                interval_query = Q(
+                    'bool',
+                    should=[
                         interval_query_per_field(query_list, 'title'),
                         interval_query_per_field(query_list, 'short_description'),
                         interval_query_per_field(query_list, 'description'),
                         interval_query_per_field(query_list, 'website_data'),
                         interval_query_per_field(query_list, 'additional_information'),
-                        interval_query_per_field(query_list, 'location')
+                        interval_query_per_field(query_list, 'locations.name')
                     ],
                     minimum_should_match=1,
                     boost=50
                 )
-                
-                # 3rd priority: If the words are found in any order
-                words_query = Q('bool', must=[
+
+                # individual word queries
+                words_query = Q(
+                    'bool',
+                    must=[
                         MultiMatch(
                             query=_query,
                             type="most_fields",
@@ -136,63 +155,116 @@ def make_query_from_list(search_query_list):
                                 'description^2',
                                 'website_data',
                                 'additional_information',
-                                'location^5'
+                                'locations.name^5'
                             ],
                             fuzziness='AUTO'
-                        ) for _query in query_list
-                    ],
+                        )
+                        for _query in query_list
+                    ]
                 )
-                
+
                 new_query = Q('bool', should=[phrase_query, interval_query, words_query], minimum_should_match=1)
             i -= 1
-        elif type == 1:
+
+        elif type_ == 1:  # AND / OR operator
             opp = query
             i += 1
             continue
-        elif type == 2:
-            new_query = Q('bool', should=[MultiMatch(
-                    query=query, 
-                    type="phrase", 
-                    fields=[
-                        'title^5',
-                        'short_description^3',
-                        'description^2',
-                        'website_data',
-                        'additional_information',
-                        'location^5'
-                    ]
-                ), Q(
-                    'nested', 
-                    path='keywords', 
-                    query=MatchPhrase(keyword=query)
-                )], 
-                minimum_should_match=1, 
+
+        elif type_ == 2:  # quoted phrase
+            new_query = Q(
+                'bool',
+                should=[
+                    Q(MultiMatch(
+                        query=query,
+                        type="phrase",
+                        fields=[
+                            'title^5',
+                            'short_description^3',
+                            'description^2',
+                            'website_data',
+                            'additional_information',
+                            'locations.name^5'
+                        ]
+                    )),
+                    Q(
+                        'nested',
+                        path='keywords',
+                        query=MatchPhrase(**{"keywords.keyword": query}),
+                        boost=300
+                    )
+                ],
+                minimum_should_match=1,
                 boost=100
             )
-        
+
+        # combine queries with AND/OR
         if es_query is None:
             es_query = new_query
         else:
             es_query = es_query & new_query if opp == 'AND' else es_query | new_query
-        
+
         i += 1
+
     return es_query
 
-def es_opportunity_search(search_query, ours_website=False):
+def parse_tri_state(value):
+    """Turn a 'true'/'false'/'' form value into True/False/None (None = no filter)."""
+    if value == 'true':
+        return True
+    if value == 'false':
+        return False
+    return None
+
+# locations.id is indexed as an Elasticsearch integer, which rejects anything larger
+MAX_LOCATION_ID = 2**31 - 1
+
+def parse_location_ids(values):
+    """Turn the submitted 'locations' form values into a list of Location ids."""
+    location_ids = []
+    for value in values:
+        # isdigit() alone also accepts characters int() rejects, such as '²',
+        # and int() itself raises on digit strings thousands of characters long
+        if value.isascii() and value.isdigit() and len(value) <= 10 and int(value) <= MAX_LOCATION_ID:
+            location_ids.append(int(value))
+    return location_ids
+
+def filterable_locations(ours_website=False):
+    """Locations offered in the search filter: those used by at least one opportunity the search can return."""
+    # One filter() call, so every condition has to hold for the same opportunity
+    visible = {'opportunity__active': True}
+    if ours_website:
+        today = datetime.date.today()
+        visible.update(
+            opportunity__show_on_website=True,
+            opportunity__show_on_website_start_date__lte=today,
+            opportunity__show_on_website_end_date__gte=today,
+        )
+    return Location.objects.filter(**visible).distinct()
+
+def es_opportunity_search(search_query, ours_website=False, on_campus=None, is_paid=None, locations=None):
     search_query_list = divide_query(search_query)
-    if len(search_query_list) == 0:
+    has_filters = on_campus is not None or is_paid is not None or bool(locations)
+    if len(search_query_list) == 0 and not has_filters:
         return []
-    
+
     filter_query = Q(Match(active=True))
     if ours_website:
         filter_query = filter_query & \
             Q(Match(show_on_website=True)) & \
             Q('range', show_on_website_start_date={'lte': datetime.datetime.now()}) & \
             Q('range', show_on_website_end_date={'gte': datetime.datetime.now()})
-    
-    query = make_query_from_list(search_query_list)
+    if on_campus is not None:
+        filter_query = filter_query & Q(Match(on_campus=on_campus))
+    if is_paid is not None:
+        filter_query = filter_query & Q(Match(is_paid=is_paid))
+    if locations:
+        # matches opportunities in any of the selected locations
+        filter_query = filter_query & Q('terms', **{'locations.id': locations})
+
+    query = make_query_from_list(search_query_list) if search_query_list else Q('match_all')
     result_opp = OpportunityDocument.search().extra(size=1000).filter(filter_query).query(query).execute()
-    
+
     result_opp = [opp.meta.id for opp in result_opp]
     return result_opp
 
@@ -201,9 +273,18 @@ def es_opportunity_search(search_query, ours_website=False):
 def opportunity_search(request):
     if request.method == 'POST':
         search_query = request.POST.get('search_query', '')
-        if len(search_query) == 0:
+        on_campus = parse_tri_state(request.POST.get('on_campus', ''))
+        is_paid = parse_tri_state(request.POST.get('is_paid', ''))
+        locations = parse_location_ids(request.POST.getlist('locations'))
+        has_filters = on_campus is not None or is_paid is not None or len(locations) > 0
+        if len(search_query) == 0 and not has_filters:
             return redirect('search_no_result')
-        result_opp = es_opportunity_search(search_query)
+        result_opp = es_opportunity_search(
+            search_query,
+            on_campus=on_campus,
+            is_paid=is_paid,
+            locations=locations,
+        )
         num_results = len(result_opp)
         if num_results == 0:
             return search_no_result(request, search_query, num_results)
@@ -213,7 +294,7 @@ def opportunity_search(request):
             'result_opp': result_opp,
         }
         return render(request, 'search_result.html', context)
-    return render(request, 'search_base.html')
+    return render(request, 'search_base.html', {'locations': filterable_locations()})
 
 @login_required
 @restrict_to_http_methods('GET', 'POST')

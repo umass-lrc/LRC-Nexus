@@ -509,6 +509,10 @@ def delete_class_shifts(request):
 @restrict_to_http_methods('GET', 'POST')
 def load_tutor_roles(request):
     if request.method == 'POST':
+        # Clear any existing cache when starting a new upload
+        if hasattr(load_tutor_role_from_line, '_cache'):
+            delattr(load_tutor_role_from_line, '_cache')
+            
         form = loadTutorRoleForm(request.POST, request.FILES)
         if not form.is_valid():
             messages.error(request, f"Form error: {form.errors}")
@@ -550,27 +554,57 @@ def load_tutor_role_from_line(request, line_number):
             first_name = values[0]
             last_name = values[1]
             courses = values[2:]
-            sem = Semester.objects.get_active_semester()
-            position = Positions.objects.get(
-                user__first_name=first_name, 
-                user__last_name=last_name, 
-                semester=sem,
-                position=PositionChoices.TUTOR,
-            )
-            role = TutorRoleInfo.objects.get_or_create(
-                position=position,
-            )[0]
+            
+            # Cache frequently used objects to avoid repeated queries
+            if not hasattr(request, '_tutor_cache'):
+                request._tutor_cache = {
+                    'semester': Semester.objects.get_active_semester(),
+                    'positions': {},
+                    'courses': {},
+                }
+                
+                # Pre-load all tutor positions for this semester
+                positions = Positions.objects.select_related('user').filter(
+                    semester=request._tutor_cache['semester'],
+                    position=PositionChoices.TUTOR,
+                )
+                for pos in positions:
+                    key = f"{pos.user.first_name}_{pos.user.last_name}"
+                    request._tutor_cache['positions'][key] = pos
+                
+                # Pre-load all courses
+                courses_qs = Course.objects.select_related('subject').all()
+                for course in courses_qs:
+                    key = f"{course.subject.short_name}-{course.number}"
+                    request._tutor_cache['courses'][key] = course
+            
+            cache = request._tutor_cache
+            
+            # Use cached data instead of database queries
+            position_key = f"{first_name}_{last_name}"
+            position = cache['positions'].get(position_key)
+            
+            if not position:
+                raise Exception(f"Position not found for {first_name} {last_name}")
+            
+            role, created = TutorRoleInfo.objects.get_or_create(position=position)
             role.assigned_courses.clear()
-            for course in courses:
-                if course == '':
+            
+            # Bulk add courses
+            courses_to_add = []
+            for course_str in courses:
+                if course_str == '':
                     continue
-                err_course = course
-                info = course.split('-')
-                subject = '-'.join(info[:-1])
-                number = info[-1]
-                course = Course.objects.get(subject__short_name=subject, number=number)
-                role.assigned_courses.add(course)
-            role.save()
+                err_course = course_str
+                course = cache['courses'].get(course_str)
+                if course:
+                    courses_to_add.append(course)
+                else:
+                    raise Exception(f"Course not found: {course_str}")
+            
+            if courses_to_add:
+                role.assigned_courses.add(*courses_to_add)
+            
             content += f"<b>==Tutor Role Added Successfully==</b>"
         except Exception as e:
             content += f"<b>==Error Occoured On Line {line_number}, Tutor Role Not Added: {e}=={err_course}</b>"

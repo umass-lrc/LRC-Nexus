@@ -1,0 +1,25 @@
+{% comment %} Location filter of the opportunity search, shared by search_base.html and
+api_search_base.html. Needs location_filter_script.html inside a script tag on the same page. {% endcomment %}
+{% if locations %}
+<details class="location-filter">
+  <summary>Location<span class="location-filter-count"></span></summary>
+  <div class="location-filter-panel">
+    <input
+      type="search"
+      class="location-filter-search {{search_class}}"
+      placeholder="Search locations..."
+      autocomplete="off"
+    />
+    <div class="location-filter-options">
+      {% for location in locations %}
+      <label class="location-filter-option">
+        <input type="checkbox" name="locations" value="{{location.id}}" />
+        <span>{{location.name}}</span>
+      </label>
+      {% endfor %}
+      <p class="location-filter-empty" hidden>No matching locations.</p>
+    </div>
+    <button type="button" class="location-filter-clear">Clear</button>
+  </div>
+</details>
+{% endif %}

@@ -123,6 +123,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.dev
+.env.prod
 .venv
 env/
 venv/
@@ -168,3 +170,7 @@ cython_debug/
 
 # File storage
 temp/*
+
+#Claude
+./claude
+CLAUDE.md
