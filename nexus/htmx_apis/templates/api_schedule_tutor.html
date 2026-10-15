@@ -40,6 +40,13 @@
     font-size: 16px;
   }
 
+  /* Light blue blocks with dark text: lighter than the internal drop-in
+     color (#4169E1) while keeping the times readable. */
+  .nexus-schedule .nexus-time-block {
+    background-color: #cfe0fb;
+    color: #1a3a7a;
+  }
+
   /* This fragment is embedded on external pages, so don't rely on the host's
      CSS: pin the header with native sticky positioning (no overflow wrapper,
      which would trap it) and set the header alignment explicitly. */
@@ -119,8 +126,7 @@
           {% for s in day %}
           <div class="margin-10px-top">
             <div
-              class="padding-5px-tb padding-15px-lr border-radius-5 margin-10px-bottom text-white font-size16 xs-font-size13"
-              style="background-color: {{kind|color_coder}}"
+              class="nexus-time-block padding-5px-tb padding-15px-lr border-radius-5 margin-10px-bottom font-size16 xs-font-size13"
             >
               {{s.start| date:"h:i A" |lower}} - {{s.end|date:"h:i A"|lower}}
             </div>
