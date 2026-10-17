@@ -2,18 +2,13 @@ services:
   elasticsearch:
     container_name: es-nexus
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
-    env_file:
-      - ./.env.prod
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms6g -Xmx6g
+      - ES_JAVA_OPTS=-Xms8g -Xmx8g
       - node.name=es-nexus
       - cluster.name=es-docker-cluster
       - network.host=0.0.0.0
-      # .env.prod sets these for django; blank them here so nginx-proxy doesn't route the site to this container
-      - VIRTUAL_HOST=
-      - LETSENCRYPT_HOST=
     expose:
       - 9200
     networks:
@@ -35,6 +30,11 @@ services:
       - 8000
     env_file:
       - ./.env.prod
+    environment:
+      # Proxy routing lives here, not in .env.prod, so only django joins the nginx-proxy upstream
+      - VIRTUAL_HOST=lrcstaff.umass.edu
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=lrcstaff.umass.edu
     depends_on:
       - elasticsearch
     networks:
@@ -60,12 +60,10 @@ services:
 
   acme-companion:
     image: nginxproxy/acme-companion
-    env_file:
-      - ./.env.prod
     environment:
-      # .env.prod sets these for django; blank them here so nginx-proxy doesn't route the site to this container
-      - VIRTUAL_HOST=
-      - LETSENCRYPT_HOST=
+      - DEFAULT_EMAIL=lrc@umass.edu
+      - NGINX_PROXY_CONTAINER=nginx-nexus
+      - NGINX_DOCKER_GEN_CONTAINER=nginx-nexus
     volumes:
       - certs:/etc/nginx/certs
       - html:/usr/share/nginx/html
